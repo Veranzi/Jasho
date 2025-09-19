@@ -9,6 +9,13 @@ class JobsPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFF0D47A1), // JASHO primary blue
         title: const Text("Jobs Marketplace"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add_circle_outline),
+            onPressed: () => Navigator.pushNamed(context, '/postJob'),
+            tooltip: 'Post Job',
+          )
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -22,18 +29,21 @@ class JobsPage extends StatelessWidget {
           // Sample job cards
           _buildJobCard(
             context,
+            id: 'job-1',
             title: "Boda Boda Delivery",
             description: "Earn by delivering parcels within Nairobi.",
             price: "KES 500/trip",
           ),
           _buildJobCard(
             context,
+            id: 'job-2',
             title: "Mama Fua – Cleaning Job",
             description: "House cleaning job, flexible hours.",
             price: "KES 800/day",
           ),
           _buildJobCard(
             context,
+            id: 'job-3',
             title: "Handyman Work",
             description: "Fixing small household repairs.",
             price: "KES 1000/job",
@@ -46,6 +56,7 @@ class JobsPage extends StatelessWidget {
   /// Job Card Widget
   Widget _buildJobCard(
     BuildContext context, {
+    required String id,
     required String title,
     required String description,
     required String price,
@@ -75,10 +86,7 @@ class JobsPage extends StatelessWidget {
                         color: Colors.green)),
                 ElevatedButton(
                   onPressed: () {
-                    // Show confirmation
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text("Applied for $title")),
-                    );
+                    Navigator.pushNamed(context, '/jobDetail', arguments: id);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF0D47A1), // Blue background

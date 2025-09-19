@@ -9,12 +9,17 @@ class HelpPage extends StatelessWidget {
       appBar: AppBar(title: const Text("Help & Support")),
       body: ListView(
         padding: const EdgeInsets.all(16),
-        children: const [
-          Text("FAQ:", style: TextStyle(fontWeight: FontWeight.bold)),
-          SizedBox(height: 10),
-          Text("1. How to reset password?\nGo to 'Forgot Password' on login page."),
-          SizedBox(height: 10),
-          Text("2. How to check earnings?\nGo to Dashboard > Earnings."),
+        children: [
+          const Text("FAQ:", style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 10),
+          const Text("1. How to reset password?\nGo to 'Forgot Password' on login page."),
+          const SizedBox(height: 10),
+          const Text("2. How to check earnings?\nGo to Dashboard > Earnings."),
+          const SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: () => Navigator.pushNamed(context, '/supportChat'),
+            child: const Text('Chat with Support'),
+          ),
         ],
       ),
     );

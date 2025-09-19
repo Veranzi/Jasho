@@ -56,7 +56,7 @@ class ProfileDrawer extends StatelessWidget {
             title: const Text("Update Profile"),
             onTap: () {
               Navigator.pop(context);
-              Navigator.pushNamed(context, '/updateProfile');
+              Navigator.pushNamed(context, '/profileUpdate');
             },
           ),
 

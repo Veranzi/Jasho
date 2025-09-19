@@ -42,6 +42,18 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Edit Profile"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.verified_user),
+            onPressed: () => Navigator.pushNamed(context, '/kyc'),
+            tooltip: 'KYC',
+          ),
+          IconButton(
+            icon: const Icon(Icons.security),
+            onPressed: () => Navigator.pushNamed(context, '/security'),
+            tooltip: 'Security',
+          )
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -52,7 +64,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
               // Profile Image
               CircleAvatar(
                 radius: 60,
-                backgroundImage: const AssetImage("assets/avatar.png"),
+                backgroundColor: Colors.grey.shade300,
                 child: Align(
                   alignment: Alignment.bottomRight,
                   child: IconButton(

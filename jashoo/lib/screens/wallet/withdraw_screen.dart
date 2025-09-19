@@ -1,0 +1,75 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../providers/wallet_provider.dart';
+import '../../providers/pin_provider.dart';
+
+class WithdrawScreen extends StatefulWidget {
+  const WithdrawScreen({super.key});
+
+  @override
+  State<WithdrawScreen> createState() => _WithdrawScreenState();
+}
+
+class _WithdrawScreenState extends State<WithdrawScreen> {
+  final _amountController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Withdraw')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            TextField(
+              controller: _amountController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: 'Amount (KES)'),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () async {
+                final amt = double.tryParse(_amountController.text.trim());
+                if (amt == null || amt <= 0) return;
+                final ok = await _verifyPin(context);
+                if (!ok) return;
+                context.read<WalletProvider>().withdrawKes(amt);
+                Navigator.pop(context);
+              },
+              child: const Text('Withdraw to M-PESA'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<bool> _verifyPin(BuildContext context) async {
+    final pinController = TextEditingController();
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Enter PIN'),
+        content: TextField(
+          controller: pinController,
+          obscureText: true,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(labelText: 'PIN'),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () {
+              final pin = pinController.text.trim();
+              final ok = context.read<PinProvider>().verify(pin);
+              Navigator.pop(context, ok);
+            },
+            child: const Text('Confirm'),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
+  }
+}
+

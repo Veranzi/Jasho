@@ -92,7 +92,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   const SizedBox(height: 30),
 
                   // Input fields
-                  _buildTextField(usernameController, "Username", Icons.person_outline,
+                  _buildTextField(usernameController, "Full Name", Icons.person_outline,
                       validator: (val) =>
                           val == null || val.isEmpty ? "Enter username" : null),
                   _buildTextField(phoneController, "Phone Number", Icons.phone_outlined,

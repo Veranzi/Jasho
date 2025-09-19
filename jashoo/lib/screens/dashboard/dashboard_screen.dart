@@ -2,6 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import '../../providers/wallet_provider.dart';
+import 'profile_drawer.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:provider/provider.dart';
+import '../../providers/jobs_provider.dart';
 
 class DashBoardScreen extends StatefulWidget {
   const DashBoardScreen({super.key});
@@ -26,6 +32,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: _buildAppBar(),
+      drawer: const ProfileDrawer(),
       body: _buildBody(),
       bottomNavigationBar: _buildCustomBottomNavigationBar(),
     );
@@ -64,7 +71,11 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
       case 1:
         return const Center(child: Text("History Page (Transactions)"));
       case 2:
-        return const Center(child: Text("AI Insights (Smart Predictions)"));
+        return GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => Navigator.pushNamed(context, '/aiAssistant'),
+          child: const Center(child: Text("Open AI Insights")),
+        );
       case 3:
         return _buildProfile();
       default:
@@ -83,12 +94,17 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
               children: [
-                _buildStatusCards(),
+          _buildStatusCards(),
                 const SizedBox(height: 24),
-                _buildServicesSection("Quick Actions", _quickActions),
+                _buildEarningsSavingsChart(),
+                const SizedBox(height: 24),
+          _buildServicesSection("Quick Actions", _quickActions),
                 const SizedBox(height: 24),
                 _buildJobsShortcut(),
                 const SizedBox(height: 24),
+          _buildInsightsCard(),
+                const SizedBox(height: 24),
+                _buildTaskSummary(),
               ],
             ),
           ),
@@ -98,6 +114,10 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   }
 
   Widget _buildWalletCard() {
+    final wallet = context.watch<WalletProvider>();
+    final isKes = wallet.displayCurrency == Currency.kes;
+    final balance = isKes ? wallet.kesBalance : wallet.usdtBalance;
+    final label = isKes ? 'KES' : 'USDT';
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
       decoration: const BoxDecoration(
@@ -117,22 +137,48 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                "KES 12,500",
-                style: TextStyle(
+              Text(
+                "$label ${balance.toStringAsFixed(isKes ? 0 : 2)}",
+                style: const TextStyle(
                     color: Colors.white,
                     fontSize: 28,
                     fontWeight: FontWeight.bold),
               ),
-              OutlinedButton(
-                onPressed: () {},
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  side: BorderSide(color: Colors.white.withOpacity(0.5)),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
-                ),
-                child: const Text("MANAGE"),
+              Row(
+                children: [
+                  OutlinedButton(
+                    onPressed: wallet.toggleCurrency,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      side: BorderSide(color: Colors.white.withOpacity(0.5)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)),
+                    ),
+                    child: Text(isKes ? 'SHOW USDT' : 'SHOW KES'),
+                  ),
+                  const SizedBox(width: 8),
+                  OutlinedButton(
+                    onPressed: () => Navigator.pushNamed(context, '/deposit'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      side: BorderSide(color: Colors.white.withOpacity(0.5)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)),
+                    ),
+                    child: const Text("DEPOSIT"),
+                  ),
+                  const SizedBox(width: 8),
+                  OutlinedButton(
+                    onPressed: () => Navigator.pushNamed(context, '/withdraw'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      side: BorderSide(color: Colors.white.withOpacity(0.5)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)),
+                    ),
+                    child: const Text("WITHDRAW"),
+                  ),
+                ],
               ),
             ],
           ),
@@ -236,7 +282,20 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   Widget _buildServiceItem(IconData icon, String label) {
     return GestureDetector(
       onTap: () {
-        // TODO: Handle tap
+        switch (label) {
+          case 'Airtime':
+            Navigator.pushNamed(context, '/deposit');
+            break;
+          case 'Electricity':
+            Navigator.pushNamed(context, '/withdraw');
+            break;
+          case 'Water':
+            Navigator.pushNamed(context, '/convert');
+            break;
+          case 'Internet':
+            Navigator.pushNamed(context, '/aiAssistant');
+            break;
+        }
       },
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -410,4 +469,144 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
     {'icon': Icons.water_drop, 'label': 'Water'},
     {'icon': Icons.wifi, 'label': 'Internet'},
   ];
+
+  Widget _buildInsightsCard() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            spreadRadius: 1,
+            blurRadius: 10,
+          ),
+        ],
+      ),
+      child: Row(
+        children: const [
+          Icon(Icons.insights, color: primaryColor),
+          SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'You earned 20% more than last week, save KES 500 to reach goal.',
+              style: TextStyle(fontSize: 14),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEarningsSavingsChart() {
+    final spotsEarnings = [
+      const FlSpot(0, 2),
+      const FlSpot(1, 3),
+      const FlSpot(2, 4),
+      const FlSpot(3, 3.5),
+      const FlSpot(4, 5),
+      const FlSpot(5, 6),
+      const FlSpot(6, 7),
+    ];
+    final spotsSavings = [
+      const FlSpot(0, 1),
+      const FlSpot(1, 1.2),
+      const FlSpot(2, 1.4),
+      const FlSpot(3, 1.8),
+      const FlSpot(4, 2),
+      const FlSpot(5, 2.5),
+      const FlSpot(6, 3),
+    ];
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            spreadRadius: 1,
+            blurRadius: 10,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Earnings vs Savings (Weekly)',
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 180,
+            child: LineChart(
+              LineChartData(
+                gridData: const FlGridData(show: false),
+                titlesData: const FlTitlesData(show: false),
+                borderData: FlBorderData(show: false),
+                lineBarsData: [
+                  LineChartBarData(
+                    spots: spotsEarnings,
+                    isCurved: true,
+                    color: Colors.green,
+                    barWidth: 3,
+                    dotData: const FlDotData(show: false),
+                  ),
+                  LineChartBarData(
+                    spots: spotsSavings,
+                    isCurved: true,
+                    color: Colors.blue,
+                    barWidth: 3,
+                    dotData: const FlDotData(show: false),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTaskSummary() {
+    final jobs = context.watch<JobsProvider>();
+    final todayJobs = jobs.jobs.where((j) => j.status == JobStatus.pending).length;
+    final inProgress = jobs.jobs.where((j) => j.status == JobStatus.inProgress).length;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            spreadRadius: 1,
+            blurRadius: 10,
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Column(
+            children: [
+              const Text('Today\'s gigs'),
+              Text('$todayJobs', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          Column(
+            children: [
+              const Text('Active'),
+              Text('$inProgress', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          TextButton(
+            onPressed: () => Navigator.pushNamed(context, '/jobs'),
+            child: const Text('View jobs'),
+          ),
+        ],
+      ),
+    );
+  }
 }
