@@ -36,7 +36,8 @@ class JashoApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'JASHO',
         theme: ThemeData(
-          primarySwatch: Colors.cyan,
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0D47A1)),
+          useMaterial3: true,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
         initialRoute: '/splash',

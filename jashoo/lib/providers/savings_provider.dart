@@ -26,9 +26,11 @@ class LoanRequest {
 class SavingsProvider extends ChangeNotifier {
   final List<SavingsGoal> _goals = [];
   final List<LoanRequest> _loans = [];
+  int _pointsEarnedFromSavings = 0;
 
   List<SavingsGoal> get goals => List.unmodifiable(_goals);
   List<LoanRequest> get loans => List.unmodifiable(_loans);
+  int get pointsEarnedFromSavings => _pointsEarnedFromSavings;
 
   void addGoal(SavingsGoal goal) {
     _goals.add(goal);
@@ -38,6 +40,8 @@ class SavingsProvider extends ChangeNotifier {
   void contribute(String id, double amount) {
     final goal = _goals.firstWhere((g) => g.id == id, orElse: () => throw ArgumentError('Goal not found'));
     goal.saved += amount;
+    // Earn points: 1 KES = 1 point (cap to int)
+    _pointsEarnedFromSavings += amount.floor();
     notifyListeners();
   }
 

@@ -16,7 +16,7 @@ class _DepositScreenState extends State<DepositScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Deposit')),
+      appBar: AppBar(title: const Text('Deposit'), backgroundColor: const Color(0xFF0D47A1)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

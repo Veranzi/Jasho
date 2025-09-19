@@ -17,9 +17,16 @@ class _SavingsScreenState extends State<SavingsScreen> {
   Widget build(BuildContext context) {
     final savings = context.watch<SavingsProvider>();
     return Scaffold(
-      appBar: AppBar(title: const Text('Savings')),
+      appBar: AppBar(title: const Text('Savings'), backgroundColor: const Color(0xFF0D47A1)),
       body: Column(
         children: [
+          Container(
+            width: double.infinity,
+            color: Colors.blue.shade50,
+            padding: const EdgeInsets.all(12),
+            child: Text('Points from savings: ${savings.pointsEarnedFromSavings}',
+                style: const TextStyle(fontWeight: FontWeight.bold)),
+          ),
           Expanded(
             child: ListView.builder(
               itemCount: savings.goals.length,

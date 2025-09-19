@@ -28,7 +28,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       // This is the dark teal background color from your design
-      backgroundColor: const Color.fromARGB(255, 106, 142, 214), // A dark blue similar to the image
+      backgroundColor: const Color(0xFF0D47A1),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

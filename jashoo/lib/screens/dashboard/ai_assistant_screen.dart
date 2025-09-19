@@ -10,7 +10,7 @@ class AiAssistantScreen extends StatelessWidget {
     final ai = context.watch<AiProvider>();
     final isEnglish = ai.languageCode == 'en';
     return Scaffold(
-      appBar: AppBar(title: const Text('Jasho Insights')),
+      appBar: AppBar(title: const Text('Jasho Insights'), backgroundColor: const Color(0xFF0D47A1)),
       body: Column(
         children: [
           Padding(
