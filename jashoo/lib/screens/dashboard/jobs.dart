@@ -43,7 +43,7 @@ class JobsPage extends StatelessWidget {
     );
   }
 
-  /// FIX: Now we pass `BuildContext context`
+  /// Job Card Widget
   Widget _buildJobCard(
     BuildContext context, {
     required String title,
@@ -81,10 +81,15 @@ class JobsPage extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0D47A1),
+                    backgroundColor: const Color(0xFF0D47A1), // Blue background
+                    foregroundColor: Colors.white, // White text
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    textStyle: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.bold),
                   ),
                   child: const Text("Apply"),
                 ),
