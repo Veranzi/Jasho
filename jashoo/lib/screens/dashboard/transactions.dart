@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 
 class TransactionHistoryScreen extends StatefulWidget {
   const TransactionHistoryScreen({super.key});
@@ -52,6 +54,8 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
 
   // Selected filter date
   DateTime? _selectedDate;
+  String? _selectedService;
+  String? _selectedStatus;
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +81,20 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
         Padding(
           padding: const EdgeInsets.only(right: 8.0),
           child: OutlinedButton(
-            onPressed: () {},
+            onPressed: _exportAsPdf,
+            style: OutlinedButton.styleFrom(
+              foregroundColor: Colors.white,
+              side: BorderSide(color: Colors.white.withOpacity(0.5)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text("Export PDF"),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(right: 8.0),
+          child: OutlinedButton(
+            onPressed: () => Navigator.pushNamed(context, '/supportChat'),
             style: OutlinedButton.styleFrom(
               foregroundColor: Colors.white,
               side: BorderSide(color: Colors.white.withOpacity(0.5)),
@@ -93,13 +110,24 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
 
   Widget _buildBody() {
     // Filtered transactions
-    final filteredTransactions = _selectedDate == null
-        ? _transactions
-        : _transactions.where((tx) {
-            final txDate = DateFormat("yyyy-MM-dd HH:mm:ss a")
-                .parse(tx["date"].toString());
-            return DateUtils.isSameDay(txDate, _selectedDate!);
-          }).toList();
+    List<Map<String, dynamic>> filteredTransactions = _transactions;
+    if (_selectedDate != null) {
+      filteredTransactions = filteredTransactions.where((tx) {
+        final txDate = DateFormat("yyyy-MM-dd HH:mm:ss a")
+            .parse(tx["date"].toString());
+        return DateUtils.isSameDay(txDate, _selectedDate!);
+      }).toList();
+    }
+    if (_selectedService != null) {
+      filteredTransactions = filteredTransactions
+          .where((tx) => tx['service'] == _selectedService)
+          .toList();
+    }
+    if (_selectedStatus != null) {
+      filteredTransactions = filteredTransactions
+          .where((tx) => tx['status'] == _selectedStatus)
+          .toList();
+    }
 
     return Column(
       children: [
@@ -120,6 +148,37 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
         ),
       ],
     );
+  }
+
+  Future<void> _exportAsPdf() async {
+    final doc = pw.Document();
+    doc.addPage(
+      pw.Page(
+        build: (context) => pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Text('Transaction History', style: pw.TextStyle(fontSize: 18)),
+            pw.SizedBox(height: 8),
+            ..._transactions.map((tx) => pw.Padding(
+                  padding: const pw.EdgeInsets.symmetric(vertical: 4),
+                  child: pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            pw.Text('${tx['service']} (${tx['companyId']})'),
+                            pw.Text('${tx['mobileNo']} - ${tx['date']}'),
+                          ]),
+                      pw.Text('${tx['amount']} - ${tx['status']}'),
+                    ],
+                  ),
+                )),
+          ],
+        ),
+      ),
+    );
+    await Printing.layoutPdf(onLayout: (format) async => doc.save());
   }
 
   Widget _buildWalletCard() {
@@ -215,12 +274,27 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
             ),
           ),
           Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("Service", style: TextStyle(color: Colors.grey[600])),
-                Icon(Icons.arrow_drop_down, color: Colors.grey[600]),
-              ],
+            child: DropdownButton<String>(
+              hint: Text('Service', style: TextStyle(color: Colors.grey[600])),
+              value: _selectedService,
+              isExpanded: true,
+              underline: const SizedBox(),
+              items: _services
+                  .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                  .toList(),
+              onChanged: (v) => setState(() => _selectedService = v),
+            ),
+          ),
+          Expanded(
+            child: DropdownButton<String>(
+              hint: Text('Status', style: TextStyle(color: Colors.grey[600])),
+              value: _selectedStatus,
+              isExpanded: true,
+              underline: const SizedBox(),
+              items: _statuses
+                  .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                  .toList(),
+              onChanged: (v) => setState(() => _selectedStatus = v),
             ),
           ),
         ],
@@ -355,4 +429,11 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
       ),
     );
   }
+
+  List<String> get _services => {
+        for (final tx in _transactions) tx['service'] as String,
+      }.toList();
+  List<String> get _statuses => {
+        for (final tx in _transactions) tx['status'] as String,
+      }.toList();
 }

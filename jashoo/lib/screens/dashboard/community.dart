@@ -7,8 +7,9 @@ class CommunityScreen extends StatefulWidget {
   _CommunityScreenState createState() => _CommunityScreenState();
 }
 
-class _CommunityScreenState extends State<CommunityScreen> {
+class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProviderStateMixin {
   final TextEditingController _postController = TextEditingController();
+  late final TabController _tabController;
 
   // Mock community posts (later can fetch from Firebase or API)
   final List<Map<String, String>> _posts = [
@@ -39,68 +40,112 @@ class _CommunityScreenState extends State<CommunityScreen> {
       appBar: AppBar(
         title: const Text("Community"),
         backgroundColor: Colors.cyan,
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Messages area
-            Expanded(
-              child: ListView.builder(
-                reverse: true, // newest posts at the bottom like a chat
-                itemCount: _posts.length,
-                itemBuilder: (context, index) {
-                  final post = _posts[index];
-                  return Card(
-                    margin:
-                        const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        child: Text(post["user"]![0]), // First letter of user
-                      ),
-                      title: Text(post["user"]!),
-                      subtitle: Text(post["message"]!),
-                    ),
-                  );
-                },
-              ),
-            ),
-
-            // Input area
-            const Divider(height: 1),
-            Container(
-              color: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _postController,
-                      decoration: const InputDecoration(
-                        hintText: "Share something...",
-                        border: OutlineInputBorder(),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                      ),
-                      onSubmitted: (text) {
-                        if (text.trim().isNotEmpty) {
-                          _addPost(text.trim());
-                        }
-                      },
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.send, color: Colors.cyan),
-                    onPressed: () {
-                      if (_postController.text.trim().isNotEmpty) {
-                        _addPost(_postController.text.trim());
-                      }
-                    },
-                  )
-                ],
-              ),
-            )
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: 'Feed'),
+            Tab(text: 'Groups'),
+            Tab(text: 'Announcements'),
           ],
         ),
+      ),
+      body: SafeArea(
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            _buildFeed(),
+            _buildGroups(),
+            _buildAnnouncements(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+  }
+
+  Widget _buildFeed() {
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+            reverse: true,
+            itemCount: _posts.length,
+            itemBuilder: (context, index) {
+              final post = _posts[index];
+              return Card(
+                margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                child: ListTile(
+                  leading: CircleAvatar(child: Text(post["user"]![0])),
+                  title: Text(post["user"]!),
+                  subtitle: Text(post["message"]!),
+                ),
+              );
+            },
+          ),
+        ),
+        const Divider(height: 1),
+        Container(
+          color: Colors.white,
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _postController,
+                  decoration: const InputDecoration(
+                    hintText: "Share something...",
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  ),
+                  onSubmitted: (text) {
+                    if (text.trim().isNotEmpty) {
+                      _addPost(text.trim());
+                    }
+                  },
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.send, color: Colors.cyan),
+                onPressed: () {
+                  if (_postController.text.trim().isNotEmpty) {
+                    _addPost(_postController.text.trim());
+                  }
+                },
+              )
+            ],
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget _buildGroups() {
+    final groups = const ['Boda Boda Tips', 'Mama Fua Network', 'Carpenters Guild'];
+    return ListView.builder(
+      itemCount: groups.length,
+      itemBuilder: (_, i) => ListTile(
+        leading: const Icon(Icons.group),
+        title: Text(groups[i]),
+        trailing: TextButton(onPressed: () {}, child: const Text('Join')),
+      ),
+    );
+  }
+
+  Widget _buildAnnouncements() {
+    final ann = const [
+      'Partnership: Safaricom Airtime discounts this week',
+      'Government update: NHIF registration drive',
+    ];
+    return ListView.builder(
+      itemCount: ann.length,
+      itemBuilder: (_, i) => ListTile(
+        leading: const Icon(Icons.campaign),
+        title: Text(ann[i]),
       ),
     );
   }

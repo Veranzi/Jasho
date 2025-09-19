@@ -189,6 +189,30 @@ class _LoginScreenState extends State<LoginScreen> {
                         fontSize: 18, color: Color(0xFF00505D)),
                   ),
                 ),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    OutlinedButton.icon(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/phoneAuth');
+                      },
+                      icon: const Icon(Icons.sms),
+                      label: const Text('Login with Phone'),
+                    ),
+                    OutlinedButton.icon(
+                      onPressed: () {
+                        // stub Google login
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Google Sign-In (stub)')),
+                        );
+                        Navigator.pushReplacementNamed(context, '/dashboard');
+                      },
+                      icon: const Icon(Icons.account_circle),
+                      label: const Text('Google'),
+                    ),
+                  ],
+                )
               ],
             ),
           ),
