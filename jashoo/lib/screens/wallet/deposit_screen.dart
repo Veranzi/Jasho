@@ -11,6 +11,7 @@ class DepositScreen extends StatefulWidget {
 
 class _DepositScreenState extends State<DepositScreen> {
   final _amountController = TextEditingController();
+  String _method = 'M-PESA';
 
   @override
   Widget build(BuildContext context) {
@@ -25,15 +26,26 @@ class _DepositScreenState extends State<DepositScreen> {
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(labelText: 'Amount (KES)'),
             ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              value: _method,
+              decoration: const InputDecoration(labelText: 'Method'),
+              items: const [
+                DropdownMenuItem(value: 'M-PESA', child: Text('M-PESA')),
+                DropdownMenuItem(value: 'ABSA Bank', child: Text('ABSA Bank')),
+                DropdownMenuItem(value: 'Card', child: Text('Card')),
+              ],
+              onChanged: (v) => setState(() => _method = v ?? 'M-PESA'),
+            ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
                 final amt = double.tryParse(_amountController.text.trim());
                 if (amt == null || amt <= 0) return;
-                context.read<WalletProvider>().depositKes(amt, description: 'M-PESA Deposit');
+                context.read<WalletProvider>().depositKes(amt, description: '$_method Deposit');
                 Navigator.pop(context);
               },
-              child: const Text('Deposit via M-PESA'),
+              child: Text('Deposit via $_method'),
             ),
           ],
         ),

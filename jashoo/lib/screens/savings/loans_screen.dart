@@ -15,10 +15,19 @@ class _LoansScreenState extends State<LoansScreen> {
   @override
   Widget build(BuildContext context) {
     final savings = context.watch<SavingsProvider>();
+    final totalSaved = savings.goals.fold<double>(0, (sum, g) => sum + g.saved);
+    final eligibility = (totalSaved * 0.5).toStringAsFixed(0); // 50% of savings
     return Scaffold(
       appBar: AppBar(title: const Text('Microloans')),
       body: Column(
         children: [
+          Container(
+            width: double.infinity,
+            color: Colors.green.shade50,
+            padding: const EdgeInsets.all(12),
+            child: Text('Eligible up to: KES $eligibility (based on savings)',
+                style: const TextStyle(fontWeight: FontWeight.bold)),
+          ),
           Expanded(
             child: ListView.builder(
               itemCount: savings.loans.length,

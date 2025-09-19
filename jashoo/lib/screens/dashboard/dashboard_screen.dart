@@ -69,7 +69,8 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
       case 0:
         return _buildDashboard();
       case 1:
-        return const Center(child: Text("History Page (Transactions)"));
+        // Redirect via bottom nav; keep body minimal
+        return const SizedBox.shrink();
       case 2:
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
@@ -372,6 +373,41 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
           },
         ),
 
+        // Savings
+        ListTile(
+          leading: const Icon(Icons.savings, color: primaryColor),
+          title: const Text("Savings"),
+          onTap: () => Navigator.pushNamed(context, '/savings'),
+        ),
+
+        // Loans
+        ListTile(
+          leading: const Icon(Icons.account_balance, color: primaryColor),
+          title: const Text("Loans"),
+          onTap: () => Navigator.pushNamed(context, '/loans'),
+        ),
+
+        // Jasho Points
+        ListTile(
+          leading: const Icon(Icons.emoji_events, color: primaryColor),
+          title: const Text("Jasho Points"),
+          onTap: () => Navigator.pushNamed(context, '/gamification'),
+        ),
+
+        // Leaderboard
+        ListTile(
+          leading: const Icon(Icons.leaderboard, color: primaryColor),
+          title: const Text("Leaderboard"),
+          onTap: () => Navigator.pushNamed(context, '/leaderboard'),
+        ),
+
+        // Rewards
+        ListTile(
+          leading: const Icon(Icons.card_giftcard, color: primaryColor),
+          title: const Text("Rewards"),
+          onTap: () => Navigator.pushNamed(context, '/rewards'),
+        ),
+
         // Change Password
         ListTile(
           leading: const Icon(Icons.lock, color: primaryColor),
@@ -438,7 +474,17 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   Widget _buildNavItem(IconData icon, String label, int index) {
     final bool isSelected = _selectedIndex == index;
     return GestureDetector(
-      onTap: () => setState(() => _selectedIndex = index),
+      onTap: () {
+        if (index == 1) {
+          Navigator.pushNamed(context, '/transactionHistory');
+          return;
+        }
+        if (index == 2) {
+          Navigator.pushNamed(context, '/aiAssistant');
+          return;
+        }
+        setState(() => _selectedIndex = index);
+      },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
