@@ -71,7 +71,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
       case 0:
         return _buildDashboard();
       case 1:
-        return const TransactionHistoryScreen();
+        return const TransactionHistoryScreen(embedded: true);
       case 2:
         return const AiAssistantScreen();
       case 3:
