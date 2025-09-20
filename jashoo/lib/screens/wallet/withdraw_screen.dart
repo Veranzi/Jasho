@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/wallet_provider.dart';
 import '../../providers/pin_provider.dart';
+import '../../providers/user_provider.dart';
 
 class WithdrawScreen extends StatefulWidget {
   const WithdrawScreen({super.key});
@@ -14,6 +15,9 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
   final _amountController = TextEditingController();
   String _method = 'M-PESA';
   String _category = 'Food';
+  final _mpesaNumberController = TextEditingController();
+  final _absaAccountController = TextEditingController();
+  String? _selectedHustle;
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +43,19 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
               onChanged: (v) => setState(() => _method = v ?? 'M-PESA'),
             ),
             const SizedBox(height: 12),
+            if (_method == 'M-PESA')
+              TextField(
+                controller: _mpesaNumberController,
+                keyboardType: TextInputType.phone,
+                decoration: const InputDecoration(labelText: 'M-PESA Number'),
+              )
+            else
+              TextField(
+                controller: _absaAccountController,
+                keyboardType: TextInputType.text,
+                decoration: const InputDecoration(labelText: 'ABSA Account Number'),
+              ),
+            const SizedBox(height: 12),
             DropdownButtonFormField<String>(
               value: _category,
               decoration: const InputDecoration(labelText: 'Category'),
@@ -52,6 +69,15 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
               ],
               onChanged: (v) => setState(() => _category = v ?? 'Food'),
             ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              value: _selectedHustle,
+              decoration: const InputDecoration(labelText: 'Hustle (source)'),
+              items: (context.read<UserProvider>().profile?.skills ?? [])
+                  .map((h) => DropdownMenuItem(value: h, child: Text(h)))
+                  .toList(),
+              onChanged: (v) => setState(() => _selectedHustle = v),
+            ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () async {
@@ -59,7 +85,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                 if (amt == null || amt <= 0) return;
                 final ok = await _verifyPin(context);
                 if (!ok) return;
-                context.read<WalletProvider>().withdrawKes(amt, category: _category, method: _method);
+                context.read<WalletProvider>().withdrawKes(amt, category: _category, method: _method, hustle: _selectedHustle);
                 Navigator.pop(context);
               },
               child: Text('Withdraw to $_method'),
