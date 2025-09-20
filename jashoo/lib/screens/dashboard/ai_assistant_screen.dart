@@ -101,6 +101,56 @@ class AiAssistantScreen extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(height: 8),
+          // Expenditure breakdown
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12.0),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), spreadRadius: 1, blurRadius: 10)],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('Expenditure (This Week)', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 150,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: PieChart(
+                            PieChartData(
+                              sectionsSpace: 2,
+                              centerSpaceRadius: 24,
+                              sections: _expenditureSections(),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _legend(color: Colors.orange, label: 'Food'),
+                              _legend(color: Colors.lightBlue, label: 'Electricity'),
+                              _legend(color: Colors.teal, label: 'Water'),
+                              _legend(color: Colors.deepPurple, label: 'Internet'),
+                              _legend(color: Colors.grey, label: 'Other'),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
           Expanded(
             child: ListView.builder(
               itemCount: ai.suggestions.length,
@@ -133,6 +183,29 @@ class AiAssistantScreen extends StatelessWidget {
           const Icon(Icons.trending_up, color: Color(0xFF0D47A1)),
           const SizedBox(width: 8),
           Expanded(child: Text(text)),
+        ],
+      ),
+    );
+  }
+
+  List<PieChartSectionData> _expenditureSections() {
+    return const [
+      PieChartSectionData(value: 35, color: Colors.orange, title: ''),
+      PieChartSectionData(value: 20, color: Colors.lightBlue, title: ''),
+      PieChartSectionData(value: 15, color: Colors.teal, title: ''),
+      PieChartSectionData(value: 18, color: Colors.deepPurple, title: ''),
+      PieChartSectionData(value: 12, color: Colors.grey, title: ''),
+    ];
+  }
+
+  Widget _legend({required Color color, required String label}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          Container(width: 10, height: 10, color: color),
+          const SizedBox(width: 6),
+          Text(label),
         ],
       ),
     );
