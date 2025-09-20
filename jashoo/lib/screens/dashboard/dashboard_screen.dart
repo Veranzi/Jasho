@@ -348,108 +348,118 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
 
   /// ----------------- PROFILE -----------------
   Widget _buildProfile() {
-    return ListView(
-      padding: const EdgeInsets.all(16),
+    return Column(
       children: [
-        const CircleAvatar(
-          radius: 40,
-          backgroundColor: primaryColor,
-          child: Icon(Icons.person, color: Colors.white, size: 40),
+        const SizedBox(height: 16),
+        Row(
+          children: const [
+            SizedBox(width: 16),
+            CircleAvatar(
+              radius: 36,
+              backgroundColor: primaryColor,
+              child: Icon(Icons.person, color: Colors.white, size: 40),
+            ),
+            SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Your Profile',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 12),
-        const Center(
-            child: Text("John Doe",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))),
-        const Center(child: Text("Gig Worker", style: TextStyle(fontSize: 14))),
-        const Divider(height: 32),
-
-        // Community
-        ListTile(
-          leading: const Icon(Icons.group, color: primaryColor),
-          title: const Text("Community"),
-          subtitle: const Text("Connect with other gig workers"),
-          onTap: () {
-            Navigator.pushNamed(context, '/community');
-          },
+        const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.pushNamed(context, '/profileUpdate'),
+                  icon: const Icon(Icons.edit),
+                  label: const Text('Edit'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.pushNamed(context, '/gamification'),
+                  icon: const Icon(Icons.emoji_events),
+                  label: const Text('Points'),
+                ),
+              ),
+            ],
+          ),
         ),
-
-        // Savings
-        ListTile(
-          leading: const Icon(Icons.savings, color: primaryColor),
-          title: const Text("Savings"),
-          onTap: () => Navigator.pushNamed(context, '/savings'),
+        const SizedBox(height: 8),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.pushNamed(context, '/savings'),
+                  icon: const Icon(Icons.savings),
+                  label: const Text('Savings'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.pushNamed(context, '/loans'),
+                  icon: const Icon(Icons.account_balance),
+                  label: const Text('Loans'),
+                ),
+              ),
+            ],
+          ),
         ),
-
-        // Loans
-        ListTile(
-          leading: const Icon(Icons.account_balance, color: primaryColor),
-          title: const Text("Loans"),
-          onTap: () => Navigator.pushNamed(context, '/loans'),
+        const SizedBox(height: 8),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.pushNamed(context, '/insurance'),
+                  icon: const Icon(Icons.health_and_safety),
+                  label: const Text('Insurance'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.pushNamed(context, '/help'),
+                  icon: const Icon(Icons.help),
+                  label: const Text('Help'),
+                ),
+              ),
+            ],
+          ),
         ),
-
-        // Jasho Points
-        ListTile(
-          leading: const Icon(Icons.emoji_events, color: primaryColor),
-          title: const Text("Jasho Points"),
-          onTap: () => Navigator.pushNamed(context, '/gamification'),
-        ),
-
-        // Leaderboard
-        ListTile(
-          leading: const Icon(Icons.leaderboard, color: primaryColor),
-          title: const Text("Leaderboard"),
-          onTap: () => Navigator.pushNamed(context, '/leaderboard'),
-        ),
-
-        // Rewards
-        ListTile(
-          leading: const Icon(Icons.card_giftcard, color: primaryColor),
-          title: const Text("Rewards"),
-          onTap: () => Navigator.pushNamed(context, '/rewards'),
-        ),
-
-        // Change Password
-        ListTile(
-          leading: const Icon(Icons.lock, color: primaryColor),
-          title: const Text("Change Password"),
-          onTap: () {
-            Navigator.pushNamed(context, '/changePassword');
-          },
-        ),
-
-        // Help
-        ListTile(
-          leading: const Icon(Icons.help, color: primaryColor),
-          title: const Text("Help"),
-          onTap: () {
-            Navigator.pushNamed(context, '/help');
-          },
-        ),
-
-        // Insurance
-        ListTile(
-          leading: const Icon(Icons.health_and_safety, color: primaryColor),
-          title: const Text("Insurance"),
-          onTap: () => Navigator.pushNamed(context, '/insurance'),
-        ),
-
-        // Settings
-        ListTile(
-          leading: const Icon(Icons.settings, color: primaryColor),
-          title: const Text("Settings"),
-          onTap: () {
-            Navigator.pushNamed(context, '/profileUpdate');
-          },
-        ),
-
-        // Logout
-        ListTile(
-          leading: const Icon(Icons.logout, color: Colors.red),
-          title: const Text("Logout"),
-          onTap: () {
-            Navigator.pushNamed(context, '/logout');
-          },
-        ),
+        const Spacer(),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
+          child: Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.pushNamed(context, '/changePassword'),
+                  icon: const Icon(Icons.lock),
+                  label: const Text('Password'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.pushNamed(context, '/logout'),
+                  icon: const Icon(Icons.logout, color: Colors.red),
+                  label: const Text('Logout'),
+                ),
+              ),
+            ],
+          ),
+        )
       ],
     );
   }
