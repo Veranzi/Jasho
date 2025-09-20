@@ -33,7 +33,6 @@ class _DepositScreenState extends State<DepositScreen> {
               items: const [
                 DropdownMenuItem(value: 'M-PESA', child: Text('M-PESA')),
                 DropdownMenuItem(value: 'ABSA Bank', child: Text('ABSA Bank')),
-                DropdownMenuItem(value: 'Card', child: Text('Card')),
               ],
               onChanged: (v) => setState(() => _method = v ?? 'M-PESA'),
             ),
