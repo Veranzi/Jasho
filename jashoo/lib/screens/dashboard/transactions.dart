@@ -4,7 +4,8 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
 class TransactionHistoryScreen extends StatefulWidget {
-  const TransactionHistoryScreen({super.key});
+  final bool embedded;
+  const TransactionHistoryScreen({super.key, this.embedded = false});
 
   @override
   State<TransactionHistoryScreen> createState() =>
@@ -68,6 +69,9 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.embedded) {
+      return _buildBody();
+    }
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: _buildAppBar(),
