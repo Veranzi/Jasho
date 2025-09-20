@@ -42,7 +42,7 @@ class _DepositScreenState extends State<DepositScreen> {
               onPressed: () {
                 final amt = double.tryParse(_amountController.text.trim());
                 if (amt == null || amt <= 0) return;
-                context.read<WalletProvider>().depositKes(amt, description: '$_method Deposit');
+                context.read<WalletProvider>().depositKes(amt, description: '$_method Deposit', method: _method);
                 Navigator.pop(context);
               },
               child: Text('Deposit via $_method'),

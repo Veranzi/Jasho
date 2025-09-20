@@ -42,6 +42,24 @@ class _SavingsScreenState extends State<SavingsScreen> {
               },
             ),
           ),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Hustle Breakdown', style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                ...savings.hustleSavings.entries.map((e) => Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(e.key),
+                        Text('KES ${e.value.toStringAsFixed(0)}'),
+                      ],
+                    )),
+              ],
+            ),
+          ),
           Padding(
             padding: const EdgeInsets.all(12.0),
             child: Row(
@@ -87,6 +105,7 @@ class _SavingsScreenState extends State<SavingsScreen> {
 
   Future<void> _contributeDialog(BuildContext context, String goalId) async {
     final controller = TextEditingController();
+    final hustleController = TextEditingController();
     return showDialog(
       context: context,
       builder: (_) => AlertDialog(

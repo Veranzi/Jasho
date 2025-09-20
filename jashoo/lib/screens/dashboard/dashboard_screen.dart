@@ -426,6 +426,13 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
           },
         ),
 
+        // Insurance
+        ListTile(
+          leading: const Icon(Icons.health_and_safety, color: primaryColor),
+          title: const Text("Insurance"),
+          onTap: () => Navigator.pushNamed(context, '/insurance'),
+        ),
+
         // Settings
         ListTile(
           leading: const Icon(Icons.settings, color: primaryColor),

@@ -28,6 +28,7 @@ import 'screens/gamification/rewards_screen.dart';
 import 'screens/jobs/job_detail_screen.dart';
 import 'screens/jobs/post_job_screen.dart';
 import 'screens/settings/security_screen.dart';
+import 'screens/insurance/insurance_screen.dart';
 import 'screens/dashboard/jobs.dart';
 import 'screens/dashboard/transactions.dart';
 
@@ -65,4 +66,5 @@ final Map<String, WidgetBuilder> appRoutes = {
   '/jobDetail': (_) => const JobDetailScreen(),
   '/postJob': (_) => const PostJobScreen(),
   '/security': (_) => const SecurityScreen(),
+  '/insurance': (_) => const InsuranceScreen(),
 };

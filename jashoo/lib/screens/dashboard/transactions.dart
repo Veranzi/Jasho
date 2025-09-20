@@ -56,6 +56,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
   DateTime? _selectedDate;
   String? _selectedService;
   String? _selectedStatus;
+  String? _selectedCategory;
 
   @override
   Widget build(BuildContext context) {
@@ -126,6 +127,11 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
     if (_selectedStatus != null) {
       filteredTransactions = filteredTransactions
           .where((tx) => tx['status'] == _selectedStatus)
+          .toList();
+    }
+    if (_selectedCategory != null) {
+      filteredTransactions = filteredTransactions
+          .where((tx) => tx['category'] == _selectedCategory)
           .toList();
     }
 
@@ -297,6 +303,18 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
               onChanged: (v) => setState(() => _selectedStatus = v),
             ),
           ),
+          Expanded(
+            child: DropdownButton<String>(
+              hint: Text('Category', style: TextStyle(color: Colors.grey[600])),
+              value: _selectedCategory,
+              isExpanded: true,
+              underline: const SizedBox(),
+              items: _categories
+                  .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                  .toList(),
+              onChanged: (v) => setState(() => _selectedCategory = v),
+            ),
+          ),
         ],
       ),
     );
@@ -435,5 +453,9 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
       }.toList();
   List<String> get _statuses => {
         for (final tx in _transactions) tx['status'] as String,
+      }.toList();
+  List<String> get _categories => {
+        for (final tx in _transactions)
+          if (tx['category'] != null) tx['category'] as String,
       }.toList();
 }
