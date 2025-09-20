@@ -12,6 +12,7 @@ class WalletTransaction {
   final String description;
   final String? category; // e.g., Food, Electricity, Internet, Deposit
   final String? method; // e.g., M-PESA, ABSA Bank, Card
+  final String? hustle; // which hustle source
 
   WalletTransaction({
     required this.id,
@@ -23,6 +24,7 @@ class WalletTransaction {
     required this.description,
     this.category,
     this.method,
+    this.hustle,
   });
 }
 
@@ -44,7 +46,7 @@ class WalletProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void depositKes(double amount, {String description = 'Deposit', String? method, String category = 'Deposit'}) {
+  void depositKes(double amount, {String description = 'Deposit', String? method, String? hustle, String category = 'Deposit'}) {
     _kesBalance += amount;
     _transactions.add(WalletTransaction(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -56,11 +58,12 @@ class WalletProvider extends ChangeNotifier {
       description: description,
       category: category,
       method: method,
+      hustle: hustle,
     ));
     notifyListeners();
   }
 
-  void withdrawKes(double amount, {String category = 'Expense', String? method}) {
+  void withdrawKes(double amount, {String category = 'Expense', String? method, String? hustle}) {
     if (amount <= 0 || amount > _kesBalance) return;
     _kesBalance -= amount;
     _transactions.add(WalletTransaction(
@@ -73,6 +76,7 @@ class WalletProvider extends ChangeNotifier {
       description: 'Withdraw',
       category: category,
       method: method,
+      hustle: hustle,
     ));
     notifyListeners();
   }
