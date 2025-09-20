@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/savings_provider.dart';
+import '../../providers/gamification_provider.dart';
 
 class SavingsScreen extends StatefulWidget {
   const SavingsScreen({super.key});
@@ -122,6 +123,7 @@ class _SavingsScreenState extends State<SavingsScreen> {
               final amt = double.tryParse(controller.text.trim()) ?? 0;
               if (amt > 0) {
                 context.read<SavingsProvider>().contribute(goalId, amt);
+                context.read<GamificationProvider>().earnPoints(amt.floor());
               }
               Navigator.pop(context);
             },
