@@ -17,9 +17,16 @@ class _SavingsScreenState extends State<SavingsScreen> {
   Widget build(BuildContext context) {
     final savings = context.watch<SavingsProvider>();
     return Scaffold(
-      appBar: AppBar(title: const Text('Savings')),
+      appBar: AppBar(title: const Text('Savings'), backgroundColor: const Color(0xFF0D47A1)),
       body: Column(
         children: [
+          Container(
+            width: double.infinity,
+            color: Colors.blue.shade50,
+            padding: const EdgeInsets.all(12),
+            child: Text('Points from savings: ${savings.pointsEarnedFromSavings}',
+                style: const TextStyle(fontWeight: FontWeight.bold)),
+          ),
           Expanded(
             child: ListView.builder(
               itemCount: savings.goals.length,
@@ -33,6 +40,24 @@ class _SavingsScreenState extends State<SavingsScreen> {
                   onTap: () => _contributeDialog(context, goal.id),
                 );
               },
+            ),
+          ),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Hustle Breakdown', style: TextStyle(fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                ...savings.hustleSavings.entries.map((e) => Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(e.key),
+                        Text('KES ${e.value.toStringAsFixed(0)}'),
+                      ],
+                    )),
+              ],
             ),
           ),
           Padding(
@@ -80,6 +105,7 @@ class _SavingsScreenState extends State<SavingsScreen> {
 
   Future<void> _contributeDialog(BuildContext context, String goalId) async {
     final controller = TextEditingController();
+    final hustleController = TextEditingController();
     return showDialog(
       context: context,
       builder: (_) => AlertDialog(

@@ -12,11 +12,13 @@ class WithdrawScreen extends StatefulWidget {
 
 class _WithdrawScreenState extends State<WithdrawScreen> {
   final _amountController = TextEditingController();
+  String _method = 'M-PESA';
+  String _category = 'Food';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Withdraw')),
+      appBar: AppBar(title: const Text('Withdraw'), backgroundColor: const Color(0xFF0D47A1)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -26,6 +28,31 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
               keyboardType: TextInputType.number,
               decoration: const InputDecoration(labelText: 'Amount (KES)'),
             ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              value: _method,
+              decoration: const InputDecoration(labelText: 'Method'),
+              items: const [
+                DropdownMenuItem(value: 'M-PESA', child: Text('M-PESA')),
+                DropdownMenuItem(value: 'ABSA Bank', child: Text('ABSA Bank')),
+                DropdownMenuItem(value: 'Card', child: Text('Card')),
+              ],
+              onChanged: (v) => setState(() => _method = v ?? 'M-PESA'),
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              value: _category,
+              decoration: const InputDecoration(labelText: 'Category'),
+              items: const [
+                DropdownMenuItem(value: 'Food', child: Text('Food')),
+                DropdownMenuItem(value: 'Electricity', child: Text('Electricity')),
+                DropdownMenuItem(value: 'Water', child: Text('Water')),
+                DropdownMenuItem(value: 'Internet', child: Text('Internet')),
+                DropdownMenuItem(value: 'Transport', child: Text('Transport')),
+                DropdownMenuItem(value: 'Other', child: Text('Other')),
+              ],
+              onChanged: (v) => setState(() => _category = v ?? 'Food'),
+            ),
             const SizedBox(height: 16),
             ElevatedButton(
               onPressed: () async {
@@ -33,10 +60,10 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                 if (amt == null || amt <= 0) return;
                 final ok = await _verifyPin(context);
                 if (!ok) return;
-                context.read<WalletProvider>().withdrawKes(amt);
+                context.read<WalletProvider>().withdrawKes(amt, category: _category, method: _method);
                 Navigator.pop(context);
               },
-              child: const Text('Withdraw to M-PESA'),
+              child: Text('Withdraw to $_method'),
             ),
           ],
         ),

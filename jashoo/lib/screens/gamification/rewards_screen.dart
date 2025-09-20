@@ -9,12 +9,13 @@ class RewardsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final g = context.watch<GamificationProvider>();
     final rewards = const [
-      {'name': '100MB Safaricom Data', 'cost': 500},
-      {'name': 'KES 50 fee discount', 'cost': 300},
-      {'name': 'Visibility Boost (3 days)', 'cost': 800},
+      {'name': '100MB Safaricom Data', 'cost': 500, 'type': 'airtime'},
+      {'name': 'KES 50 Savings Withdrawal Discount', 'cost': 300, 'type': 'discount'},
+      {'name': 'Visibility Boost (3 days)', 'cost': 800, 'type': 'goods'},
+      {'name': 'USDT Bonus 1', 'cost': 1000, 'type': 'usdt'},
     ];
     return Scaffold(
-      appBar: AppBar(title: const Text('Rewards')),
+      appBar: AppBar(title: const Text('Rewards'), backgroundColor: const Color(0xFF0D47A1)),
       body: ListView.builder(
         itemCount: rewards.length,
         itemBuilder: (_, i) {

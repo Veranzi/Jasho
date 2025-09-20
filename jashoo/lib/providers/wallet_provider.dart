@@ -10,6 +10,8 @@ class WalletTransaction {
   final DateTime date;
   final String status; // Pending, Success, Failed
   final String description;
+  final String? category; // e.g., Food, Electricity, Internet, Deposit
+  final String? method; // e.g., M-PESA, ABSA Bank, Card
 
   WalletTransaction({
     required this.id,
@@ -19,6 +21,8 @@ class WalletTransaction {
     required this.date,
     required this.status,
     required this.description,
+    this.category,
+    this.method,
   });
 }
 
@@ -40,7 +44,7 @@ class WalletProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void depositKes(double amount, {String description = 'Deposit'}) {
+  void depositKes(double amount, {String description = 'Deposit', String? method, String category = 'Deposit'}) {
     _kesBalance += amount;
     _transactions.add(WalletTransaction(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -50,11 +54,13 @@ class WalletProvider extends ChangeNotifier {
       date: DateTime.now(),
       status: 'Success',
       description: description,
+      category: category,
+      method: method,
     ));
     notifyListeners();
   }
 
-  void withdrawKes(double amount) {
+  void withdrawKes(double amount, {String category = 'Expense', String? method}) {
     if (amount <= 0 || amount > _kesBalance) return;
     _kesBalance -= amount;
     _transactions.add(WalletTransaction(
@@ -64,7 +70,9 @@ class WalletProvider extends ChangeNotifier {
       currencyCode: 'KES',
       date: DateTime.now(),
       status: 'Success',
-      description: 'Withdraw to M-PESA',
+      description: 'Withdraw',
+      category: category,
+      method: method,
     ));
     notifyListeners();
   }
@@ -82,6 +90,7 @@ class WalletProvider extends ChangeNotifier {
       date: DateTime.now(),
       status: 'Success',
       description: 'Convert KES to USDT',
+      category: 'Convert',
     ));
     notifyListeners();
   }

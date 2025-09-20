@@ -6,6 +6,7 @@ class SavingsGoal {
   double target;
   double saved;
   DateTime? dueDate;
+  String? hustle; // optional hustle attribution
 
   SavingsGoal({
     required this.id,
@@ -13,6 +14,7 @@ class SavingsGoal {
     required this.target,
     this.saved = 0,
     this.dueDate,
+    this.hustle,
   });
 }
 
@@ -26,9 +28,13 @@ class LoanRequest {
 class SavingsProvider extends ChangeNotifier {
   final List<SavingsGoal> _goals = [];
   final List<LoanRequest> _loans = [];
+  int _pointsEarnedFromSavings = 0;
+  final Map<String, double> _hustleToSaved = {}; // hustle -> total saved
 
   List<SavingsGoal> get goals => List.unmodifiable(_goals);
   List<LoanRequest> get loans => List.unmodifiable(_loans);
+  int get pointsEarnedFromSavings => _pointsEarnedFromSavings;
+  Map<String, double> get hustleSavings => Map.unmodifiable(_hustleToSaved);
 
   void addGoal(SavingsGoal goal) {
     _goals.add(goal);
@@ -38,6 +44,11 @@ class SavingsProvider extends ChangeNotifier {
   void contribute(String id, double amount) {
     final goal = _goals.firstWhere((g) => g.id == id, orElse: () => throw ArgumentError('Goal not found'));
     goal.saved += amount;
+    // Earn points: 1 KES = 1 point (cap to int)
+    _pointsEarnedFromSavings += amount.floor();
+    if (goal.hustle != null && goal.hustle!.isNotEmpty) {
+      _hustleToSaved.update(goal.hustle!, (v) => v + amount, ifAbsent: () => amount);
+    }
     notifyListeners();
   }
 
