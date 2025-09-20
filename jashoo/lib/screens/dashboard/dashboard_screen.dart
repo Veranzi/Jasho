@@ -8,6 +8,8 @@ import 'profile_drawer.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:provider/provider.dart';
 import '../../providers/jobs_provider.dart';
+import 'ai_assistant_screen.dart';
+import 'transactions.dart';
 
 class DashBoardScreen extends StatefulWidget {
   const DashBoardScreen({super.key});
@@ -69,14 +71,9 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
       case 0:
         return _buildDashboard();
       case 1:
-        // Redirect via bottom nav; keep body minimal
-        return const SizedBox.shrink();
+        return const TransactionHistoryScreen();
       case 2:
-        return GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () => Navigator.pushNamed(context, '/aiAssistant'),
-          child: const Center(child: Text("Open AI Insights")),
-        );
+        return const AiAssistantScreen();
       case 3:
         return _buildProfile();
       default:
@@ -491,17 +488,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   Widget _buildNavItem(IconData icon, String label, int index) {
     final bool isSelected = _selectedIndex == index;
     return GestureDetector(
-      onTap: () {
-        if (index == 1) {
-          Navigator.pushNamed(context, '/transactionHistory');
-          return;
-        }
-        if (index == 2) {
-          Navigator.pushNamed(context, '/aiAssistant');
-          return;
-        }
-        setState(() => _selectedIndex = index);
-      },
+      onTap: () => setState(() => _selectedIndex = index),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
