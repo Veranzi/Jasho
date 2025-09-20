@@ -11,7 +11,10 @@ class AiAssistantScreen extends StatelessWidget {
     final ai = context.watch<AiProvider>();
     final isEnglish = ai.languageCode == 'en';
     return Scaffold(
-      appBar: AppBar(title: const Text('Jasho Insights'), backgroundColor: const Color(0xFF0D47A1)),
+      appBar: AppBar(
+        title: const Text('Jasho Insights'),
+        backgroundColor: const Color(0xFF0D47A1),
+      ),
       body: Column(
         children: [
           Padding(
@@ -189,7 +192,7 @@ class AiAssistantScreen extends StatelessWidget {
   }
 
   List<PieChartSectionData> _expenditureSections() {
-    return const [
+    return [
       PieChartSectionData(value: 35, color: Colors.orange, title: ''),
       PieChartSectionData(value: 20, color: Colors.lightBlue, title: ''),
       PieChartSectionData(value: 15, color: Colors.teal, title: ''),
@@ -211,4 +214,3 @@ class AiAssistantScreen extends StatelessWidget {
     );
   }
 }
-
