@@ -92,21 +92,21 @@ uvicorn app.main:app --reload
 ```
 ## 🛠️ Features (MVP Scope)
 
-✅ User registration & login (JWT auth)
+  ✅ User registration & login (JWT auth)
 
-✅ Income tracking (manual entry, M-Pesa SMS parsing)
+  ✅ Income tracking (manual entry, M-Pesa SMS parsing)
 
-✅ Wallet & savings goals
+  ✅ Wallet & savings goals
 
-✅ Gig/job logging
+  ✅ Gig/job logging
 
-✅ Chatbot + USSD endpoints
+  ✅ Chatbot + USSD endpoints
 
-🔜 AI income forecasting (LSTM/Prophet)
+  🔜 AI income forecasting (LSTM/Prophet)
 
-🔜 Hustle Trust Score (alternative credit scoring)
+  🔜 Hustle Trust Score (alternative credit scoring)
 
-🔜 Fraud/Scam detection
+  🔜 Fraud/Scam detection
 
 ## 🧪 Running Tests
 pytest
