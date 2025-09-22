@@ -68,29 +68,29 @@ cd jasho-backend
 python -m venv venv
 source venv/bin/activate   # Mac/Linux
 venv\Scripts\activate      # Windows
-
-4. Install dependencies
+```
+3. Install dependencies
+```bash
 pip install -r requirements.txt
-
-5. Setup environment variables
-
+```
+4. Setup environment variables
+```bash
 Create a .env file in the project root:
 
 DATABASE_URL=postgresql+psycopg2://user:password@localhost:5432/jasho
 SECRET_KEY=supersecret
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
-
+```
 5. Run database migrations
+```bash
 alembic upgrade head
-
+```
 6. Start the server
+```bash
 uvicorn app.main:app --reload
-
-
-Server will run at: http://localhost:8000
-
-🛠️ Features (MVP Scope)
+```
+## 🛠️ Features (MVP Scope)
 
 ✅ User registration & login (JWT auth)
 
@@ -108,16 +108,16 @@ Server will run at: http://localhost:8000
 
 🔜 Fraud/Scam detection
 
-🧪 Running Tests
+## 🧪 Running Tests
 pytest
 
 🌍 Roadmap
 
-Phase 1 (Hackathon MVP):
+## Phase 1 (Hackathon MVP):
 
 Auth, wallet, income tracker, chatbot (Eng/Swa), USSD menus
 
-Phase 2 (Pilot w/ Absa):
+## Phase 2 (Pilot w/ Absa):
 
 Hustle Trust Score
 
@@ -125,7 +125,7 @@ Savings + micro-insurance
 
 Fraud shield
 
-Phase 3 (Scaling):
+## Phase 3 (Scaling):
 
 Community noticeboard
 
@@ -133,7 +133,7 @@ Gamification (badges, airtime/data rewards)
 
 Multi-country expansion (Tanzania, Uganda, Nigeria)
 
-🤝 Contributing
+## 🤝 Contributing
 
 We welcome contributions!
 
@@ -147,16 +147,8 @@ Push branch (git push origin feature-x)
 
 Create Pull Request
 
-📜 License
+## 📜 License
 
 This project is licensed under the MIT License. See LICENSE file for details.
 
 Jasho Backend — Built for hustlers, by hustlers.
-
-
----
-
-⚡This README **briefs what you’re building, explains why it matters, how to run it, what’s in scope, and what’s next** — exactly what hackathon judges and future devs need.  
-
-Do you want me to now spin up the **starter code (`main.py`, `db.py`, and `auth routes`)** so you can immediately run `uvicorn` and see Jasho’s backend alive?
-
