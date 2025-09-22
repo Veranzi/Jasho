@@ -137,15 +137,15 @@ Multi-country expansion (Tanzania, Uganda, Nigeria)
 
 We welcome contributions!
 
-Fork the repo
+1.Fork the repo
 
-Create a feature branch (git checkout -b feature-x)
+2.Create a feature branch (git checkout -b feature-x)
 
-Commit changes (git commit -m "Add feature x")
+3.Commit changes (git commit -m "Add feature x")
 
-Push branch (git push origin feature-x)
+4.Push branch (git push origin feature-x)
 
-Create Pull Request
+5.Create Pull Request
 
 ## 📜 License
 
