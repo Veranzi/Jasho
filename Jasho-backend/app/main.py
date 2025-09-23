@@ -1,12 +1,12 @@
 # app/main.py
 from fastapi import FastAPI
-from app.database import init_db
-from app.routers import auth_router, incomes_router, wallet_router, ussd_router, chatbot_router, mpesa_router
+from app.db.database import init_db
+from app.routers import auth_router, income_routers, wallet_router, ussd_router, chatbot_router, mpesa_router
 
 app = FastAPI(title="Jasho Backend")
 
 app.include_router(auth_router.router)
-app.include_router(incomes_router.router)
+app.include_router(income_routers.router)
 app.include_router(wallet_router.router)
 app.include_router(ussd_router.router)
 app.include_router(chatbot_router.router)

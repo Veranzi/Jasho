@@ -1,7 +1,7 @@
 # app/routers/auth_router.py
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
-from app.database import get_session
+from app.db.database import get_session
 from app.models import User, Wallet
 from app.schemas import UserCreate, Token
 from app.auth import hash_password, create_access_token, verify_password
