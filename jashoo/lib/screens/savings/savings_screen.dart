@@ -250,6 +250,7 @@ class _GoalsList extends StatelessWidget {
             ],
           ),
         );
+        );
       },
     );
   }
