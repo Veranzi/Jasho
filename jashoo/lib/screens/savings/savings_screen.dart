@@ -16,10 +16,20 @@ class _SavingsScreenState extends State<SavingsScreen> {
   final _targetController = TextEditingController();
 
   @override
+  void dispose() {
+    _nameController.dispose();
+    _targetController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final savings = context.watch<SavingsProvider>();
     return Scaffold(
-      appBar: AppBar(title: const Text('Savings'), backgroundColor: const Color(0xFF0D47A1)),
+      appBar: AppBar(
+        title: const Text('Savings'),
+        backgroundColor: const Color(0xFF0D47A1),
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _openCreateGoalSheet(context, savings),
         icon: const Icon(Icons.add),
@@ -32,14 +42,14 @@ class _SavingsScreenState extends State<SavingsScreen> {
           children: [
             _PointsFromSavings(points: savings.pointsEarnedFromSavings),
             const SizedBox(height: 16),
-            _SectionTitle('Your goals'),
+            const _SectionTitle('Your goals'),
             const SizedBox(height: 8),
             _GoalsList(
               goals: savings.goals,
               onContribute: (id) => _contributeDialog(context, id),
             ),
             const SizedBox(height: 16),
-            _SectionTitle('Hustle breakdown'),
+            const _SectionTitle('Hustle breakdown'),
             const SizedBox(height: 8),
             _HustleBreakdown(data: savings.hustleSavings),
             const SizedBox(height: 80),
@@ -51,7 +61,6 @@ class _SavingsScreenState extends State<SavingsScreen> {
 
   Future<void> _contributeDialog(BuildContext context, String goalId) async {
     final controller = TextEditingController();
-    final hustleController = TextEditingController();
     return showDialog(
       context: context,
       builder: (_) => AlertDialog(
@@ -62,7 +71,10 @@ class _SavingsScreenState extends State<SavingsScreen> {
           decoration: const InputDecoration(labelText: 'Amount'),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
           TextButton(
             onPressed: () {
               final amt = double.tryParse(controller.text.trim()) ?? 0;
@@ -79,11 +91,14 @@ class _SavingsScreenState extends State<SavingsScreen> {
     );
   }
 
-  Future<void> _openCreateGoalSheet(BuildContext context, SavingsProvider savings) async {
+  Future<void> _openCreateGoalSheet(
+      BuildContext context, SavingsProvider savings) async {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (ctx) {
         return Padding(
           padding: EdgeInsets.only(
@@ -96,17 +111,26 @@ class _SavingsScreenState extends State<SavingsScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text('Create savings goal', style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text(
+                'Create savings goal',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               const SizedBox(height: 12),
               TextField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Goal name', prefixIcon: Icon(Icons.flag)),
+                decoration: const InputDecoration(
+                  labelText: 'Goal name',
+                  prefixIcon: Icon(Icons.flag),
+                ),
               ),
               const SizedBox(height: 12),
               TextField(
                 controller: _targetController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Target amount (KES)', prefixIcon: Icon(Icons.savings)),
+                decoration: const InputDecoration(
+                  labelText: 'Target amount (KES)',
+                  prefixIcon: Icon(Icons.savings),
+                ),
               ),
               const SizedBox(height: 16),
               SizedBox(
@@ -114,9 +138,14 @@ class _SavingsScreenState extends State<SavingsScreen> {
                 child: ElevatedButton.icon(
                   onPressed: () {
                     final name = _nameController.text.trim();
-                    final target = double.tryParse(_targetController.text.trim()) ?? 0.0;
+                    final target =
+                        double.tryParse(_targetController.text.trim()) ?? 0.0;
                     if (name.isEmpty || target <= 0) {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Enter name and valid target')));
+                      ScaffoldMessenger.of(ctx).showSnackBar(
+                        const SnackBar(
+                          content: Text('Enter name and valid target'),
+                        ),
+                      );
                       return;
                     }
                     savings.addGoal(SavingsGoal(
@@ -162,7 +191,10 @@ class _PointsFromSavings extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Points earned from savings', style: TextStyle(fontWeight: FontWeight.bold)),
+                const Text(
+                  'Points earned from savings',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
                 Text('$points pts'),
               ],
             ),
@@ -176,9 +208,16 @@ class _PointsFromSavings extends StatelessWidget {
 class _SectionTitle extends StatelessWidget {
   final String text;
   const _SectionTitle(this.text);
+
   @override
   Widget build(BuildContext context) {
-    return Text(text, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold));
+    return Text(
+      text,
+      style: Theme.of(context)
+          .textTheme
+          .titleMedium
+          ?.copyWith(fontWeight: FontWeight.bold),
+    );
   }
 }
 
@@ -208,15 +247,13 @@ class _GoalsList extends StatelessWidget {
       itemBuilder: (_, i) {
         final goal = goals[i];
         final progress = goal.target == 0 ? 0.0 : goal.saved / goal.target;
-        return AnimatedScale(
-          duration: const Duration(milliseconds: 250),
-          curve: Curves.easeOutBack,
-          scale: 1.0,
-          child: Container(
+        return Container(
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.2)),
+            border: Border.all(
+              color: Theme.of(context).dividerColor.withOpacity(0.2),
+            ),
           ),
           padding: const EdgeInsets.all(12),
           child: Column(
@@ -226,8 +263,15 @@ class _GoalsList extends StatelessWidget {
                 children: [
                   const Icon(Icons.flag),
                   const SizedBox(width: 8),
-                  Expanded(child: Text(goal.name, style: const TextStyle(fontWeight: FontWeight.bold))),
-                  Text('KES ${goal.saved.toStringAsFixed(0)} / ${goal.target.toStringAsFixed(0)}'),
+                  Expanded(
+                    child: Text(
+                      goal.name,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Text(
+                    'KES ${goal.saved.toStringAsFixed(0)} / ${goal.target.toStringAsFixed(0)}',
+                  ),
                 ],
               ),
               const SizedBox(height: 8),
@@ -250,7 +294,6 @@ class _GoalsList extends StatelessWidget {
             ],
           ),
         );
-        );
       },
     );
   }
@@ -269,7 +312,9 @@ class _HustleBreakdown extends StatelessWidget {
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.2)),
+          border: Border.all(
+            color: Theme.of(context).dividerColor.withOpacity(0.2),
+          ),
         ),
         child: const Text('No hustle breakdown yet.'),
       );
@@ -282,7 +327,9 @@ class _HustleBreakdown extends StatelessWidget {
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.2)),
+            border: Border.all(
+              color: Theme.of(context).dividerColor.withOpacity(0.2),
+            ),
           ),
           child: Row(
             children: [
@@ -297,4 +344,3 @@ class _HustleBreakdown extends StatelessWidget {
     );
   }
 }
-
