@@ -10,6 +10,7 @@ class UserProfile {
   String? idType; // ID/Passport
   String? idNumber;
   String? photoUrl;
+  String? absaAccountNumber; // Optional linked Absa settlement account
 
   UserProfile({
     required this.userId,
@@ -21,6 +22,7 @@ class UserProfile {
     this.idType,
     this.idNumber,
     this.photoUrl,
+    this.absaAccountNumber,
   });
 }
 
@@ -38,6 +40,7 @@ class UserProvider extends ChangeNotifier {
       location: 'Nairobi, Westlands',
       rating: 4.6,
       isVerified: false,
+      absaAccountNumber: '123456789012',
     );
     notifyListeners();
   }
@@ -59,6 +62,24 @@ class UserProvider extends ChangeNotifier {
       idType: idType,
       idNumber: idNumber,
       photoUrl: photoUrl ?? _profile!.photoUrl,
+      absaAccountNumber: _profile!.absaAccountNumber,
+    );
+    notifyListeners();
+  }
+
+  void linkAbsaAccount(String accountNumber) {
+    if (_profile == null) return;
+    _profile = UserProfile(
+      userId: _profile!.userId,
+      fullName: _profile!.fullName,
+      skills: _profile!.skills,
+      location: _profile!.location,
+      rating: _profile!.rating,
+      isVerified: _profile!.isVerified,
+      idType: _profile!.idType,
+      idNumber: _profile!.idNumber,
+      photoUrl: _profile!.photoUrl,
+      absaAccountNumber: accountNumber,
     );
     notifyListeners();
   }

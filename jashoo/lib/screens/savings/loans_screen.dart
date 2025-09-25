@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/savings_provider.dart';
 import '../../widgets/skeleton.dart';
+import 'package:provider/provider.dart' show ReadContext, WatchContext;
+import '../../providers/user_provider.dart';
 
 class LoansScreen extends StatefulWidget {
   const LoansScreen({super.key});
@@ -58,9 +60,8 @@ class _AbsaAccountMask extends StatefulWidget {
 
 class _AbsaAccountMaskState extends State<_AbsaAccountMask> {
   bool _showFull = false;
-  final String _account = '123456789012';
-
-  String get _masked => _account.replaceRange(3, _account.length - 2, '*' * (_account.length - 5));
+  String get _account => context.watch<UserProvider>().profile?.absaAccountNumber ?? '************';
+  String get _masked => _account.length < 6 ? _account : _account.replaceRange(3, _account.length - 2, '*' * (_account.length - 5));
 
   @override
   Widget build(BuildContext context) {
