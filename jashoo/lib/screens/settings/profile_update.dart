@@ -157,8 +157,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
                   final v = (value ?? '').trim();
                   if (v.isEmpty) return null; // optional
                   if (v.length < 8 || v.length > 20) return "Enter a valid account number";
-                  if (!RegExp(r'^\d+
-').hasMatch(v)) return "Digits only";
+                  if (!RegExp(r'^\d+$').hasMatch(v)) return "Digits only";
                   return null;
                 },
               ),
