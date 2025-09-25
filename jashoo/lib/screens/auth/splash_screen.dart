@@ -38,7 +38,7 @@ class _SplashScreenState extends State<SplashScreen> {
               width: 150.0,
               height: 150.0,
               child: Image.asset(
-                'assets/logo.png', // Ensure this path matches your asset in pubspec.yaml
+                'assets/logo1.png', // Ensure this path matches your asset in pubspec.yaml
               ),
             ),
             const SizedBox(height: 24),
