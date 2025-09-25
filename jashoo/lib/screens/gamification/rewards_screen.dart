@@ -1,9 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/gamification_provider.dart';
+import '../../widgets/skeleton.dart';
 
-class RewardsScreen extends StatelessWidget {
+class RewardsScreen extends StatefulWidget {
   const RewardsScreen({super.key});
+
+  @override
+  State<RewardsScreen> createState() => _RewardsScreenState();
+}
+
+class _RewardsScreenState extends State<RewardsScreen> with SingleTickerProviderStateMixin {
+  bool _loading = true;
+  late final AnimationController _controller;
+  late final Animation<double> _fade;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
+    _fade = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
+    Future.delayed(const Duration(milliseconds: 450), () {
+      if (mounted) {
+        setState(() => _loading = false);
+        _controller.forward();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +53,20 @@ class RewardsScreen extends StatelessWidget {
             _PointsHeader(points: g.points),
             const SizedBox(height: 16),
             Expanded(
-              child: GridView.builder(
+              child: _loading
+                  ? GridView.builder(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        childAspectRatio: 0.95,
+                      ),
+                      itemCount: 6,
+                      itemBuilder: (_, __) => const Skeleton(height: 160),
+                    )
+                  : FadeTransition(
+                      opacity: _fade,
+                      child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   crossAxisSpacing: 12,
@@ -43,7 +85,8 @@ class RewardsScreen extends StatelessWidget {
                     onRedeem: canRedeem ? () => g.redeemPoints(r['cost'] as int) : null,
                   );
                 },
-              ),
+                      ),
+                    ),
             ),
           ],
         ),

@@ -1,7 +1,36 @@
 import 'package:flutter/material.dart';
+import '../../widgets/skeleton.dart';
 
-class InsuranceScreen extends StatelessWidget {
+class InsuranceScreen extends StatefulWidget {
   const InsuranceScreen({super.key});
+
+  @override
+  State<InsuranceScreen> createState() => _InsuranceScreenState();
+}
+
+class _InsuranceScreenState extends State<InsuranceScreen> with SingleTickerProviderStateMixin {
+  bool _loading = true;
+  late final AnimationController _controller;
+  late final Animation<double> _fade;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
+    _fade = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
+    Future.delayed(const Duration(milliseconds: 450), () {
+      if (mounted) {
+        setState(() => _loading = false);
+        _controller.forward();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,23 +49,37 @@ class InsuranceScreen extends StatelessWidget {
             _InsuranceHeader(),
             const SizedBox(height: 16),
             Expanded(
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 0.95,
-                ),
-                itemCount: covers.length,
-                itemBuilder: (_, i) {
-                  final c = covers[i];
-                  return _CoverCard(
-                    name: c['name'] as String,
-                    premium: c['premium'] as String,
-                    onApply: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Applied (stub)'))),
-                  );
-                },
-              ),
+              child: _loading
+                  ? GridView.builder(
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        childAspectRatio: 0.95,
+                      ),
+                      itemCount: 6,
+                      itemBuilder: (_, __) => const Skeleton(height: 160),
+                    )
+                  : FadeTransition(
+                      opacity: _fade,
+                      child: GridView.builder(
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 0.95,
+                        ),
+                        itemCount: covers.length,
+                        itemBuilder: (_, i) {
+                          final c = covers[i];
+                          return _CoverCard(
+                            name: c['name'] as String,
+                            premium: c['premium'] as String,
+                            onApply: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Applied (stub)'))),
+                          );
+                        },
+                      ),
+                    ),
             ),
           ],
         ),

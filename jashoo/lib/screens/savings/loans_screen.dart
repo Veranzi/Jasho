@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/savings_provider.dart';
+import '../../widgets/skeleton.dart';
 
 class LoansScreen extends StatefulWidget {
   const LoansScreen({super.key});
@@ -50,6 +51,49 @@ class _LoansScreenState extends State<LoansScreen> {
   }
 }
 
+class _AbsaAccountMask extends StatefulWidget {
+  @override
+  State<_AbsaAccountMask> createState() => _AbsaAccountMaskState();
+}
+
+class _AbsaAccountMaskState extends State<_AbsaAccountMask> {
+  bool _showFull = false;
+  final String _account = '123456789012';
+
+  String get _masked => _account.replaceRange(3, _account.length - 2, '*' * (_account.length - 5));
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.pink.shade50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.pink.shade100),
+      ),
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        children: [
+          const Icon(Icons.account_balance, color: Color(0xFFD81B60)),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Absa settlement account', style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(_showFull ? _account : _masked),
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: () => setState(() => _showFull = !_showFull),
+            child: Text(_showFull ? 'Hide' : 'Show'),
+          )
+        ],
+      ),
+    );
+  }
+}
+
 class _EligibilityCard extends StatelessWidget {
   final String eligibility;
   const _EligibilityCard({required this.eligibility});
@@ -84,31 +128,56 @@ class _EligibilityCard extends StatelessWidget {
   }
 }
 
-class _AbsaHighlightCard extends StatelessWidget {
+class _AbsaHighlightCard extends StatefulWidget {
+  @override
+  State<_AbsaHighlightCard> createState() => _AbsaHighlightCardState();
+}
+
+class _AbsaHighlightCardState extends State<_AbsaHighlightCard> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _fade;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 600));
+    _fade = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Color(0xFF7B1FA2), Color(0xFFD81B60)]),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          const Icon(Icons.account_balance, color: Colors.white),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text('Loans provided by Absa', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                SizedBox(height: 4),
-                Text('Fast decisions. Fair rates. Tailored for hustlers.', style: TextStyle(color: Colors.white70)),
-              ],
-            ),
-          )
-        ],
+    return FadeTransition(
+      opacity: _fade,
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(colors: [Color(0xFF7B1FA2), Color(0xFFD81B60)]),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            const Icon(Icons.account_balance, color: Colors.white),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Text('Loans provided by Absa', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 4),
+                  Text('Fast decisions. Fair rates. Tailored for hustlers.', style: TextStyle(color: Colors.white70)),
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -143,6 +212,8 @@ class _LoanApplicationCard extends StatelessWidget {
               prefixIcon: const Icon(Icons.money),
             ),
           ),
+          const SizedBox(height: 12),
+          _AbsaAccountMask(),
           const SizedBox(height: 12),
           SizedBox(
             width: double.infinity,
@@ -181,15 +252,14 @@ class _LoanList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (loans.isEmpty) {
-      return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.2)),
-        ),
-        child: const Text('No loan requests yet.'),
+      return Column(
+        children: const [
+          Skeleton(height: 64),
+          SizedBox(height: 8),
+          Skeleton(height: 64),
+          SizedBox(height: 8),
+          Skeleton(height: 64),
+        ],
       );
     }
     return ListView.separated(

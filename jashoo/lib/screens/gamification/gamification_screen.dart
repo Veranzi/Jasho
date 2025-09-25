@@ -89,7 +89,9 @@ class _HeaderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeInOut,
       width: double.infinity,
       decoration: BoxDecoration(
         gradient: const LinearGradient(

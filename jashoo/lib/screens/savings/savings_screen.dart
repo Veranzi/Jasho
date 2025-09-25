@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/savings_provider.dart';
 import '../../providers/gamification_provider.dart';
+import '../../widgets/skeleton.dart';
 
 class SavingsScreen extends StatefulWidget {
   const SavingsScreen({super.key});
@@ -189,15 +190,14 @@ class _GoalsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (goals.isEmpty) {
-      return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.2)),
-        ),
-        child: const Text('No goals yet. Tap “New goal” to start.'),
+      return Column(
+        children: const [
+          Skeleton(height: 90),
+          SizedBox(height: 8),
+          Skeleton(height: 90),
+          SizedBox(height: 8),
+          Skeleton(height: 90),
+        ],
       );
     }
     return ListView.separated(
@@ -208,7 +208,11 @@ class _GoalsList extends StatelessWidget {
       itemBuilder: (_, i) {
         final goal = goals[i];
         final progress = goal.target == 0 ? 0.0 : goal.saved / goal.target;
-        return Container(
+        return AnimatedScale(
+          duration: const Duration(milliseconds: 250),
+          curve: Curves.easeOutBack,
+          scale: 1.0,
+          child: Container(
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(12),
