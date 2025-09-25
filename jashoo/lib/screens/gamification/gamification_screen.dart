@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Badge;
 import 'package:provider/provider.dart';
 import '../../providers/gamification_provider.dart';
 
@@ -89,7 +89,9 @@ class _HeaderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeInOut,
       width: double.infinity,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
