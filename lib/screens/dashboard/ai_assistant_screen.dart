@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../providers/ai_provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AiAssistantScreen extends StatelessWidget {
   const AiAssistantScreen({super.key});
@@ -98,7 +99,7 @@ class AiAssistantScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Expenditure (This Week)', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('Expenditure (This Week)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp)),
                   const SizedBox(height: 12),
                   SizedBox(
                     height: 150,

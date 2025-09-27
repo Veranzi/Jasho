@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import '../../providers/jobs_provider.dart';
 import 'ai_assistant_screen.dart';
 import 'transactions.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DashBoardScreen extends StatefulWidget {
   const DashBoardScreen({super.key});
@@ -130,16 +131,16 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         children: [
           Text("Wallet Balance",
               style:
-                  TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14)),
+                  TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14.sp)),
           const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 "$label ${balance.toStringAsFixed(isKes ? 0 : 2)}",
-                style: const TextStyle(
+                style: TextStyle(
                     color: Colors.white,
-                    fontSize: 28,
+                    fontSize: 28.sp,
                     fontWeight: FontWeight.bold),
               ),
               Row(
