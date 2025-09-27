@@ -20,8 +20,10 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom + 16),
           child: Padding(
             padding:
                 const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
