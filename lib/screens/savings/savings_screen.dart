@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/savings_provider.dart';
 import '../../providers/gamification_provider.dart';
 import '../../widgets/skeleton.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SavingsScreen extends StatefulWidget {
   const SavingsScreen({super.key});
@@ -42,14 +43,14 @@ class _SavingsScreenState extends State<SavingsScreen> {
           children: [
             _PointsFromSavings(points: savings.pointsEarnedFromSavings),
             const SizedBox(height: 16),
-            const _SectionTitle('Your goals'),
+          const _SectionTitle('Your goals'),
             const SizedBox(height: 8),
             _GoalsList(
               goals: savings.goals,
               onContribute: (id) => _contributeDialog(context, id),
             ),
             const SizedBox(height: 16),
-            const _SectionTitle('Hustle breakdown'),
+          const _SectionTitle('Hustle breakdown'),
             const SizedBox(height: 8),
             _HustleBreakdown(data: savings.hustleSavings),
             const SizedBox(height: 80),
@@ -178,9 +179,9 @@ class _PointsFromSavings extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.blue.shade50,
+        color: const Color(0xFFE6FFF5),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.blue.shade100),
+        border: Border.all(color: const Color(0xFFBBF7D0)),
       ),
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -191,11 +192,11 @@ class _PointsFromSavings extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Points earned from savings',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
                 ),
-                Text('$points pts'),
+                Text('$points pts', style: TextStyle(fontSize: 12.sp)),
               ],
             ),
           )

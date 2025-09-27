@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'login_screen.dart'; // Make sure this path is correct
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -35,13 +36,13 @@ class _SplashScreenState extends State<SplashScreen> {
           children: [
             // Your Logo Widget
             SizedBox(
-              width: 150.0,
-              height: 150.0,
+              width: 150.w,
+              height: 150.w,
               child: Image.asset(
                 'assets/logo1.png', // Ensure this path matches your asset in pubspec.yaml
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
             // Optional: Add a loading indicator
             const CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
