@@ -9,7 +9,8 @@ class JobsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF10B981),
-        title: Text("Jobs Marketplace", style: TextStyle(fontSize: 16.sp)),
+        title: Image.asset('assets/logo1.png', height: 28),
+        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.add_circle_outline),

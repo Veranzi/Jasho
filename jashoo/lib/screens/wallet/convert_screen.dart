@@ -17,7 +17,11 @@ class _ConvertScreenState extends State<ConvertScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Convert KES ↔ USDT'), backgroundColor: const Color(0xFF10B981)),
+      appBar: AppBar(
+        title: Image.asset('assets/logo1.png', height: 28),
+        centerTitle: true,
+        backgroundColor: const Color(0xFF10B981),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
