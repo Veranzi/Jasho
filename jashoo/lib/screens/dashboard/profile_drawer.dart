@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/locale_provider.dart';
+import '../../providers/gamification_provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ProfileDrawer extends StatelessWidget {
@@ -9,6 +10,7 @@ class ProfileDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localeProvider = context.watch<LocaleProvider>();
+    final gamificationProvider = context.watch<GamificationProvider>();
     final isEnglish = localeProvider.languageCode == 'en';
 
     return Drawer(
@@ -57,6 +59,77 @@ class ProfileDrawer extends StatelessWidget {
                   ],
                 ),
               ),
+
+              // Badges section
+              if (gamificationProvider.badges.isNotEmpty) ...[
+                const Divider(),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Badges',
+                        style: TextStyle(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        height: 80,
+                        child: ListView.separated(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: gamificationProvider.badges.length,
+                          separatorBuilder: (_, __) => const SizedBox(width: 8),
+                          itemBuilder: (_, i) {
+                            final badge = gamificationProvider.badges[i];
+                            return Container(
+                              width: 160,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.grey[300]!),
+                              ),
+                              padding: const EdgeInsets.all(8),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.emoji_events, color: Colors.amber, size: 20),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          badge.name,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                        Text(
+                                          badge.description,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(fontSize: 10),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(),
+              ],
 
               // Community
               ListTile(
