@@ -82,21 +82,71 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
           const SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Column(
-              children: [
-                _buildStatusCards(),
-                const SizedBox(height: 24),
-                _buildEarningsSavingsChart(),
-                const SizedBox(height: 24),
-                _buildServicesSection("Quick Actions", _quickActions),
-                const SizedBox(height: 24),
-                _buildJobsShortcut(),
-                const SizedBox(height: 24),
-                _buildInsightsCard(),
-                const SizedBox(height: 24),
-                _buildTaskSummary(),
-                const SizedBox(height: 24), // Extra padding at bottom
-              ],
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.maxWidth > 600) {
+                  // Desktop/Tablet layout - rows
+                  return Column(
+                    children: [
+                      _buildStatusCards(),
+                      const SizedBox(height: 16),
+                      // First row: Chart and Quick Actions
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: _buildEarningsSavingsChart(),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            flex: 1,
+                            child: _buildServicesSection("Quick Actions", _quickActions),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      // Second row: Jobs shortcut and Insights
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            flex: 2,
+                            child: _buildJobsShortcut(),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            flex: 1,
+                            child: _buildInsightsCard(),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      // Third row: Task summary (full width)
+                      _buildTaskSummary(),
+                      const SizedBox(height: 24),
+                    ],
+                  );
+                } else {
+                  // Mobile layout - columns
+                  return Column(
+                    children: [
+                      _buildStatusCards(),
+                      const SizedBox(height: 16),
+                      _buildEarningsSavingsChart(),
+                      const SizedBox(height: 16),
+                      _buildServicesSection("Quick Actions", _quickActions),
+                      const SizedBox(height: 16),
+                      _buildJobsShortcut(),
+                      const SizedBox(height: 16),
+                      _buildInsightsCard(),
+                      const SizedBox(height: 16),
+                      _buildTaskSummary(),
+                      const SizedBox(height: 24),
+                    ],
+                  );
+                }
+              },
             ),
           ),
         ],
