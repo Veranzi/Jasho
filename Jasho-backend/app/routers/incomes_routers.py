@@ -3,7 +3,7 @@ from app.models import Wallet
 from fastapi import APIRouter, Depends, HTTPException, Header
 from typing import List
 from sqlmodel import Session, select
-from app.database import get_session
+from app.db.database import get_session
 from app.models import Income, User
 from app.schemas import IncomeCreate
 from app.auth import decode_token

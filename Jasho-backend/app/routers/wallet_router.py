@@ -1,7 +1,7 @@
 # app/routers/wallet_router.py
 from fastapi import APIRouter, Depends, Header, HTTPException
 from sqlmodel import Session, select
-from app.database import get_session
+from app.db.database import get_session
 from app.models import Wallet, User
 from app.schemas import WalletTopup
 from app.auth import decode_token
