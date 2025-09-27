@@ -196,7 +196,7 @@ class _EarnGrid extends StatelessWidget {
       _EarnItem(Icons.person_add_alt, 'Complete profile', 20),
       _EarnItem(Icons.send, 'Send money / pay bill', 10),
       _EarnItem(Icons.group_add, 'Refer a friend (verified)', 50),
-      _EarnItem(Icons.account_balance, 'Use ABSA services', 20),
+      _EarnItem(Icons.handshake, 'Use partner services (ABSA)', 20),
       _EarnItem(Icons.work, 'Refer for jobs', 25),
       _EarnItem(Icons.savings, 'Save consistently (weekly bonus)', 5),
       _EarnItem(Icons.emoji_events, 'Hit milestones', 100),
