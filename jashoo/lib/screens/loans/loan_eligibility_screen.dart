@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+//import 'package:flutter/src/foundation/change_notifier.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
+
 
 class LoanEligibilityScreen extends StatefulWidget {
   const LoanEligibilityScreen({super.key});
@@ -18,7 +21,7 @@ class _LoanEligibilityScreenState extends State<LoanEligibilityScreen> {
   
   String _selectedSacco = '';
   String _selectedEvidenceType = 'M-Pesa Statement';
-  List<File> _uploadedDocuments = [];
+  final List<File> _uploadedDocuments = [];
   bool _isLoading = false;
 
   final List<String> _saccos = [
@@ -981,6 +984,8 @@ class _QRScanScreenState extends State<_QRScanScreen> {
                     return const Icon(Icons.flash_off, color: Colors.grey);
                   case TorchState.on:
                     return const Icon(Icons.flash_on, color: Colors.yellow);
+                  default:
+                    return const Icon(Icons.flash_off, color: Colors.grey);
                 }
               },
             ),
@@ -989,13 +994,15 @@ class _QRScanScreenState extends State<_QRScanScreen> {
           IconButton(
             onPressed: () => controller.switchCamera(),
             icon: ValueListenableBuilder(
-              valueListenable: controller.cameraFacingState,
-              builder: (context, state, child) {
-                switch (state) {
+              valueListenable: controller.cameraFacing,
+              builder: (context, facing, child) {
+                switch (facing) {
                   case CameraFacing.front:
                     return const Icon(Icons.camera_front);
                   case CameraFacing.back:
                     return const Icon(Icons.camera_rear);
+                  default:
+                    return const Icon(Icons.camera_alt); // Default icon
                 }
               },
             ),
@@ -1172,4 +1179,8 @@ class _QRScanScreenState extends State<_QRScanScreen> {
       }
     }
   }
+}
+
+extension on MobileScannerController {
+  ValueListenable<CameraFacing> get cameraFacing => cameraFacingStateStream;
 }
