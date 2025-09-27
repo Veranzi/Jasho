@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../providers/ai_provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AiAssistantScreen extends StatelessWidget {
   const AiAssistantScreen({super.key});
@@ -15,20 +16,25 @@ class AiAssistantScreen extends StatelessWidget {
         title: const Text('Jasho Insights'),
         backgroundColor: const Color(0xFF10B981),
       ),
-      body: Column(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
         children: [
           // Removed language switch; now controlled globally via drawer
           // Period toggles
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            child: Row(
-              children: [
-                ChoiceChip(label: const Text('Daily'), selected: true, onSelected: (_) {}),
-                const SizedBox(width: 8),
-                ChoiceChip(label: const Text('Weekly'), selected: false, onSelected: (_) {}),
-                const SizedBox(width: 8),
-                ChoiceChip(label: const Text('Monthly'), selected: false, onSelected: (_) {}),
-              ],
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  ChoiceChip(label: const Text('Daily'), selected: true, onSelected: (_) {}),
+                  const SizedBox(width: 8),
+                  ChoiceChip(label: const Text('Weekly'), selected: false, onSelected: (_) {}),
+                  const SizedBox(width: 8),
+                  ChoiceChip(label: const Text('Monthly'), selected: false, onSelected: (_) {}),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 8),
@@ -98,7 +104,7 @@ class AiAssistantScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Expenditure (This Week)', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('Expenditure (This Week)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp)),
                   const SizedBox(height: 12),
                   SizedBox(
                     height: 150,
@@ -134,20 +140,22 @@ class AiAssistantScreen extends StatelessWidget {
               ),
             ),
           ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: ai.suggestions.length,
-              itemBuilder: (context, index) {
-                final s = ai.suggestions[index];
-                final text = isEnglish ? s.messageEn : s.messageSw;
-                return ListTile(
-                  leading: const Icon(Icons.insights),
-                  title: Text(text),
-                );
-              },
-            ),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: ai.suggestions.length,
+            itemBuilder: (context, index) {
+              final s = ai.suggestions[index];
+              final text = isEnglish ? s.messageEn : s.messageSw;
+              return ListTile(
+                leading: const Icon(Icons.insights),
+                title: Text(text),
+              );
+            },
           ),
         ],
+      ),
+        ),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart' hide Badge;
 import 'package:provider/provider.dart';
 import '../../providers/gamification_provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class GamificationScreen extends StatelessWidget {
   const GamificationScreen({super.key});
@@ -109,7 +110,7 @@ class _HeaderCard extends StatelessWidget {
             children: [
               const Icon(Icons.stars, color: Colors.white, size: 28),
               const SizedBox(width: 8),
-              Text('Level $level', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              Text('Level $level', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.sp)),
               const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -118,14 +119,14 @@ class _HeaderCard extends StatelessWidget {
                   children: [
                     const Icon(Icons.local_fire_department, color: Colors.orangeAccent, size: 18),
                     const SizedBox(width: 6),
-                    Text('${streakDays}d streak', style: const TextStyle(color: Colors.white)),
+                    Text('${streakDays}d streak', style: TextStyle(color: Colors.white, fontSize: 12.sp)),
                   ],
                 ),
               ),
             ],
           ),
           const SizedBox(height: 10),
-          Text('$points pts', style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
+          Text('$points pts', style: TextStyle(color: Colors.white, fontSize: 32.sp, fontWeight: FontWeight.bold)),
           const SizedBox(height: 6),
           ClipRRect(
             borderRadius: BorderRadius.circular(999),
@@ -137,7 +138,7 @@ class _HeaderCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          Text('Next level: ${(progressToNext * 100).toStringAsFixed(0)}%', style: const TextStyle(color: Colors.white70)),
+          Text('Next level: ${(progressToNext * 100).toStringAsFixed(0)}%', style: TextStyle(color: Colors.white70, fontSize: 12.sp)),
         ],
       ),
     );

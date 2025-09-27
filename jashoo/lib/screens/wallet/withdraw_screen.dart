@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/wallet_provider.dart';
 import '../../providers/pin_provider.dart';
 import '../../providers/user_provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class WithdrawScreen extends StatefulWidget {
   const WithdrawScreen({super.key});
@@ -22,7 +23,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Withdraw'), backgroundColor: const Color(0xFF10B981)),
+      appBar: AppBar(title: Text('Withdraw', style: TextStyle(fontSize: 16.sp)), backgroundColor: const Color(0xFF10B981)),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -37,7 +38,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
               value: _method,
-              decoration: const InputDecoration(labelText: 'Method'),
+              decoration: InputDecoration(labelText: 'Method', labelStyle: TextStyle(fontSize: 14.sp)),
               items: const [
                 DropdownMenuItem(value: 'M-PESA', child: Text('M-PESA')),
                 DropdownMenuItem(value: 'ABSA Bank', child: Text('ABSA Bank')),
@@ -60,7 +61,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
               value: _category,
-              decoration: const InputDecoration(labelText: 'Category'),
+              decoration: InputDecoration(labelText: 'Category', labelStyle: TextStyle(fontSize: 14.sp)),
               items: const [
                 DropdownMenuItem(value: 'Food', child: Text('Food')),
                 DropdownMenuItem(value: 'Electricity', child: Text('Electricity')),
@@ -74,7 +75,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
               value: _selectedHustle,
-              decoration: const InputDecoration(labelText: 'Hustle (source)'),
+              decoration: InputDecoration(labelText: 'Hustle (source)', labelStyle: TextStyle(fontSize: 14.sp)),
               items: (context.read<UserProvider>().profile?.skills ?? [])
                   .map((h) => DropdownMenuItem(value: h, child: Text(h)))
                   .toList(),
@@ -90,7 +91,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                 context.read<WalletProvider>().withdrawKes(amt, category: _category, method: _method, hustle: _selectedHustle);
                 Navigator.pop(context);
               },
-              child: Text('Withdraw to $_method'),
+              child: Text('Withdraw to $_method', style: TextStyle(fontSize: 14.sp)),
             ),
           ],
         ),

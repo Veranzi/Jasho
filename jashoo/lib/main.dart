@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'l10n/app_localizations.dart';
+import 'package:responsive_framework/responsive_framework.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'routes.dart';
 import 'providers/auth_provider.dart';
 import 'providers/user_provider.dart';
@@ -35,7 +37,11 @@ class JashoApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => PinProvider()),
       ],
       child: Consumer<LocaleProvider>(
-        builder: (context, localeProvider, _) => MaterialApp(
+        builder: (context, localeProvider, _) => ScreenUtilInit(
+          designSize: const Size(390, 844),
+          minTextAdapt: true,
+          splitScreenMode: true,
+          builder: (_, __) => MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'JASHO',
         theme: ThemeData(
@@ -56,7 +62,18 @@ class JashoApp extends StatelessWidget {
         ],
         initialRoute: '/splash',
         routes: appRoutes,
-      ),
+          builder: (context, child) => ResponsiveBreakpoints.builder(
+            child: child!,
+            breakpoints: const [
+              Breakpoint(start: 0, end: 360, name: MOBILE),
+              Breakpoint(start: 361, end: 800, name: TABLET),
+              Breakpoint(start: 801, end: 1200, name: DESKTOP),
+              Breakpoint(start: 1201, end: double.infinity, name: '4K'),
+            ],
+            defaultScale: true,
+          ),
+          ),
+        ),
       ),
     );
   }

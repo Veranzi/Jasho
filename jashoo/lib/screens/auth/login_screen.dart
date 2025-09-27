@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'signup_screen.dart'; // This navigates to your signup screen
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -37,12 +38,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 30),
 
                 // 2. Title
-                const Text(
+                Text(
                   "Login",
                   style: TextStyle(
-                    fontSize: 30,
+                    fontSize: 30.sp,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF10B981),
+                    color: const Color(0xFF10B981),
                   ),
                   textAlign: TextAlign.left,
                 ),
@@ -147,9 +148,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     elevation: 2,
                   ),
-                  child: const Text(
+                  child: Text(
                     "Login",
-                    style: TextStyle(fontSize: 18, color: Colors.white),
+                    style: TextStyle(fontSize: 18.sp, color: Colors.white),
                   ),
                 ),
                 const SizedBox(height: 18),
@@ -183,10 +184,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     "Create Account",
                     style: TextStyle(
-                        fontSize: 18, color: Color(0xFF10B981)),
+                        fontSize: 18.sp, color: const Color(0xFF10B981)),
                   ),
                 ),
                 const SizedBox(height: 10),

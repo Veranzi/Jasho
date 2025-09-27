@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import '../../providers/jobs_provider.dart';
 import 'ai_assistant_screen.dart';
 import 'transactions.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DashBoardScreen extends StatefulWidget {
   const DashBoardScreen({super.key});
@@ -48,10 +49,10 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         children: [
           Image.asset('assets/logo.png', height: 28, color: Colors.white),
           const SizedBox(width: 12),
-          const Text(
+          Text(
             "JASHO",
             style: TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
+                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20.sp),
           ),
         ],
       ),
@@ -130,16 +131,16 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         children: [
           Text("Wallet Balance",
               style:
-                  TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14)),
+                  TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14.sp)),
           const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 "$label ${balance.toStringAsFixed(isKes ? 0 : 2)}",
-                style: const TextStyle(
+                style: TextStyle(
                     color: Colors.white,
-                    fontSize: 28,
+                    fontSize: 28.sp,
                     fontWeight: FontWeight.bold),
               ),
               Row(
@@ -224,11 +225,11 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         child: Column(
           children: [
             Text(title,
-                style: TextStyle(color: Colors.grey[600], fontSize: 14)),
+                style: TextStyle(color: Colors.grey[600], fontSize: 14.sp)),
             const SizedBox(height: 4),
             Text(value,
-                style: const TextStyle(
-                    fontSize: 18,
+                style: TextStyle(
+                    fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87)),
           ],
@@ -253,8 +254,8 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title,
-              style: const TextStyle(
-                  fontSize: 18,
+              style: TextStyle(
+                  fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87)),
           const SizedBox(height: 16),
