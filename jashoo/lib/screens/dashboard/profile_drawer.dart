@@ -33,8 +33,9 @@ class ProfileDrawer extends StatelessWidget {
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
+                          const SizedBox(height: 8), // Add top spacing
                           Text(
                             "John Doe",
                             style: TextStyle(
