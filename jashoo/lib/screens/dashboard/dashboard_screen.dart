@@ -601,7 +601,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                   Text(
                     title,
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
