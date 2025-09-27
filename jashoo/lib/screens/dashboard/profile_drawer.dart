@@ -16,9 +16,10 @@ class ProfileDrawer extends StatelessWidget {
         child: SingleChildScrollView( // ✅ prevents vertical overflow
           child: Column(
             children: [
-              // Profile image - separate from header
+              // Profile image - separate from header, left-aligned
               Container(
                 padding: const EdgeInsets.all(16),
+                alignment: Alignment.centerLeft,
                 child: const CircleAvatar(
                   radius: 30,
                   backgroundColor: Color(0xFF10B981),
