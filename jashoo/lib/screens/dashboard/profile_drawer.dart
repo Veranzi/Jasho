@@ -20,35 +20,42 @@ class ProfileDrawer extends StatelessWidget {
                 margin: EdgeInsets.zero,
                 padding: const EdgeInsets.all(16),
                 decoration: const BoxDecoration(color: Color(0xFF10B981)),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
                   children: [
+                    // Profile image on the left
                     const CircleAvatar(
                       radius: 30,
                       backgroundColor: Colors.white,
                       child: Icon(Icons.person, size: 40, color: Color(0xFF10B981)),
                     ),
-                    const SizedBox(height: 10),
-                    Flexible(
-                      child: Text(
-                        "John Doe",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18.sp,
-                          overflow: TextOverflow.ellipsis, // ✅ no horizontal overflow
-                        ),
-                        maxLines: 1,
-                      ),
-                    ),
-                    Flexible(
-                      child: Text(
-                        "Gig Worker",
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14.sp,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        maxLines: 1,
+                    const SizedBox(width: 16),
+                    // Name and work info on the right
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "John Doe",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.bold,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            maxLines: 1,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "Gig Worker",
+                            style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 14.sp,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            maxLines: 1,
+                          ),
+                        ],
                       ),
                     ),
                   ],
