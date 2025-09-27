@@ -50,54 +50,25 @@ class GamificationScreen extends StatelessWidget {
             const SizedBox(height: 8),
             _RedeemQuick(onRedeem: (cost) => g.redeemPoints(cost), currentPoints: points),
             const SizedBox(height: 16),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                if (constraints.maxWidth > 400) {
-                  // Two buttons side by side for larger screens
-                  return Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => Navigator.pushNamed(context, '/rewards'),
-                          icon: const Icon(Icons.store),
-                          label: const Text('Open Rewards Store'),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () => g.earnPoints(100),
-                          icon: const Icon(Icons.add),
-                          label: const Text('Simulate +100'),
-                        ),
-                      ),
-                    ],
-                  );
-                } else {
-                  // Stacked buttons for smaller screens
-                  return Column(
-                    children: [
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton.icon(
-                          onPressed: () => Navigator.pushNamed(context, '/rewards'),
-                          icon: const Icon(Icons.store),
-                          label: const Text('Open Rewards Store'),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton.icon(
-                          onPressed: () => g.earnPoints(100),
-                          icon: const Icon(Icons.add),
-                          label: const Text('Simulate +100'),
-                        ),
-                      ),
-                    ],
-                  );
-                }
-              },
+            // Open Rewards Store and Simulate buttons in same row
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () => Navigator.pushNamed(context, '/rewards'),
+                    icon: const Icon(Icons.store),
+                    label: const Text('Open Rewards Store'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => g.earnPoints(100),
+                    icon: const Icon(Icons.add),
+                    label: const Text('Simulate +100'),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
