@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/gamification_provider.dart';
 import '../../widgets/skeleton.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class RewardsScreen extends StatefulWidget {
   const RewardsScreen({super.key});
@@ -51,7 +52,7 @@ class _RewardsScreenState extends State<RewardsScreen> with SingleTickerProvider
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _PointsHeader(points: g.points),
-            const SizedBox(height: 16),
+          const SizedBox(height: 16),
             Expanded(
               child: _loading
                   ? GridView.builder(
@@ -108,7 +109,7 @@ class _PointsHeader extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
       ),
       padding: const EdgeInsets.all(16),
-      child: Row(
+            child: Row(
         children: [
           const Icon(Icons.workspace_premium, color: Colors.white),
           const SizedBox(width: 12),
@@ -116,15 +117,15 @@ class _PointsHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Your balance', style: TextStyle(color: Colors.white70)),
-                Text('$points pts', style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+                      Text('Your balance', style: TextStyle(color: Colors.white70, fontSize: 12.sp)),
+                      Text('$points pts', style: TextStyle(color: Colors.white, fontSize: 22.sp, fontWeight: FontWeight.bold)),
               ],
             ),
           ),
           OutlinedButton(
             style: OutlinedButton.styleFrom(foregroundColor: Colors.white, side: const BorderSide(color: Colors.white70)),
             onPressed: () {},
-            child: const Text('How it works'),
+                  child: Text('How it works', style: TextStyle(fontSize: 12.sp)),
           )
         ],
       ),
