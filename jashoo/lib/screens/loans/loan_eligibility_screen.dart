@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+//import 'package:flutter/src/foundation/change_notifier.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
+
 
 class LoanEligibilityScreen extends StatefulWidget {
   const LoanEligibilityScreen({super.key});
@@ -18,7 +21,7 @@ class _LoanEligibilityScreenState extends State<LoanEligibilityScreen> {
   
   String _selectedSacco = '';
   String _selectedEvidenceType = 'M-Pesa Statement';
-  List<File> _uploadedDocuments = [];
+  final List<File> _uploadedDocuments = [];
   bool _isLoading = false;
 
   final List<String> _saccos = [
@@ -972,12 +975,11 @@ class _QRScanScreenState extends State<_QRScanScreen> {
         actions: [
           IconButton(
             onPressed: () => controller.toggleTorch(),
-            icon: const Icon(Icons.flash_on),
+
             tooltip: 'Toggle Flash',
           ),
           IconButton(
             onPressed: () => controller.switchCamera(),
-            icon: const Icon(Icons.camera_rear),
             tooltip: 'Switch Camera',
           ),
         ],
@@ -1128,4 +1130,8 @@ class _QRScanScreenState extends State<_QRScanScreen> {
       }
     }
   }
+}
+
+extension on MobileScannerController {
+  ValueListenable<CameraFacing> get cameraFacing => cameraFacingStateStream;
 }
