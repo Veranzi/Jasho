@@ -31,6 +31,7 @@ class GamificationScreen extends StatelessWidget {
           ),
         ],
       ),
+      bottomNavigationBar: _buildBottomNavigationBar(context),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -41,10 +42,6 @@ class GamificationScreen extends StatelessWidget {
             _SectionTitle(title: 'Ways to earn points'),
             const SizedBox(height: 8),
             _EarnGrid(onSimulate: (value) => g.earnPoints(value)),
-            const SizedBox(height: 16),
-            _SectionTitle(title: 'Badges'),
-            const SizedBox(height: 8),
-            _BadgesStrip(badges: g.badges),
             const SizedBox(height: 16),
             _SectionTitle(title: 'Redeem quickly'),
             const SizedBox(height: 8),
@@ -69,6 +66,77 @@ class GamificationScreen extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomNavigationBar(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      decoration: BoxDecoration(color: Colors.white, boxShadow: [
+        BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 10),
+      ]),
+      child: SafeArea(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildNavItem(context, Icons.home, "Home", 0),
+            _buildNavItem(context, Icons.history, "History", 1),
+            _buildNavItem(context, Icons.insights, "AI Insight", 2),
+            _buildNavItem(context, Icons.person, "Profile", 3),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNavItem(BuildContext context, IconData icon, String label, int index) {
+    const Color primaryColor = Color(0xFF10B981);
+    const Color lightBlueBackground = Color(0xFFE6FFF5);
+    
+    return GestureDetector(
+      onTap: () {
+        switch (index) {
+          case 0:
+            Navigator.pushReplacementNamed(context, '/dashboard');
+            break;
+          case 1:
+            Navigator.pushNamed(context, '/transactionHistory');
+            break;
+          case 2:
+            Navigator.pushNamed(context, '/aiAssistant');
+            break;
+          case 3:
+            Navigator.pushNamed(context, '/profileUpdate');
+            break;
+        }
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        decoration: BoxDecoration(
+            color: index == 2 ? lightBlueBackground : Colors.transparent, // Highlight AI Insight
+            borderRadius: BorderRadius.circular(20)),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon,
+                color: index == 2 ? primaryColor : Colors.grey[600], size: 24),
+            const SizedBox(height: 2),
+            Flexible(
+              child: Text(label,
+                  style: TextStyle(
+                      color: index == 2 ? primaryColor : Colors.grey[600],
+                      fontSize: 10,
+                      fontWeight:
+                          index == 2 ? FontWeight.bold : FontWeight.normal),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1),
             ),
           ],
         ),
