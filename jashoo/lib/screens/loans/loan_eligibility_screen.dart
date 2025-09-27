@@ -11,14 +11,48 @@ class LoanEligibilityScreen extends StatefulWidget {
 
 class _LoanEligibilityScreenState extends State<LoanEligibilityScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _saccoNameController = TextEditingController();
   final _saccoIdController = TextEditingController();
   final _amountController = TextEditingController();
   final _descriptionController = TextEditingController();
   
+  String _selectedSacco = '';
   String _selectedEvidenceType = 'M-Pesa Statement';
   List<File> _uploadedDocuments = [];
   bool _isLoading = false;
+
+  final List<String> _saccos = [
+    'Stima SACCO',
+    'Mwalimu SACCO',
+    'Kenya Police SACCO',
+    'Kenya Teachers SACCO',
+    'Kenya Defense Forces SACCO',
+    'Kenya Power SACCO',
+    'Kenya Airways SACCO',
+    'Kenya Commercial Bank SACCO',
+    'Cooperative Bank SACCO',
+    'National Bank SACCO',
+    'Kenya Revenue Authority SACCO',
+    'Kenya Railways SACCO',
+    'Kenya Ports Authority SACCO',
+    'Kenya Posta SACCO',
+    'Kenya Broadcasting Corporation SACCO',
+    'Kenya Wildlife Service SACCO',
+    'Kenya Forest Service SACCO',
+    'Kenya Meteorological Department SACCO',
+    'Kenya Medical Research Institute SACCO',
+    'Kenya Agricultural Research Institute SACCO',
+    'Kenya Industrial Research Institute SACCO',
+    'Kenya Bureau of Standards SACCO',
+    'Kenya National Examinations Council SACCO',
+    'Kenya Institute of Curriculum Development SACCO',
+    'Kenya Institute of Special Education SACCO',
+    'Kenya Institute of Mass Communication SACCO',
+    'Kenya Institute of Administration SACCO',
+    'Kenya Institute of Management SACCO',
+    'Kenya Institute of Public Policy Research SACCO',
+    'Kenya Institute of Economic Affairs SACCO',
+    'Other SACCO/Chama',
+  ];
 
   final List<String> _evidenceTypes = [
     'M-Pesa Statement',
@@ -31,7 +65,6 @@ class _LoanEligibilityScreenState extends State<LoanEligibilityScreen> {
 
   @override
   void dispose() {
-    _saccoNameController.dispose();
     _saccoIdController.dispose();
     _amountController.dispose();
     _descriptionController.dispose();
@@ -140,17 +173,28 @@ class _LoanEligibilityScreenState extends State<LoanEligibilityScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          TextFormField(
-            controller: _saccoNameController,
+          DropdownButtonFormField<String>(
+            value: _selectedSacco.isEmpty ? null : _selectedSacco,
             decoration: const InputDecoration(
-              labelText: 'SACCO/Chama Name',
-              hintText: 'e.g., Stima SACCO, Mwalimu SACCO',
+              labelText: 'Select SACCO/Chama',
+              hintText: 'Choose your SACCO or Chama',
               prefixIcon: Icon(Icons.business),
               border: OutlineInputBorder(),
             ),
+            items: _saccos.map((String sacco) {
+              return DropdownMenuItem<String>(
+                value: sacco,
+                child: Text(sacco),
+              );
+            }).toList(),
+            onChanged: (String? newValue) {
+              setState(() {
+                _selectedSacco = newValue ?? '';
+              });
+            },
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Please enter SACCO/Chama name';
+                return 'Please select a SACCO/Chama';
               }
               return null;
             },
@@ -366,32 +410,58 @@ class _LoanEligibilityScreenState extends State<LoanEligibilityScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          Row(
+          Column(
             children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: _pickDocuments,
-                  icon: const Icon(Icons.add_photo_alternate),
-                  label: const Text('Add Documents'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF10B981),
-                    side: const BorderSide(color: Color(0xFF10B981)),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _pickDocuments,
+                      icon: const Icon(Icons.add_photo_alternate),
+                      label: const Text('Upload'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFF10B981),
+                        side: const BorderSide(color: Color(0xFF10B981)),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _takePhoto,
+                      icon: const Icon(Icons.camera_alt),
+                      label: const Text('Take Photo'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFF10B981),
+                        side: const BorderSide(color: Color(0xFF10B981)),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _scanDocument,
+                      icon: const Icon(Icons.document_scanner),
+                      label: const Text('Scan'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: const Color(0xFF10B981),
+                        side: const BorderSide(color: Color(0xFF10B981)),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: _takePhoto,
-                  icon: const Icon(Icons.camera_alt),
-                  label: const Text('Take Photo'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: const Color(0xFF10B981),
-                    side: const BorderSide(color: Color(0xFF10B981)),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
+              const SizedBox(height: 8),
+              const Text(
+                'Upload from gallery • Take a photo • Scan documents',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 12,
                 ),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
@@ -493,6 +563,30 @@ class _LoanEligibilityScreenState extends State<LoanEligibilityScreen> {
     }
   }
 
+  Future<void> _scanDocument() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.camera,
+      preferredCameraDevice: CameraDevice.rear,
+      imageQuality: 85,
+    );
+    
+    if (image != null) {
+      setState(() {
+        _uploadedDocuments.add(File(image.path));
+      });
+      
+      // Show scanning feedback
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Document scanned successfully!'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
   void _removeDocument(int index) {
     setState(() {
       _uploadedDocuments.removeAt(index);
@@ -550,15 +644,15 @@ class _LoanEligibilityScreenState extends State<LoanEligibilityScreen> {
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.grey[300]!),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('SACCO: ${_saccoNameController.text}'),
-                    Text('Amount: KES ${_amountController.text}'),
-                    Text('Evidence: $_selectedEvidenceType'),
-                    Text('Documents: ${_uploadedDocuments.length} uploaded'),
-                  ],
-                ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('SACCO: $_selectedSacco'),
+                      Text('Amount: KES ${_amountController.text}'),
+                      Text('Evidence: $_selectedEvidenceType'),
+                      Text('Documents: ${_uploadedDocuments.length} uploaded'),
+                    ],
+                  ),
               ),
               const SizedBox(height: 12),
               const Text(
