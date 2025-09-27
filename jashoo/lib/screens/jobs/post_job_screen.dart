@@ -19,7 +19,9 @@ class _PostJobScreenState extends State<PostJobScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Post a Job')),
-      body: Padding(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
@@ -47,6 +49,8 @@ class _PostJobScreenState extends State<PostJobScreen> {
               child: const Text('Post'),
             ),
           ],
+        ),
+          ),
         ),
       ),
     );

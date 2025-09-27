@@ -8,18 +8,22 @@ class ChangePassword extends StatelessWidget {
     final newPasswordController = TextEditingController();
     return Scaffold(
       appBar: AppBar(title: const Text("Change Password")),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            TextField(controller: newPasswordController, decoration: const InputDecoration(labelText: "New Password"), obscureText: true),
-            const SizedBox(height: 20),
-            ElevatedButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Password updated!")));
-                },
-                child: const Text("Update Password")),
-          ],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              children: [
+                TextField(controller: newPasswordController, decoration: const InputDecoration(labelText: "New Password"), obscureText: true),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Password updated!")));
+                    },
+                    child: const Text("Update Password")),
+              ],
+            ),
+          ),
         ),
       ),
     );

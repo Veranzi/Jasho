@@ -17,7 +17,9 @@ class _SetPinScreenState extends State<SetPinScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Transaction PIN')),
-      body: Padding(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
@@ -46,6 +48,8 @@ class _SetPinScreenState extends State<SetPinScreen> {
               child: const Text('Save PIN'),
             )
           ],
+        ),
+          ),
         ),
       ),
     );

@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../providers/locale_provider.dart';
 
 class ProfileDrawer extends StatelessWidget {
   const ProfileDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final localeProvider = context.watch<LocaleProvider>();
+    final isEnglish = localeProvider.languageCode == 'en';
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -81,6 +85,18 @@ class ProfileDrawer extends StatelessWidget {
           ),
 
           const Divider(),
+
+          // Language switch
+          SwitchListTile(
+            secondary: const Icon(Icons.language, color: Colors.indigo),
+            title: const Text("Language"),
+            subtitle: Text(isEnglish ? 'English' : 'Swahili'),
+            value: isEnglish,
+            onChanged: (val) {
+              final newCode = val ? 'en' : 'sw';
+              context.read<LocaleProvider>().setLanguage(newCode);
+            },
+          ),
 
           // Logout
           ListTile(
