@@ -30,7 +30,7 @@ class ProfileDrawer extends StatelessWidget {
                       child: Icon(Icons.person, size: 40, color: Color(0xFF10B981)),
                     ),
                     const SizedBox(height: 12),
-                    // Name and work info below the image
+                    // Name and work info below the image, left-aligned
                     Text(
                       "John Doe",
                       style: TextStyle(
