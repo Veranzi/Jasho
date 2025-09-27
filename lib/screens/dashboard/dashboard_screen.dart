@@ -346,119 +346,123 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
 
   /// ----------------- PROFILE -----------------
   Widget _buildProfile() {
-    return Column(
-      children: [
-        const SizedBox(height: 16),
-        Row(
-          children: const [
-            SizedBox(width: 16),
-            CircleAvatar(
-              radius: 36,
-              backgroundColor: primaryColor,
-              child: Icon(Icons.person, color: Colors.white, size: 40),
+    return SafeArea(
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            const SizedBox(height: 16),
+            Row(
+              children: const [
+                SizedBox(width: 16),
+                CircleAvatar(
+                  radius: 36,
+                  backgroundColor: primaryColor,
+                  child: Icon(Icons.person, color: Colors.white, size: 40),
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Your Profile',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ],
             ),
-            SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                'Your Profile',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => Navigator.pushNamed(context, '/profileUpdate'),
+                      icon: const Icon(Icons.edit),
+                      label: const Text('Edit'),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => Navigator.pushNamed(context, '/gamification'),
+                      icon: const Icon(Icons.emoji_events),
+                      label: const Text('Points'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => Navigator.pushNamed(context, '/savings'),
+                      icon: const Icon(Icons.savings),
+                      label: const Text('Savings'),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => Navigator.pushNamed(context, '/loans'),
+                      icon: const Icon(Icons.account_balance),
+                      label: const Text('Loans'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => Navigator.pushNamed(context, '/insurance'),
+                      icon: const Icon(Icons.health_and_safety),
+                      label: const Text('Insurance'),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => Navigator.pushNamed(context, '/help'),
+                      icon: const Icon(Icons.help),
+                      label: const Text('Help'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => Navigator.pushNamed(context, '/changePassword'),
+                      icon: const Icon(Icons.lock),
+                      label: const Text('Password'),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => Navigator.pushNamed(context, '/logout'),
+                      icon: const Icon(Icons.logout, color: Colors.red),
+                      label: const Text('Logout'),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
-        const SizedBox(height: 16),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () => Navigator.pushNamed(context, '/profileUpdate'),
-                  icon: const Icon(Icons.edit),
-                  label: const Text('Edit'),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () => Navigator.pushNamed(context, '/gamification'),
-                  icon: const Icon(Icons.emoji_events),
-                  label: const Text('Points'),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 8),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () => Navigator.pushNamed(context, '/savings'),
-                  icon: const Icon(Icons.savings),
-                  label: const Text('Savings'),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () => Navigator.pushNamed(context, '/loans'),
-                  icon: const Icon(Icons.account_balance),
-                  label: const Text('Loans'),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 8),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () => Navigator.pushNamed(context, '/insurance'),
-                  icon: const Icon(Icons.health_and_safety),
-                  label: const Text('Insurance'),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () => Navigator.pushNamed(context, '/help'),
-                  icon: const Icon(Icons.help),
-                  label: const Text('Help'),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const Spacer(),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
-          child: Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () => Navigator.pushNamed(context, '/changePassword'),
-                  icon: const Icon(Icons.lock),
-                  label: const Text('Password'),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () => Navigator.pushNamed(context, '/logout'),
-                  icon: const Icon(Icons.logout, color: Colors.red),
-                  label: const Text('Logout'),
-                ),
-              ),
-            ],
-          ),
-        )
-      ],
+      ),
     );
   }
 
