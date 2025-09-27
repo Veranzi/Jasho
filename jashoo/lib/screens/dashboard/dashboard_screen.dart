@@ -143,42 +143,42 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                     fontSize: 28.sp,
                     fontWeight: FontWeight.bold),
               ),
-              Row(
-                children: [
-                  OutlinedButton(
-                    onPressed: wallet.toggleCurrency,
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      side: BorderSide(color: Colors.white.withOpacity(0.5)),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)),
-                    ),
-                    child: Text(isKes ? 'SHOW USDT' : 'SHOW KES'),
-                  ),
-                  const SizedBox(width: 8),
-                  OutlinedButton(
-                    onPressed: () => Navigator.pushNamed(context, '/deposit'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      side: BorderSide(color: Colors.white.withOpacity(0.5)),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)),
-                    ),
-                    child: const Text("DEPOSIT"),
-                  ),
-                  const SizedBox(width: 8),
-                  OutlinedButton(
-                    onPressed: () => Navigator.pushNamed(context, '/withdraw'),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      side: BorderSide(color: Colors.white.withOpacity(0.5)),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)),
-                    ),
-                    child: const Text("WITHDRAW"),
-                  ),
-                ],
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              OutlinedButton(
+                onPressed: wallet.toggleCurrency,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  side: BorderSide(color: Colors.white.withOpacity(0.5)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                ),
+                child: Text(isKes ? 'SHOW USDT' : 'SHOW KES'),
               ),
+              OutlinedButton(
+                onPressed: () => Navigator.pushNamed(context, '/deposit'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  side: BorderSide(color: Colors.white.withOpacity(0.5)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                ),
+                child: const Text("DEPOSIT"),
+              ),
+              OutlinedButton(
+                onPressed: () => Navigator.pushNamed(context, '/withdraw'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  side: BorderSide(color: Colors.white.withOpacity(0.5)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
+                ),
+                child: const Text("WITHDRAW"),
+              ),
+            ],
+          ),
             ],
           ),
           const SizedBox(height: 16),
