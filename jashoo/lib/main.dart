@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'l10n/app_localizations.dart';
 import 'routes.dart';
 import 'providers/auth_provider.dart';
 import 'providers/user_provider.dart';
@@ -38,7 +39,7 @@ class JashoApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'JASHO',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0D47A1)),
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF10B981)),
           useMaterial3: true,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
@@ -48,6 +49,7 @@ class JashoApp extends StatelessWidget {
           Locale('sw'),
         ],
         localizationsDelegates: const [
+          AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,

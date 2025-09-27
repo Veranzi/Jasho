@@ -42,7 +42,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(
                     fontSize: 30,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF0D47A1),
+                    color: Color(0xFF10B981),
                   ),
                   textAlign: TextAlign.left,
                 ),
@@ -55,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: InputDecoration(
                     hintText: "Enter your mobile number",
                     prefixIcon: const Icon(Icons.phone_android,
-                        color: Color(0xFF0D47A1)),
+                        color: Color(0xFF10B981)),
                     filled: true,
                     fillColor: Colors.grey.shade100,
                     contentPadding: const EdgeInsets.symmetric(vertical: 18),
@@ -75,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: InputDecoration(
                     hintText: "Enter your password",
                     prefixIcon: const Icon(Icons.lock_outline,
-                        color: Color(0xFF0D47A1)),
+                        color: Color(0xFF10B981)),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _isPasswordVisible
@@ -113,7 +113,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               _rememberMe = value ?? false;
                             });
                           },
-                          activeColor: const Color(0xFF0D47A1),
+                          activeColor: const Color(0xFF10B981),
                         ),
                         const Text("Remember me"),
                       ],
@@ -125,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text(
                         "Forgot password?",
                         style: TextStyle(
-                          color: Color(0xFF0D47A1),
+                          color: Color(0xFF10B981),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -140,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Navigator.pushReplacementNamed(context, '/dashboard');
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0D47A1),
+                    backgroundColor: const Color(0xFF10B981),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -178,7 +178,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    side: const BorderSide(color: Color(0xFF0D47A1)),
+                    side: const BorderSide(color: Color(0xFF10B981)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -186,7 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: const Text(
                     "Create Account",
                     style: TextStyle(
-                        fontSize: 18, color: Color(0xFF0D47A1)),
+                        fontSize: 18, color: Color(0xFF10B981)),
                   ),
                 ),
                 const SizedBox(height: 10),

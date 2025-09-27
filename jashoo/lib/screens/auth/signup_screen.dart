@@ -88,7 +88,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF0D47A1),
+                      color: Color(0xFF10B981),
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -224,7 +224,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF0D47A1),
+                      backgroundColor: const Color(0xFF10B981),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
@@ -280,16 +280,23 @@ class _SignupScreenState extends State<SignupScreen> {
 
   Widget _buildPasswordField(TextEditingController controller, String label,
       {String? Function(String?)? validator}) {
+    bool obscure = true;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: TextFormField(
-        controller: controller,
-        obscureText: true,
-        validator: validator,
-        decoration: InputDecoration(
-          labelText: label,
-          prefixIcon: const Icon(Icons.lock_outline),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+      child: StatefulBuilder(
+        builder: (context, setState) => TextFormField(
+          controller: controller,
+          obscureText: obscure,
+          validator: validator,
+          decoration: InputDecoration(
+            labelText: label,
+            prefixIcon: const Icon(Icons.lock_outline),
+            suffixIcon: IconButton(
+              icon: Icon(obscure ? Icons.visibility_off : Icons.visibility),
+              onPressed: () => setState(() => obscure = !obscure),
+            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+          ),
         ),
       ),
     );

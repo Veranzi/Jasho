@@ -15,7 +15,7 @@ class ProfileDrawer extends StatelessWidget {
         children: [
           const DrawerHeader(
             decoration: BoxDecoration(
-              color: Color(0xFF0D47A1), // JASHO primary blue
+              color: Color(0xFF10B981),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -23,7 +23,7 @@ class ProfileDrawer extends StatelessWidget {
                 CircleAvatar(
                   radius: 30,
                   backgroundColor: Colors.white,
-                  child: Icon(Icons.person, size: 40, color: Color(0xFF0D47A1)),
+                  child: Icon(Icons.person, size: 40, color: Color(0xFF10B981)),
                 ),
                 SizedBox(height: 10),
                 Text("John Doe",
@@ -36,7 +36,7 @@ class ProfileDrawer extends StatelessWidget {
 
           // Community
           ListTile(
-            leading: const Icon(Icons.group, color: Colors.blue),
+            leading: const Icon(Icons.group, color: Color(0xFF10B981)),
             title: const Text("Community"),
             onTap: () {
               Navigator.pop(context);
@@ -88,7 +88,7 @@ class ProfileDrawer extends StatelessWidget {
 
           // Language switch
           SwitchListTile(
-            secondary: const Icon(Icons.language, color: Colors.indigo),
+            secondary: const Icon(Icons.language, color: Color(0xFF10B981)),
             title: const Text("Language"),
             subtitle: Text(isEnglish ? 'English' : 'Swahili'),
             value: isEnglish,

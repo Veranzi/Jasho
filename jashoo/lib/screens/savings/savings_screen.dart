@@ -28,7 +28,7 @@ class _SavingsScreenState extends State<SavingsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Savings'),
-        backgroundColor: const Color(0xFF0D47A1),
+        backgroundColor: const Color(0xFF10B981),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _openCreateGoalSheet(context, savings),

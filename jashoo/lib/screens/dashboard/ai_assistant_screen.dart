@@ -9,35 +9,15 @@ class AiAssistantScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ai = context.watch<AiProvider>();
-    final isEnglish = ai.languageCode == 'en';
+    final isEnglish = Localizations.localeOf(context).languageCode == 'en';
     return Scaffold(
       appBar: AppBar(
         title: const Text('Jasho Insights'),
-        backgroundColor: const Color(0xFF0D47A1),
+        backgroundColor: const Color(0xFF10B981),
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Row(
-              children: [
-                const Text('Language:'),
-                const SizedBox(width: 8),
-                ChoiceChip(
-                  label: const Text('English'),
-                  selected: isEnglish,
-                  onSelected: (_) => ai.setLanguage('en'),
-                ),
-                const SizedBox(width: 8),
-                ChoiceChip(
-                  label: const Text('Swahili'),
-                  selected: !isEnglish,
-                  onSelected: (_) => ai.setLanguage('sw'),
-                ),
-              ],
-            ),
-          ),
-          const Divider(),
+          // Removed language switch; now controlled globally via drawer
           // Period toggles
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -81,7 +61,7 @@ class AiAssistantScreen extends StatelessWidget {
                     LineChartBarData(
                       spots: const [FlSpot(0, 1), FlSpot(1, 1.6), FlSpot(2, 2.2), FlSpot(3, 3)],
                       isCurved: true,
-                      color: Colors.blue,
+                      color: Color(0xFF10B981),
                       barWidth: 3,
                       dotData: const FlDotData(show: false),
                     ),
@@ -183,7 +163,7 @@ class AiAssistantScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.trending_up, color: Color(0xFF0D47A1)),
+          const Icon(Icons.trending_up, color: Color(0xFF10B981)),
           const SizedBox(width: 8),
           Expanded(child: Text(text)),
         ],

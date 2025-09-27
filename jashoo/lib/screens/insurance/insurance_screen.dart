@@ -40,7 +40,7 @@ class _InsuranceScreenState extends State<InsuranceScreen> with SingleTickerProv
       {'name': 'Income Protection', 'premium': 'KES 80/week'},
     ];
     return Scaffold(
-      appBar: AppBar(title: const Text('Insurance'), backgroundColor: const Color(0xFF0D47A1)),
+      appBar: AppBar(title: const Text('Insurance'), backgroundColor: const Color(0xFF10B981)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

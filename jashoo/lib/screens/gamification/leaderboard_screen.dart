@@ -11,7 +11,7 @@ class LeaderboardScreen extends StatelessWidget {
       {'name': 'Carol', 'points': 4900, 'city': 'Nairobi'},
     ];
     return Scaffold(
-      appBar: AppBar(title: const Text('Leaderboard'), backgroundColor: const Color(0xFF0D47A1)),
+      appBar: AppBar(title: const Text('Leaderboard'), backgroundColor: const Color(0xFF10B981)),
       body: ListView.builder(
         itemCount: entries.length,
         itemBuilder: (_, i) => ListTile(
