@@ -451,51 +451,78 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // Profile cards layout
+                  // Profile cards layout - two per row
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Column(
                       children: [
-                        _buildProfileCard(
-                          icon: Icons.edit,
-                          title: 'Edit Profile',
-                          subtitle: 'Update your personal information',
-                          onTap: () => Navigator.pushNamed(context, '/profileUpdate'),
+                        // Row 1: Edit Profile and Points & Rewards
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildProfileCard(
+                                icon: Icons.edit,
+                                title: 'Edit Profile',
+                                subtitle: 'Update your personal information',
+                                onTap: () => Navigator.pushNamed(context, '/profileUpdate'),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _buildProfileCard(
+                                icon: Icons.emoji_events,
+                                title: 'Points & Rewards',
+                                subtitle: 'View your points and rewards',
+                                onTap: () => Navigator.pushNamed(context, '/gamification'),
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 12),
-                        _buildProfileCard(
-                          icon: Icons.emoji_events,
-                          title: 'Points & Rewards',
-                          subtitle: 'View your points and rewards',
-                          onTap: () => Navigator.pushNamed(context, '/gamification'),
+                        // Row 2: Savings and Loans
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildProfileCard(
+                                icon: Icons.savings,
+                                title: 'Savings',
+                                subtitle: 'Manage your savings account',
+                                onTap: () => Navigator.pushNamed(context, '/savings'),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _buildProfileCard(
+                                icon: Icons.account_balance,
+                                title: 'Loans',
+                                subtitle: 'Apply for loans and view status',
+                                onTap: () => Navigator.pushNamed(context, '/loans'),
+                              ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 12),
-                        _buildProfileCard(
-                          icon: Icons.savings,
-                          title: 'Savings',
-                          subtitle: 'Manage your savings account',
-                          onTap: () => Navigator.pushNamed(context, '/savings'),
-                        ),
-                        const SizedBox(height: 12),
-                        _buildProfileCard(
-                          icon: Icons.account_balance,
-                          title: 'Loans',
-                          subtitle: 'Apply for loans and view status',
-                          onTap: () => Navigator.pushNamed(context, '/loans'),
-                        ),
-                        const SizedBox(height: 12),
-                        _buildProfileCard(
-                          icon: Icons.health_and_safety,
-                          title: 'Insurance',
-                          subtitle: 'Insurance plans and coverage',
-                          onTap: () => Navigator.pushNamed(context, '/insurance'),
-                        ),
-                        const SizedBox(height: 12),
-                        _buildProfileCard(
-                          icon: Icons.help,
-                          title: 'Help & Support',
-                          subtitle: 'Get help and contact support',
-                          onTap: () => Navigator.pushNamed(context, '/help'),
+                        // Row 3: Insurance and Help & Support
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildProfileCard(
+                                icon: Icons.health_and_safety,
+                                title: 'Insurance',
+                                subtitle: 'Insurance plans and coverage',
+                                onTap: () => Navigator.pushNamed(context, '/insurance'),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _buildProfileCard(
+                                icon: Icons.help,
+                                title: 'Help & Support',
+                                subtitle: 'Get help and contact support',
+                                onTap: () => Navigator.pushNamed(context, '/help'),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
