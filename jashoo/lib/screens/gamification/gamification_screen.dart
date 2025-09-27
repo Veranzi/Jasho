@@ -15,7 +15,8 @@ class GamificationScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Jasho Points'),
+        title: Image.asset('assets/logo1.png', height: 28),
+        centerTitle: true,
         backgroundColor: const Color(0xFF10B981),
         actions: [
           IconButton(
@@ -174,45 +175,72 @@ class _EarnGrid extends StatelessWidget {
       _EarnItem(Icons.feedback, 'Give feedback', 5),
     ];
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 12,
-        crossAxisSpacing: 12,
-        childAspectRatio: 2.9,
-      ),
-      itemCount: items.length,
-      itemBuilder: (_, i) {
-        final it = items[i];
-        return InkWell(
-          onTap: () => onSimulate(it.points),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.2)),
-            ),
-            padding: const EdgeInsets.all(12),
-            child: Row(
-              children: [
-                Icon(it.icon, color: Theme.of(context).colorScheme.primary),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(it.title, maxLines: 2, overflow: TextOverflow.ellipsis),
-                      const SizedBox(height: 4),
-                      Text('+${it.points} pts', style: const TextStyle(fontWeight: FontWeight.bold)),
-                    ],
-                  ),
-                )
-              ],
-            ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Calculate responsive aspect ratio based on screen width
+        double aspectRatio;
+        if (constraints.maxWidth < 400) {
+          aspectRatio = 3.2; // Taller cards for narrow screens
+        } else if (constraints.maxWidth < 600) {
+          aspectRatio = 2.9;
+        } else {
+          aspectRatio = 2.6; // Shorter cards for wider screens
+        }
+
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            childAspectRatio: aspectRatio,
           ),
+          itemCount: items.length,
+          itemBuilder: (_, i) {
+            final it = items[i];
+            return InkWell(
+              onTap: () => onSimulate(it.points),
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.2)),
+                ),
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(it.icon, color: Theme.of(context).colorScheme.primary, size: 20),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            it.title, 
+                            maxLines: 2, 
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 12.sp),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      '+${it.points} pts', 
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 11.sp,
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         );
       },
     );

@@ -43,7 +43,7 @@ class JashoApp extends StatelessWidget {
           splitScreenMode: true,
           builder: (_, __) => MaterialApp(
             debugShowCheckedModeBanner: false,
-            title: 'JASHO',
+            title: 'Jasho',
             theme: ThemeData(
               colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF10B981)),
               useMaterial3: true,

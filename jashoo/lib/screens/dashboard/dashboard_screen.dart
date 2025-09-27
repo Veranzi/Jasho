@@ -45,17 +45,8 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
     return AppBar(
       backgroundColor: primaryColor,
       elevation: 0,
-      title: Row(
-        children: [
-          Image.asset('assets/logo.png', height: 28, color: Colors.white),
-          const SizedBox(width: 12),
-          Text(
-            "JASHO",
-            style: TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20.sp),
-          ),
-        ],
-      ),
+      title: Image.asset('assets/logo1.png', height: 32),
+      centerTitle: true,
       actions: [
         IconButton(
           icon: const Icon(Icons.notifications, color: Colors.white),
@@ -134,10 +125,11 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
               style:
                   TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14.sp)),
           const SizedBox(height: 10),
-          // Use Flexible to prevent overflow
+          // Wallet balance and action buttons in same row
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Flexible(
+              Expanded(
                 flex: 2,
                 child: Text(
                   "$label ${balance.toStringAsFixed(isKes ? 0 : 2)}",
@@ -148,71 +140,70 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+              const SizedBox(width: 12),
+              // Action buttons aligned with balance
+              Expanded(
+                flex: 1,
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: wallet.toggleCurrency,
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          side: BorderSide(color: Colors.white.withOpacity(0.5)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                        ),
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(isKes ? 'USDT' : 'KES', 
+                            style: const TextStyle(fontSize: 10)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pushNamed(context, '/deposit'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          side: BorderSide(color: Colors.white.withOpacity(0.5)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                        ),
+                        child: const FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text("DEPOSIT", style: TextStyle(fontSize: 10)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pushNamed(context, '/withdraw'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          side: BorderSide(color: Colors.white.withOpacity(0.5)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)),
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                        ),
+                        child: const FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text("WITHDRAW", style: TextStyle(fontSize: 10)),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
-          ),
-          const SizedBox(height: 12),
-          // Use Wrap with proper constraints
-          LayoutBuilder(
-            builder: (context, constraints) {
-              return Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  SizedBox(
-                    width: constraints.maxWidth > 300 ? null : (constraints.maxWidth - 16) / 3,
-                    child: OutlinedButton(
-                      onPressed: wallet.toggleCurrency,
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        side: BorderSide(color: Colors.white.withOpacity(0.5)),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20)),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      ),
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(isKes ? 'SHOW USDT' : 'SHOW KES', 
-                          style: const TextStyle(fontSize: 12)),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: constraints.maxWidth > 300 ? null : (constraints.maxWidth - 16) / 3,
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pushNamed(context, '/deposit'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        side: BorderSide(color: Colors.white.withOpacity(0.5)),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20)),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      ),
-                      child: const FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text("DEPOSIT", style: TextStyle(fontSize: 12)),
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: constraints.maxWidth > 300 ? null : (constraints.maxWidth - 16) / 3,
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pushNamed(context, '/withdraw'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        side: BorderSide(color: Colors.white.withOpacity(0.5)),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20)),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      ),
-                      child: const FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text("WITHDRAW", style: TextStyle(fontSize: 12)),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            },
           ),
           const SizedBox(height: 16),
           Container(
@@ -412,137 +403,53 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // Use responsive grid layout for buttons
+                  // Profile cards layout
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        if (constraints.maxWidth > 400) {
-                          // Two columns for larger screens
-                          return Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: OutlinedButton.icon(
-                                      onPressed: () => Navigator.pushNamed(context, '/profileUpdate'),
-                                      icon: const Icon(Icons.edit),
-                                      label: const Text('Edit'),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: OutlinedButton.icon(
-                                      onPressed: () => Navigator.pushNamed(context, '/gamification'),
-                                      icon: const Icon(Icons.emoji_events),
-                                      label: const Text('Points'),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: OutlinedButton.icon(
-                                      onPressed: () => Navigator.pushNamed(context, '/savings'),
-                                      icon: const Icon(Icons.savings),
-                                      label: const Text('Savings'),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: OutlinedButton.icon(
-                                      onPressed: () => Navigator.pushNamed(context, '/loans'),
-                                      icon: const Icon(Icons.account_balance),
-                                      label: const Text('Loans'),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: OutlinedButton.icon(
-                                      onPressed: () => Navigator.pushNamed(context, '/insurance'),
-                                      icon: const Icon(Icons.health_and_safety),
-                                      label: const Text('Insurance'),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: OutlinedButton.icon(
-                                      onPressed: () => Navigator.pushNamed(context, '/help'),
-                                      icon: const Icon(Icons.help),
-                                      label: const Text('Help'),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          );
-                        } else {
-                          // Single column for smaller screens
-                          return Column(
-                            children: [
-                              SizedBox(
-                                width: double.infinity,
-                                child: OutlinedButton.icon(
-                                  onPressed: () => Navigator.pushNamed(context, '/profileUpdate'),
-                                  icon: const Icon(Icons.edit),
-                                  label: const Text('Edit Profile'),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              SizedBox(
-                                width: double.infinity,
-                                child: OutlinedButton.icon(
-                                  onPressed: () => Navigator.pushNamed(context, '/gamification'),
-                                  icon: const Icon(Icons.emoji_events),
-                                  label: const Text('Points & Rewards'),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              SizedBox(
-                                width: double.infinity,
-                                child: OutlinedButton.icon(
-                                  onPressed: () => Navigator.pushNamed(context, '/savings'),
-                                  icon: const Icon(Icons.savings),
-                                  label: const Text('Savings'),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              SizedBox(
-                                width: double.infinity,
-                                child: OutlinedButton.icon(
-                                  onPressed: () => Navigator.pushNamed(context, '/loans'),
-                                  icon: const Icon(Icons.account_balance),
-                                  label: const Text('Loans'),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              SizedBox(
-                                width: double.infinity,
-                                child: OutlinedButton.icon(
-                                  onPressed: () => Navigator.pushNamed(context, '/insurance'),
-                                  icon: const Icon(Icons.health_and_safety),
-                                  label: const Text('Insurance'),
-                                ),
-                              ),
-                              const SizedBox(height: 8),
-                              SizedBox(
-                                width: double.infinity,
-                                child: OutlinedButton.icon(
-                                  onPressed: () => Navigator.pushNamed(context, '/help'),
-                                  icon: const Icon(Icons.help),
-                                  label: const Text('Help & Support'),
-                                ),
-                              ),
-                            ],
-                          );
-                        }
-                      },
+                    child: Column(
+                      children: [
+                        _buildProfileCard(
+                          icon: Icons.edit,
+                          title: 'Edit Profile',
+                          subtitle: 'Update your personal information',
+                          onTap: () => Navigator.pushNamed(context, '/profileUpdate'),
+                        ),
+                        const SizedBox(height: 12),
+                        _buildProfileCard(
+                          icon: Icons.emoji_events,
+                          title: 'Points & Rewards',
+                          subtitle: 'View your points and rewards',
+                          onTap: () => Navigator.pushNamed(context, '/gamification'),
+                        ),
+                        const SizedBox(height: 12),
+                        _buildProfileCard(
+                          icon: Icons.savings,
+                          title: 'Savings',
+                          subtitle: 'Manage your savings account',
+                          onTap: () => Navigator.pushNamed(context, '/savings'),
+                        ),
+                        const SizedBox(height: 12),
+                        _buildProfileCard(
+                          icon: Icons.account_balance,
+                          title: 'Loans',
+                          subtitle: 'Apply for loans and view status',
+                          onTap: () => Navigator.pushNamed(context, '/loans'),
+                        ),
+                        const SizedBox(height: 12),
+                        _buildProfileCard(
+                          icon: Icons.health_and_safety,
+                          title: 'Insurance',
+                          subtitle: 'Insurance plans and coverage',
+                          onTap: () => Navigator.pushNamed(context, '/insurance'),
+                        ),
+                        const SizedBox(height: 12),
+                        _buildProfileCard(
+                          icon: Icons.help,
+                          title: 'Help & Support',
+                          subtitle: 'Get help and contact support',
+                          onTap: () => Navigator.pushNamed(context, '/help'),
+                        ),
+                      ],
                     ),
                   ),
                 ],
@@ -572,6 +479,75 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
             ),
           )
         ],
+      ),
+    );
+  }
+
+  Widget _buildProfileCard({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              spreadRadius: 1,
+              blurRadius: 10,
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                icon,
+                color: primaryColor,
+                size: 24,
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: Colors.grey[400],
+            ),
+          ],
+        ),
       ),
     );
   }

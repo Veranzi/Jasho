@@ -28,7 +28,8 @@ class _SavingsScreenState extends State<SavingsScreen> {
     final savings = context.watch<SavingsProvider>();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Savings'),
+        title: Image.asset('assets/logo1.png', height: 28),
+        centerTitle: true,
         backgroundColor: const Color(0xFF10B981),
       ),
       floatingActionButton: FloatingActionButton.extended(
