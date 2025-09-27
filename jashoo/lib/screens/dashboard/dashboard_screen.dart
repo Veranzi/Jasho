@@ -49,10 +49,10 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         children: [
           Image.asset('assets/logo.png', height: 28, color: Colors.white),
           const SizedBox(width: 12),
-          const Text(
+          Text(
             "JASHO",
             style: TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
+                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20.sp),
           ),
         ],
       ),
@@ -225,11 +225,11 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         child: Column(
           children: [
             Text(title,
-                style: TextStyle(color: Colors.grey[600], fontSize: 14)),
+                style: TextStyle(color: Colors.grey[600], fontSize: 14.sp)),
             const SizedBox(height: 4),
             Text(value,
-                style: const TextStyle(
-                    fontSize: 18,
+                style: TextStyle(
+                    fontSize: 18.sp,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87)),
           ],
@@ -254,8 +254,8 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title,
-              style: const TextStyle(
-                  fontSize: 18,
+              style: TextStyle(
+                  fontSize: 18.sp,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87)),
           const SizedBox(height: 16),
