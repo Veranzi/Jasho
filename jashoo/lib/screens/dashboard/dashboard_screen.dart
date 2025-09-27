@@ -179,6 +179,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              // Balance amount on the left
               Expanded(
                 flex: 2,
                 child: Text(
@@ -191,13 +192,12 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                 ),
               ),
               const SizedBox(width: 12),
-              // Action buttons aligned with balance
+              // Action buttons on the right
               Expanded(
-                flex: 1,
-                child: Column(
+                flex: 3,
+                child: Row(
                   children: [
-                    SizedBox(
-                      width: double.infinity,
+                    Expanded(
                       child: OutlinedButton(
                         onPressed: wallet.toggleCurrency,
                         style: OutlinedButton.styleFrom(
@@ -214,9 +214,8 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    SizedBox(
-                      width: double.infinity,
+                    const SizedBox(width: 6),
+                    Expanded(
                       child: OutlinedButton(
                         onPressed: () => Navigator.pushNamed(context, '/deposit'),
                         style: OutlinedButton.styleFrom(
@@ -232,9 +231,8 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    SizedBox(
-                      width: double.infinity,
+                    const SizedBox(width: 6),
+                    Expanded(
                       child: OutlinedButton(
                         onPressed: () => Navigator.pushNamed(context, '/withdraw'),
                         style: OutlinedButton.styleFrom(
