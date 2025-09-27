@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'dart:io';
 
 class LoanEligibilityScreen extends StatefulWidget {
@@ -953,13 +953,13 @@ class _QRScanScreen extends StatefulWidget {
 }
 
 class _QRScanScreenState extends State<_QRScanScreen> {
-  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-  QRViewController? controller;
+  MobileScannerController controller = MobileScannerController();
   String? scannedData;
+  bool isScanning = true;
 
   @override
   void dispose() {
-    controller?.dispose();
+    controller.dispose();
     super.dispose();
   }
 
@@ -972,74 +972,183 @@ class _QRScanScreenState extends State<_QRScanScreen> {
         foregroundColor: Colors.white,
         actions: [
           IconButton(
-            onPressed: () async {
-              await controller?.toggleFlash();
-            },
-            icon: const Icon(Icons.flash_on),
+            onPressed: () => controller.toggleTorch(),
+            icon: ValueListenableBuilder(
+              valueListenable: controller.torchState,
+              builder: (context, state, child) {
+                switch (state) {
+                  case TorchState.off:
+                    return const Icon(Icons.flash_off, color: Colors.grey);
+                  case TorchState.on:
+                    return const Icon(Icons.flash_on, color: Colors.yellow);
+                }
+              },
+            ),
             tooltip: 'Toggle Flash',
+          ),
+          IconButton(
+            onPressed: () => controller.switchCamera(),
+            icon: ValueListenableBuilder(
+              valueListenable: controller.cameraFacingState,
+              builder: (context, state, child) {
+                switch (state) {
+                  case CameraFacing.front:
+                    return const Icon(Icons.camera_front);
+                  case CameraFacing.back:
+                    return const Icon(Icons.camera_rear);
+                }
+              },
+            ),
+            tooltip: 'Switch Camera',
           ),
         ],
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Expanded(
-            flex: 4,
-            child: QRView(
-              key: qrKey,
-              onQRViewCreated: _onQRViewCreated,
-              overlay: QrScannerOverlayShape(
-                borderColor: const Color(0xFF10B981),
-                borderRadius: 10,
-                borderLength: 30,
-                borderWidth: 10,
-                cutOutSize: 250,
-              ),
-            ),
+          MobileScanner(
+            controller: controller,
+            onDetect: _foundBarcode,
           ),
-          Expanded(
-            flex: 1,
-            child: Container(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  const Text(
-                    'Position the QR code within the frame',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+          // Custom overlay
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.5),
+            ),
+            child: Stack(
+              children: [
+                // Cut out the scanning area
+                Center(
+                  child: Container(
+                    width: 250,
+                    height: 250,
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: const Color(0xFF10B981),
+                        width: 3,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          await controller?.pauseCamera();
-                        },
-                        icon: const Icon(Icons.pause),
-                        label: const Text('Pause'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.orange,
-                          foregroundColor: Colors.white,
+                    child: Stack(
+                      children: [
+                        // Corner indicators
+                        Positioned(
+                          top: 0,
+                          left: 0,
+                          child: Container(
+                            width: 30,
+                            height: 30,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF10B981),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(20),
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                      ElevatedButton.icon(
-                        onPressed: () async {
-                          await controller?.resumeCamera();
-                        },
-                        icon: const Icon(Icons.play_arrow),
-                        label: const Text('Resume'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF10B981),
-                          foregroundColor: Colors.white,
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: Container(
+                            width: 30,
+                            height: 30,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF10B981),
+                              borderRadius: BorderRadius.only(
+                                topRight: Radius.circular(20),
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          child: Container(
+                            width: 30,
+                            height: 30,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF10B981),
+                              borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(20),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            width: 30,
+                            height: 30,
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF10B981),
+                              borderRadius: BorderRadius.only(
+                                bottomRight: Radius.circular(20),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ],
-              ),
+                ),
+                // Instructions
+                Positioned(
+                  bottom: 100,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+                      children: [
+                        const Text(
+                          'Position the QR code within the frame',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                setState(() {
+                                  isScanning = !isScanning;
+                                });
+                                if (isScanning) {
+                                  controller.start();
+                                } else {
+                                  controller.stop();
+                                }
+                              },
+                              icon: Icon(isScanning ? Icons.pause : Icons.play_arrow),
+                              label: Text(isScanning ? 'Pause' : 'Resume'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.orange,
+                                foregroundColor: Colors.white,
+                              ),
+                            ),
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              icon: const Icon(Icons.close),
+                              label: const Text('Cancel'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -1047,22 +1156,20 @@ class _QRScanScreenState extends State<_QRScanScreen> {
     );
   }
 
-  void _onQRViewCreated(QRViewController controller) {
-    setState(() {
-      this.controller = controller;
-    });
-    
-    controller.scannedDataStream.listen((scanData) {
-      if (scanData.code != null) {
+  void _foundBarcode(BarcodeCapture capture) {
+    final List<Barcode> barcodes = capture.barcodes;
+    for (final barcode in barcodes) {
+      if (barcode.rawValue != null) {
         setState(() {
-          scannedData = scanData.code;
+          scannedData = barcode.rawValue;
         });
         
         // Stop scanning and return the result
-        controller.dispose();
+        controller.stop();
         Navigator.of(context).pop();
-        widget.onQRCodeScanned(scanData.code!);
+        widget.onQRCodeScanned(barcode.rawValue!);
+        break;
       }
-    });
+    }
   }
 }
