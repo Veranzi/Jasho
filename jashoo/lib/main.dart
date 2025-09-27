@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'l10n/app_localizations.dart';
 import 'routes.dart';
 import 'providers/auth_provider.dart';
 import 'providers/user_provider.dart';
@@ -48,6 +49,7 @@ class JashoApp extends StatelessWidget {
           Locale('sw'),
         ],
         localizationsDelegates: const [
+          AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,

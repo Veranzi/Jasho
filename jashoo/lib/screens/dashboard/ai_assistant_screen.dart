@@ -9,7 +9,7 @@ class AiAssistantScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ai = context.watch<AiProvider>();
-    final isEnglish = ai.languageCode == 'en';
+    final isEnglish = Localizations.localeOf(context).languageCode == 'en';
     return Scaffold(
       appBar: AppBar(
         title: const Text('Jasho Insights'),
@@ -17,27 +17,7 @@ class AiAssistantScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Row(
-              children: [
-                const Text('Language:'),
-                const SizedBox(width: 8),
-                ChoiceChip(
-                  label: const Text('English'),
-                  selected: isEnglish,
-                  onSelected: (_) => ai.setLanguage('en'),
-                ),
-                const SizedBox(width: 8),
-                ChoiceChip(
-                  label: const Text('Swahili'),
-                  selected: !isEnglish,
-                  onSelected: (_) => ai.setLanguage('sw'),
-                ),
-              ],
-            ),
-          ),
-          const Divider(),
+          // Removed language switch; now controlled globally via drawer
           // Period toggles
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),

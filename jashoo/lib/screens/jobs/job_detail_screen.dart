@@ -18,7 +18,9 @@ class JobDetailScreen extends StatelessWidget {
     }
     return Scaffold(
       appBar: AppBar(title: Text(job.title)),
-      body: Padding(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,12 +45,14 @@ class JobDetailScreen extends StatelessWidget {
                 child: const Text('Mark Paid'),
               ),
             ]),
-            const Spacer(),
+            const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () => _showReviewDialog(context, jobs, job.id),
               child: const Text('Leave Review'),
             )
           ],
+        ),
+          ),
         ),
       ),
     );
