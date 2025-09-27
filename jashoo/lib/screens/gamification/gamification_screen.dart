@@ -50,24 +50,54 @@ class GamificationScreen extends StatelessWidget {
             const SizedBox(height: 8),
             _RedeemQuick(onRedeem: (cost) => g.redeemPoints(cost), currentPoints: points),
             const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => Navigator.pushNamed(context, '/rewards'),
-                    icon: const Icon(Icons.store),
-                    label: const Text('Open Rewards Store'),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => g.earnPoints(100),
-                    icon: const Icon(Icons.add),
-                    label: const Text('Simulate +100'),
-                  ),
-                ),
-              ],
+            LayoutBuilder(
+              builder: (context, constraints) {
+                if (constraints.maxWidth > 400) {
+                  // Two buttons side by side for larger screens
+                  return Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => Navigator.pushNamed(context, '/rewards'),
+                          icon: const Icon(Icons.store),
+                          label: const Text('Open Rewards Store'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () => g.earnPoints(100),
+                          icon: const Icon(Icons.add),
+                          label: const Text('Simulate +100'),
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  // Stacked buttons for smaller screens
+                  return Column(
+                    children: [
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: () => Navigator.pushNamed(context, '/rewards'),
+                          icon: const Icon(Icons.store),
+                          label: const Text('Open Rewards Store'),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () => g.earnPoints(100),
+                          icon: const Icon(Icons.add),
+                          label: const Text('Simulate +100'),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+              },
             ),
           ],
         ),
@@ -166,7 +196,8 @@ class _EarnGrid extends StatelessWidget {
       _EarnItem(Icons.person_add_alt, 'Complete profile', 20),
       _EarnItem(Icons.send, 'Send money / pay bill', 10),
       _EarnItem(Icons.group_add, 'Refer a friend (verified)', 50),
-      _EarnItem(Icons.handshake, 'Use partner services (SACCO, Absa)', 20),
+      _EarnItem(Icons.account_balance, 'Use ABSA services', 20),
+      _EarnItem(Icons.work, 'Refer for jobs', 25),
       _EarnItem(Icons.savings, 'Save consistently (weekly bonus)', 5),
       _EarnItem(Icons.emoji_events, 'Hit milestones', 100),
       _EarnItem(Icons.security, 'Cybersecurity module', 30),
@@ -330,49 +361,75 @@ class _RedeemQuick extends StatelessWidget {
       {'name': 'Partner reward', 'cost': 900, 'icon': Icons.directions_bus},
     ];
 
-    return SizedBox(
-      height: 120,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: items.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 12),
-        itemBuilder: (_, i) {
-          final r = items[i];
-          final bool canRedeem = currentPoints >= (r['cost'] as int);
-          return Container(
-            width: 220,
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.2)),
-            ),
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        double cardWidth;
+        if (constraints.maxWidth < 400) {
+          cardWidth = 180;
+        } else if (constraints.maxWidth < 600) {
+          cardWidth = 200;
+        } else {
+          cardWidth = 220;
+        }
+
+        return SizedBox(
+          height: 120,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: items.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 12),
+            itemBuilder: (_, i) {
+              final r = items[i];
+              final bool canRedeem = currentPoints >= (r['cost'] as int);
+              return Container(
+                width: cardWidth,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.2)),
+                ),
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(r['icon'] as IconData, color: Theme.of(context).colorScheme.primary),
-                    const SizedBox(width: 8),
-                    Expanded(child: Text(r['name'].toString(), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                    Row(
+                      children: [
+                        Icon(r['icon'] as IconData, color: Theme.of(context).colorScheme.primary, size: 20),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            r['name'].toString(), 
+                            maxLines: 1, 
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    Row(
+                      children: [
+                        Text('${r['cost']} pts', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                        const Spacer(),
+                        SizedBox(
+                          height: 32,
+                          child: ElevatedButton(
+                            onPressed: canRedeem ? () => onRedeem(r['cost'] as int) : null,
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                            ),
+                            child: const Text('Redeem', style: TextStyle(fontSize: 11)),
+                          ),
+                        ),
+                      ],
+                    )
                   ],
                 ),
-                const Spacer(),
-                Row(
-                  children: [
-                    Text('${r['cost']} pts', style: const TextStyle(fontWeight: FontWeight.bold)),
-                    const Spacer(),
-                    ElevatedButton(
-                      onPressed: canRedeem ? () => onRedeem(r['cost'] as int) : null,
-                      child: const Text('Redeem'),
-                    ),
-                  ],
-                )
-              ],
-            ),
-          );
-        },
-      ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }
