@@ -335,24 +335,39 @@ class _SignupScreenState extends State<SignupScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
-          Wrap(
-            spacing: 8.0,
-            children: options.map((hustle) {
-              final isSelected = selectedHustles.contains(hustle);
-              return FilterChip(
-                label: Text(hustle),
-                selected: isSelected,
-                onSelected: (selected) {
-                  setState(() {
-                    if (selected) {
-                      selectedHustles.add(hustle);
-                    } else {
-                      selectedHustles.remove(hustle);
-                    }
-                  });
-                },
+          const SizedBox(height: 8),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              return Wrap(
+                spacing: 8.0,
+                runSpacing: 8.0,
+                children: options.map((hustle) {
+                  final isSelected = selectedHustles.contains(hustle);
+                  return ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: constraints.maxWidth > 300 ? 120 : 100,
+                    ),
+                    child: FilterChip(
+                      label: Text(
+                        hustle,
+                        style: const TextStyle(fontSize: 12),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      selected: isSelected,
+                      onSelected: (selected) {
+                        setState(() {
+                          if (selected) {
+                            selectedHustles.add(hustle);
+                          } else {
+                            selectedHustles.remove(hustle);
+                          }
+                        });
+                      },
+                    ),
+                  );
+                }).toList(),
               );
-            }).toList(),
+            },
           ),
         ],
       ),

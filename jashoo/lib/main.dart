@@ -65,9 +65,9 @@ class JashoApp extends StatelessWidget {
             builder: (context, child) => ResponsiveBreakpoints.builder(
               child: child!,
               breakpoints: const [
-                Breakpoint(start: 0, end: 360, name: MOBILE),
-                Breakpoint(start: 361, end: 800, name: TABLET),
-                Breakpoint(start: 801, end: 1200, name: DESKTOP),
+                Breakpoint(start: 0, end: 600, name: MOBILE),
+                Breakpoint(start: 601, end: 900, name: TABLET),
+                Breakpoint(start: 901, end: 1200, name: DESKTOP),
                 Breakpoint(start: 1201, end: double.infinity, name: '4K'),
               ],
             ),
