@@ -955,7 +955,6 @@ class _QRScanScreen extends StatefulWidget {
 class _QRScanScreenState extends State<_QRScanScreen> {
   MobileScannerController controller = MobileScannerController();
   String? scannedData;
-  bool isScanning = true;
 
   @override
   void dispose() {
@@ -973,32 +972,12 @@ class _QRScanScreenState extends State<_QRScanScreen> {
         actions: [
           IconButton(
             onPressed: () => controller.toggleTorch(),
-            icon: ValueListenableBuilder(
-              valueListenable: controller.torchState,
-              builder: (context, state, child) {
-                switch (state) {
-                  case TorchState.off:
-                    return const Icon(Icons.flash_off, color: Colors.grey);
-                  case TorchState.on:
-                    return const Icon(Icons.flash_on, color: Colors.yellow);
-                }
-              },
-            ),
+            icon: const Icon(Icons.flash_on),
             tooltip: 'Toggle Flash',
           ),
           IconButton(
             onPressed: () => controller.switchCamera(),
-            icon: ValueListenableBuilder(
-              valueListenable: controller.cameraFacingState,
-              builder: (context, state, child) {
-                switch (state) {
-                  case CameraFacing.front:
-                    return const Icon(Icons.camera_front);
-                  case CameraFacing.back:
-                    return const Icon(Icons.camera_rear);
-                }
-              },
-            ),
+            icon: const Icon(Icons.camera_rear),
             tooltip: 'Switch Camera',
           ),
         ],
@@ -1110,39 +1089,17 @@ class _QRScanScreenState extends State<_QRScanScreen> {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            ElevatedButton.icon(
-                              onPressed: () {
-                                setState(() {
-                                  isScanning = !isScanning;
-                                });
-                                if (isScanning) {
-                                  controller.start();
-                                } else {
-                                  controller.stop();
-                                }
-                              },
-                              icon: Icon(isScanning ? Icons.pause : Icons.play_arrow),
-                              label: Text(isScanning ? 'Pause' : 'Resume'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.orange,
-                                foregroundColor: Colors.white,
-                              ),
-                            ),
-                            ElevatedButton.icon(
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                              icon: const Icon(Icons.close),
-                              label: const Text('Cancel'),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red,
-                                foregroundColor: Colors.white,
-                              ),
-                            ),
-                          ],
+                        ElevatedButton.icon(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          icon: const Icon(Icons.close),
+                          label: const Text('Cancel'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                          ),
                         ),
                       ],
                     ),
@@ -1158,17 +1115,16 @@ class _QRScanScreenState extends State<_QRScanScreen> {
 
   void _foundBarcode(BarcodeCapture capture) {
     final List<Barcode> barcodes = capture.barcodes;
-    for (final barcode in barcodes) {
+    if (barcodes.isNotEmpty) {
+      final barcode = barcodes.first;
       if (barcode.rawValue != null) {
         setState(() {
           scannedData = barcode.rawValue;
         });
         
         // Stop scanning and return the result
-        controller.stop();
         Navigator.of(context).pop();
         widget.onQRCodeScanned(barcode.rawValue!);
-        break;
       }
     }
   }
