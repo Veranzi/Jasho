@@ -1,154 +1,172 @@
-# Jasho Backend
+# Jasho Frontend (Flutter)
 
-**Tagline:** Powering Your Hustle, Growing Your Wealth  
-
-Jasho is a gig-worker super app that helps hustlers track multiple incomes, save smarter, access micro-loans, and protect themselves from scams.  
-This repository contains the **backend service** that powers the mobile app,web dashboard, chatbot, and USSD features — handling authentication, income tracking, savings, wallet, and integrations with M-Pesa and Absa APIs.
+Powering Your Hustle, Growing Your Wealth — This is the Flutter frontend for the Jasho super app. It implements onboarding/auth, dashboard, wallet, savings & loans, community, and a gamified points system with rewards.
 
 ---
 
-## 🌍 Why Jasho?
+## ✨ Features
 
-Gig workers form the backbone of Africa’s economy but face:
-- **Unpredictable income** across multiple hustles  
-- **Limited access to credit & insurance** due to lack of formal records  
-- **Exposure to fraud/scams** in digital platforms  
-- **Exclusion from digital finance** (many still on feature phones via USSD)  
-
-Jasho solves this with:
-- A unified income tracker (“Income Mirror”)  
-- AI-powered financial forecasting (“Financial Weather Radar”)  
-- Alternative credit scoring (“Hustle Trust Score”)  
-- Savings, micro-insurance & rewards  
-- Multichannel access (Mobile App, Web, Chatbot, USSD)  
-
----
-
-
-## 🚀 Tech Stack
-- **Backend Framework:** FastAPI
-- **Database ORM:** SQLModel (SQLAlchemy + Pydantic)
-- **Database:** PostgreSQL
-- **Auth & Security:** JWT (via `python-jose`), password hashing (`passlib`)
-- **Migrations:** Alembic
-- **Environment Config:** python-dotenv
-- **Async HTTP Calls:** httpx
-- **Server:** Uvicorn
+- Points & Gamification
+  - Jasho Points with levels, streaks, badges
+  - Ways to earn points: login, profile, transactions, referrals, partner services (SACCO, Absa), savings streaks, milestones, security modules, 2FA, reviews, feedback
+  - Rewards store: airtime/data, fee discounts, gift vouchers, premium analytics, partner rewards
+- Savings
+  - Savings goals with progress, hustle breakdown, contributions, weekly bonus points
+- Loans
+  - Microloans with eligibility derived from savings; Absa provides loans in this MVP
+- Wallet
+  - Deposit, withdraw, convert, set PIN
+- Jobs & Community
+  - Jobs listing, earnings view, transaction history, community board
+- Security & Settings
+  - Profile update, security settings, help, support chat
 
 ---
 
-## 📂 Project Structure
+## 🧱 Tech Stack
+
+- Flutter 3 (Material 3)
+- State: Provider
+- Platforms: Android, iOS, Web, Desktop
+
+---
+
+## ▶️ Run Locally
+
+Prerequisites: Flutter SDK installed, device/emulator configured.
+
 ```bash
-Jasho-backend/
-├── alembic/                  # migrations folder
-│   ├── versions/
-│   └── env.py
-├── app/                      # main backend app
-│   ├── main.py               # FastAPI entrypoint
-│   ├── core/                 # config & security
-│   ├── db/                   # db session, base
-│   ├── models/               # SQLModel models
-│   ├── schemas/              # Pydantic schemas
-│   ├── routers/              # API routes
-│   └── services/             # business logic
-├── tests/                    # tests
-├── .env                      # environment variables
-├── alembic.ini               # alembic config
-├── requirements.txt          # dependencies
-└── README.md                 # This file
+flutter pub get
+flutter run -d chrome           # Web
+flutter run -d android          # Android
+flutter run -d ios              # iOS (macOS required)
 ```
-## ⚙️ Setup Instructions
-1. Clone the repo
+
+To build release:
+
 ```bash
-git clone https://github.com/YOUR_USERNAME/jasho-backend.git
-cd jasho-backend
+flutter build apk               # Android
+flutter build ios               # iOS
+flutter build web               # Web
 ```
-2. Create and activate a virtual environment
+
+---
+
+## 📦 Project Structure
+
+```
+lib/
+  main.dart              # App entry, theme, providers
+  routes.dart            # Central route table
+  providers/             # Provider state (auth, user, wallet, jobs, gamification, savings, etc.)
+  screens/
+    auth/                # Login, signup, KYC, splash, etc.
+    dashboard/           # Dashboard, earnings, transactions, AI assistant
+    wallet/              # Deposit, withdraw, convert, set PIN
+    savings/             # Savings goals and loans
+    gamification/        # Points, leaderboard, rewards
+    settings/            # Profile, security, help
+    support/             # Support chat
+```
+
+Key routes (see `lib/routes.dart`): `/splash`, `/login`, `/dashboard`, `/savings`, `/loans`, `/gamification`, `/leaderboard`, `/rewards`.
+
+---
+
+## 🔐 Environment & Backend
+
+The backend is already provisioned. Integrations (e.g., auth, wallet, savings, Absa) should be configured in the providers or services layer once endpoints are available. This MVP uses local state via Providers and can be wired to HTTP clients later.
+
+Where to add API calls:
+
+- `lib/providers/auth_provider.dart`
+- `lib/providers/user_provider.dart`
+- `lib/providers/wallet_provider.dart`
+- `lib/providers/savings_provider.dart`
+- `lib/providers/gamification_provider.dart`
+
+Add your base URL and HTTP client (e.g., `http` or `dio`) as needed and map responses to provider state.
+
+---
+
+## 🧩 Points Design (UX)
+
+- Header: current points, level, progress to next level, daily streak
+- Ways to Earn (grid):
+  - Login daily (+5)
+  - Complete profile (+20)
+  - Send money / pay bills (+10 per txn)
+  - Refer verified friend (+50)
+  - Use partner services (SACCO, Absa) (+20)
+  - Save consistently weekly (+5 bonus)
+  - Reach milestones (+100)
+  - Cybersecurity module (+30)
+  - Enable 2FA / Internet Identity (+15)
+  - Leave review (+10)
+  - Give feedback (+5)
+- Quick Redeem carousel: airtime/data, fee discounts, vouchers, premium features, partner rewards
+- Rewards store page with gating by points
+
+Files: `lib/screens/gamification/gamification_screen.dart`, `lib/screens/gamification/rewards_screen.dart`, `lib/screens/gamification/leaderboard_screen.dart`.
+
+---
+
+## 💰 Savings & Loans (Absa)
+
+- Savings: create goals, contribute, view progress and hustle breakdown. Points earned on savings contributions and streaks.
+- Loans: eligibility based on savings; loans are provided by **Absa** in this MVP. The Loans screen surfaces Absa branding and a clear application flow.
+
+Files: `lib/screens/savings/savings_screen.dart`, `lib/screens/savings/loans_screen.dart`, `lib/providers/savings_provider.dart`.
+
+---
+
+## 🧠 State Management
+
+Providers registered in `main.dart`:
+
+- `AuthProvider`, `UserProvider`, `WalletProvider`, `JobsProvider`
+- `GamificationProvider` (points, levels, badges)
+- `SavingsProvider` (goals, loans, hustle breakdown)
+- `AiProvider`, `LocaleProvider`, `PinProvider`
+
+---
+
+## 🧪 Testing
+
+Run widget tests:
+
 ```bash
-python -m venv venv
-source venv/bin/activate   # Mac/Linux
-venv\Scripts\activate      # Windows
+flutter test
 ```
-3. Install dependencies
+
+---
+
+## 🚀 Deploy (Web)
+
 ```bash
-pip install -r requirements.txt
+flutter build web
+# Host the build at build/web/ on any static hosting service
 ```
-4. Setup environment variables
-```bash
-Create a .env file in the project root:
 
-DATABASE_URL=postgresql+psycopg2://user:password@localhost:5432/jasho
-SECRET_KEY=supersecret
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-```
-5. Run database migrations
-```bash
-alembic upgrade head
-```
-6. Start the server
-```bash
-uvicorn app.main:app --reload
-```
-## 🛠️ Features (MVP Scope)
+---
 
-  ✅ User registration & login (JWT auth)
+## 🗺️ Roadmap (Frontend)
 
-  ✅ Income tracking (manual entry, M-Pesa SMS parsing)
+- Wire providers to backend endpoints
+- Add analytics dashboards and premium gating via points
+- Deepen Absa loan journey (KYC, offers, repayment schedule)
+- Accessibility and localization improvements
 
-  ✅ Wallet & savings goals
-
-  ✅ Gig/job logging
-
-  ✅ Chatbot + USSD endpoints
-
-  🔜 AI income forecasting (LSTM/Prophet)
-
-  🔜 Hustle Trust Score (alternative credit scoring)
-
-  🔜 Fraud/Scam detection
-
-## 🧪 Running Tests
-pytest
-
-🌍 Roadmap
-
-## Phase 1 (Hackathon MVP):
-
-Auth, wallet, income tracker, chatbot (Eng/Swa), USSD menus
-
-## Phase 2 (Pilot w/ Absa):
-
-Hustle Trust Score
-
-Savings + micro-insurance
-
-Fraud shield
-
-## Phase 3 (Scaling):
-
-Community noticeboard
-
-Gamification (badges, airtime/data rewards)
-
-Multi-country expansion (Tanzania, Uganda, Nigeria)
+---
 
 ## 🤝 Contributing
 
-We welcome contributions!
+1. Create a feature branch
+2. Make focused edits with clear commit messages
+3. Open a PR with screenshots for UI changes
 
-1.Fork the repo
-
-2.Create a feature branch (git checkout -b feature-x)
-
-3.Commit changes (git commit -m "Add feature x")
-
-4.Push branch (git push origin feature-x)
-
-5.Create Pull Request
+---
 
 ## 📜 License
 
-This project is licensed under the MIT License. See LICENSE file for details.
-
-Jasho Backend — Built for hustlers, by hustlers.
+MIT (see root LICENSE if present)
