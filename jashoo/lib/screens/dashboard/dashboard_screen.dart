@@ -463,7 +463,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                               child: _buildProfileCard(
                                 icon: Icons.edit,
                                 title: 'Edit Profile',
-                                subtitle: 'Update your personal information',
+                                subtitle: '',
                                 onTap: () => Navigator.pushNamed(context, '/profileUpdate'),
                               ),
                             ),
@@ -471,8 +471,8 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                             Expanded(
                               child: _buildProfileCard(
                                 icon: Icons.emoji_events,
-                                title: 'Points & Rewards',
-                                subtitle: 'View your points and rewards',
+                                title: 'Jasho Points',
+                                subtitle: '',
                                 onTap: () => Navigator.pushNamed(context, '/gamification'),
                               ),
                             ),
@@ -486,7 +486,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                               child: _buildProfileCard(
                                 icon: Icons.savings,
                                 title: 'Savings',
-                                subtitle: 'Manage your savings account',
+                                subtitle: '',
                                 onTap: () => Navigator.pushNamed(context, '/savings'),
                               ),
                             ),
@@ -495,7 +495,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                               child: _buildProfileCard(
                                 icon: Icons.account_balance,
                                 title: 'Loans',
-                                subtitle: 'Apply for loans and view status',
+                                subtitle: '',
                                 onTap: () => Navigator.pushNamed(context, '/loans'),
                               ),
                             ),
@@ -509,7 +509,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                               child: _buildProfileCard(
                                 icon: Icons.health_and_safety,
                                 title: 'Insurance',
-                                subtitle: 'Insurance plans and coverage',
+                                subtitle: '',
                                 onTap: () => Navigator.pushNamed(context, '/insurance'),
                               ),
                             ),
@@ -517,8 +517,8 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                             Expanded(
                               child: _buildProfileCard(
                                 icon: Icons.help,
-                                title: 'Help & Support',
-                                subtitle: 'Get help and contact support',
+                                title: 'Help',
+                                subtitle: '',
                                 onTap: () => Navigator.pushNamed(context, '/help'),
                               ),
                             ),
