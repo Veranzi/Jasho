@@ -179,21 +179,26 @@ class _EarnGrid extends StatelessWidget {
       builder: (context, constraints) {
         // Calculate responsive aspect ratio based on screen width
         double aspectRatio;
+        int crossAxisCount;
+        
         if (constraints.maxWidth < 400) {
-          aspectRatio = 3.2; // Taller cards for narrow screens
+          aspectRatio = 3.5; // Taller cards for narrow screens
+          crossAxisCount = 2;
         } else if (constraints.maxWidth < 600) {
-          aspectRatio = 2.9;
+          aspectRatio = 3.2;
+          crossAxisCount = 2;
         } else {
-          aspectRatio = 2.6; // Shorter cards for wider screens
+          aspectRatio = 2.8; // Shorter cards for wider screens
+          crossAxisCount = 3; // More columns on wider screens
         }
 
         return GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
+            crossAxisCount: crossAxisCount,
+            mainAxisSpacing: 8,
+            crossAxisSpacing: 8,
             childAspectRatio: aspectRatio,
           ),
           itemCount: items.length,
@@ -208,31 +213,30 @@ class _EarnGrid extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.2)),
                 ),
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Row(
                       children: [
-                        Icon(it.icon, color: Theme.of(context).colorScheme.primary, size: 20),
-                        const SizedBox(width: 8),
+                        Icon(it.icon, color: Theme.of(context).colorScheme.primary, size: 18),
+                        const SizedBox(width: 6),
                         Expanded(
                           child: Text(
                             it.title, 
                             maxLines: 2, 
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 12.sp),
+                            style: TextStyle(fontSize: 10.sp),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 6),
                     Text(
                       '+${it.points} pts', 
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 11.sp,
+                        fontSize: 10.sp,
                         color: Theme.of(context).colorScheme.primary,
                       ),
                     ),
