@@ -16,20 +16,25 @@ class AiAssistantScreen extends StatelessWidget {
         title: const Text('Jasho Insights'),
         backgroundColor: const Color(0xFF10B981),
       ),
-      body: Column(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
         children: [
           // Removed language switch; now controlled globally via drawer
           // Period toggles
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
-            child: Row(
-              children: [
-                ChoiceChip(label: const Text('Daily'), selected: true, onSelected: (_) {}),
-                const SizedBox(width: 8),
-                ChoiceChip(label: const Text('Weekly'), selected: false, onSelected: (_) {}),
-                const SizedBox(width: 8),
-                ChoiceChip(label: const Text('Monthly'), selected: false, onSelected: (_) {}),
-              ],
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  ChoiceChip(label: const Text('Daily'), selected: true, onSelected: (_) {}),
+                  const SizedBox(width: 8),
+                  ChoiceChip(label: const Text('Weekly'), selected: false, onSelected: (_) {}),
+                  const SizedBox(width: 8),
+                  ChoiceChip(label: const Text('Monthly'), selected: false, onSelected: (_) {}),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 8),
@@ -135,20 +140,22 @@ class AiAssistantScreen extends StatelessWidget {
               ),
             ),
           ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: ai.suggestions.length,
-              itemBuilder: (context, index) {
-                final s = ai.suggestions[index];
-                final text = isEnglish ? s.messageEn : s.messageSw;
-                return ListTile(
-                  leading: const Icon(Icons.insights),
-                  title: Text(text),
-                );
-              },
-            ),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: ai.suggestions.length,
+            itemBuilder: (context, index) {
+              final s = ai.suggestions[index];
+              final text = isEnglish ? s.messageEn : s.messageSw;
+              return ListTile(
+                leading: const Icon(Icons.insights),
+                title: Text(text),
+              );
+            },
           ),
         ],
+      ),
+        ),
       ),
     );
   }
