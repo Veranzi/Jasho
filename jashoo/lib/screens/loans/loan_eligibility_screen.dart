@@ -173,31 +173,32 @@ class _LoanEligibilityScreenState extends State<LoanEligibilityScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          DropdownButtonFormField<String>(
-            value: _selectedSacco.isEmpty ? null : _selectedSacco,
-            decoration: const InputDecoration(
-              labelText: 'Select SACCO/Chama',
-              hintText: 'Choose your SACCO or Chama',
-              prefixIcon: Icon(Icons.business),
-              border: OutlineInputBorder(),
+          InkWell(
+            onTap: () => _showSaccoSearchDialog(context),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey[400]!),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.business, color: Color(0xFF10B981)),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      _selectedSacco.isEmpty ? 'Choose your SACCO or Chama' : _selectedSacco,
+                      style: TextStyle(
+                        color: _selectedSacco.isEmpty ? Colors.grey[600] : Colors.black,
+                        fontSize: 16,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const Icon(Icons.arrow_drop_down),
+                ],
+              ),
             ),
-            items: _saccos.map((String sacco) {
-              return DropdownMenuItem<String>(
-                value: sacco,
-                child: Text(sacco),
-              );
-            }).toList(),
-            onChanged: (String? newValue) {
-              setState(() {
-                _selectedSacco = newValue ?? '';
-              });
-            },
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please select a SACCO/Chama';
-              }
-              return null;
-            },
           ),
           const SizedBox(height: 16),
           TextFormField(
@@ -410,60 +411,118 @@ class _LoanEligibilityScreenState extends State<LoanEligibilityScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: _pickDocuments,
-                      icon: const Icon(Icons.add_photo_alternate),
-                      label: const Text('Upload'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFF10B981),
-                        side: const BorderSide(color: Color(0xFF10B981)),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isWide = constraints.maxWidth > 400;
+              
+              if (isWide) {
+                // Wide screen: horizontal layout
+                return Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: _pickDocuments,
+                            icon: const Icon(Icons.add_photo_alternate, size: 18),
+                            label: const Text('Upload', style: TextStyle(fontSize: 12)),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: const Color(0xFF10B981),
+                              side: const BorderSide(color: Color(0xFF10B981)),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: _takePhoto,
+                            icon: const Icon(Icons.camera_alt, size: 18),
+                            label: const Text('Photo', style: TextStyle(fontSize: 12)),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: const Color(0xFF10B981),
+                              side: const BorderSide(color: Color(0xFF10B981)),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: _scanDocument,
+                            icon: const Icon(Icons.document_scanner, size: 18),
+                            label: const Text('Scan', style: TextStyle(fontSize: 12)),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: const Color(0xFF10B981),
+                              side: const BorderSide(color: Color(0xFF10B981)),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Upload • Take Photo • Scan Documents',
+                      style: TextStyle(
+                        color: Colors.grey,
+                        fontSize: 11,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                );
+              } else {
+                // Narrow screen: vertical layout
+                return Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: _pickDocuments,
+                        icon: const Icon(Icons.add_photo_alternate),
+                        label: const Text('Upload Documents'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF10B981),
+                          side: const BorderSide(color: Color(0xFF10B981)),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: _takePhoto,
-                      icon: const Icon(Icons.camera_alt),
-                      label: const Text('Take Photo'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFF10B981),
-                        side: const BorderSide(color: Color(0xFF10B981)),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: _takePhoto,
+                            icon: const Icon(Icons.camera_alt),
+                            label: const Text('Take Photo'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: const Color(0xFF10B981),
+                              side: const BorderSide(color: Color(0xFF10B981)),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: _scanDocument,
+                            icon: const Icon(Icons.document_scanner),
+                            label: const Text('Scan'),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: const Color(0xFF10B981),
+                              side: const BorderSide(color: Color(0xFF10B981)),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: _scanDocument,
-                      icon: const Icon(Icons.document_scanner),
-                      label: const Text('Scan'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFF10B981),
-                        side: const BorderSide(color: Color(0xFF10B981)),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Upload from gallery • Take a photo • Scan documents',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 12,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
+                  ],
+                );
+              }
+            },
           ),
           if (_uploadedDocuments.isNotEmpty) ...[
             const SizedBox(height: 16),
@@ -593,7 +652,135 @@ class _LoanEligibilityScreenState extends State<LoanEligibilityScreen> {
     });
   }
 
+  void _showSaccoSearchDialog(BuildContext context) {
+    final TextEditingController searchController = TextEditingController();
+    List<String> filteredSaccos = List.from(_saccos);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              title: Row(
+                children: [
+                  const Icon(Icons.business, color: Color(0xFF10B981)),
+                  const SizedBox(width: 8),
+                  const Expanded(
+                    child: Text(
+                      'Select SACCO/Chama',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ],
+              ),
+              content: SizedBox(
+                width: double.maxFinite,
+                height: 400,
+                child: Column(
+                  children: [
+                    // Search field
+                    TextField(
+                      controller: searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Search SACCO...',
+                        prefixIcon: const Icon(Icons.search),
+                        border: const OutlineInputBorder(),
+                        suffixIcon: searchController.text.isNotEmpty
+                            ? IconButton(
+                                icon: const Icon(Icons.clear),
+                                onPressed: () {
+                                  searchController.clear();
+                                  setDialogState(() {
+                                    filteredSaccos = List.from(_saccos);
+                                  });
+                                },
+                              )
+                            : null,
+                      ),
+                      onChanged: (value) {
+                        setDialogState(() {
+                          filteredSaccos = _saccos
+                              .where((sacco) =>
+                                  sacco.toLowerCase().contains(value.toLowerCase()))
+                              .toList();
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    // SACCO list
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: filteredSaccos.length,
+                        itemBuilder: (context, index) {
+                          final sacco = filteredSaccos[index];
+                          final isSelected = sacco == _selectedSacco;
+                          
+                          return ListTile(
+                            leading: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF10B981).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  sacco.substring(0, 1),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF10B981),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            title: Text(
+                              sacco,
+                              style: TextStyle(
+                                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                color: isSelected ? const Color(0xFF10B981) : Colors.black,
+                              ),
+                            ),
+                            trailing: isSelected
+                                ? const Icon(Icons.check_circle, color: Color(0xFF10B981))
+                                : null,
+                            onTap: () {
+                              setState(() {
+                                _selectedSacco = sacco;
+                              });
+                              Navigator.of(context).pop();
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cancel'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   Future<void> _submitApplication() async {
+    if (_selectedSacco.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a SACCO/Chama'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     if (!_formKey.currentState!.validate()) {
       return;
     }
