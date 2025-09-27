@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/locale_provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ProfileDrawer extends StatelessWidget {
   const ProfileDrawer({super.key});
@@ -27,9 +28,9 @@ class ProfileDrawer extends StatelessWidget {
                 ),
                 SizedBox(height: 10),
                 Text("John Doe",
-                    style: TextStyle(color: Colors.white, fontSize: 18)),
+                    style: TextStyle(color: Colors.white, fontSize: 18).copyWith(fontSize: 18.sp)),
                 Text("Gig Worker",
-                    style: TextStyle(color: Colors.white70, fontSize: 14)),
+                    style: TextStyle(color: Colors.white70, fontSize: 14).copyWith(fontSize: 14.sp)),
               ],
             ),
           ),
