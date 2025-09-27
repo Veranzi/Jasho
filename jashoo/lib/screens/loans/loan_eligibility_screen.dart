@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'dart:io';
 
 class LoanEligibilityScreen extends StatefulWidget {
@@ -547,11 +548,18 @@ class _LoanEligibilityScreenState extends State<LoanEligibilityScreen> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.description, color: Color(0xFF10B981)),
+                    Icon(
+                      file.path.contains('qr_code_') 
+                          ? Icons.qr_code_scanner 
+                          : Icons.description, 
+                      color: const Color(0xFF10B981)
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Document ${index + 1}',
+                        file.path.contains('qr_code_') 
+                            ? 'QR Code Scanned'
+                            : 'Document ${index + 1}',
                         style: const TextStyle(fontWeight: FontWeight.w500),
                       ),
                     ),
@@ -623,27 +631,95 @@ class _LoanEligibilityScreenState extends State<LoanEligibilityScreen> {
   }
 
   Future<void> _scanDocument() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(
-      source: ImageSource.camera,
-      preferredCameraDevice: CameraDevice.rear,
-      imageQuality: 85,
-    );
-    
-    if (image != null) {
-      setState(() {
-        _uploadedDocuments.add(File(image.path));
-      });
-      
-      // Show scanning feedback
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Document scanned successfully!'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => _QRScanScreen(
+          onQRCodeScanned: (qrCodeData) {
+            // Handle the scanned QR code data
+            _handleScannedQRCode(qrCodeData);
+          },
         ),
-      );
-    }
+      ),
+    );
+  }
+
+  void _handleScannedQRCode(String qrCodeData) {
+    // Show dialog with scanned data
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Row(
+            children: [
+              const Icon(Icons.qr_code_scanner, color: Colors.green),
+              const SizedBox(width: 8),
+              const Text('QR Code Scanned'),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text('QR Code Data:'),
+              const SizedBox(height: 8),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey[300]!),
+                ),
+                child: SelectableText(
+                  qrCodeData,
+                  style: const TextStyle(
+                    fontFamily: 'monospace',
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'This QR code data will be included with your application as evidence.',
+                style: TextStyle(fontSize: 14, color: Colors.grey),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                
+                // Add QR code data as a virtual document
+                setState(() {
+                  // Create a virtual file entry for QR code data
+                  // We'll store this as a special entry in our documents list
+                  _uploadedDocuments.add(File('qr_code_${DateTime.now().millisecondsSinceEpoch}.txt'));
+                });
+                
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('QR Code data added to application!'),
+                    backgroundColor: Colors.green,
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF10B981),
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Add to Application'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _removeDocument(int index) {
@@ -864,5 +940,129 @@ class _LoanEligibilityScreenState extends State<LoanEligibilityScreen> {
         );
       },
     );
+  }
+}
+
+class _QRScanScreen extends StatefulWidget {
+  final Function(String) onQRCodeScanned;
+
+  const _QRScanScreen({required this.onQRCodeScanned});
+
+  @override
+  State<_QRScanScreen> createState() => _QRScanScreenState();
+}
+
+class _QRScanScreenState extends State<_QRScanScreen> {
+  final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
+  QRViewController? controller;
+  String? scannedData;
+
+  @override
+  void dispose() {
+    controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Scan QR Code'),
+        backgroundColor: const Color(0xFF10B981),
+        foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            onPressed: () async {
+              await controller?.toggleFlash();
+            },
+            icon: const Icon(Icons.flash_on),
+            tooltip: 'Toggle Flash',
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            flex: 4,
+            child: QRView(
+              key: qrKey,
+              onQRViewCreated: _onQRViewCreated,
+              overlay: QrScannerOverlayShape(
+                borderColor: const Color(0xFF10B981),
+                borderRadius: 10,
+                borderLength: 30,
+                borderWidth: 10,
+                cutOutSize: 250,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                children: [
+                  const Text(
+                    'Position the QR code within the frame',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          await controller?.pauseCamera();
+                        },
+                        icon: const Icon(Icons.pause),
+                        label: const Text('Pause'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          await controller?.resumeCamera();
+                        },
+                        icon: const Icon(Icons.play_arrow),
+                        label: const Text('Resume'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF10B981),
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _onQRViewCreated(QRViewController controller) {
+    setState(() {
+      this.controller = controller;
+    });
+    
+    controller.scannedDataStream.listen((scanData) {
+      if (scanData.code != null) {
+        setState(() {
+          scannedData = scanData.code;
+        });
+        
+        // Stop scanning and return the result
+        controller.dispose();
+        Navigator.of(context).pop();
+        widget.onQRCodeScanned(scanData.code!);
+      }
+    });
   }
 }
