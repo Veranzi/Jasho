@@ -22,7 +22,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Withdraw'), backgroundColor: const Color(0xFF0D47A1)),
+      appBar: AppBar(title: const Text('Withdraw'), backgroundColor: const Color(0xFF10B981)),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(

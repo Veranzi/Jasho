@@ -21,8 +21,8 @@ class DashBoardScreen extends StatefulWidget {
 class _DashBoardScreenState extends State<DashBoardScreen> {
   int _selectedIndex = 0;
 
-  static const Color primaryColor = Color(0xFF0D47A1);
-  static const Color lightBlueBackground = Color(0xFFE3F2FD);
+  static const Color primaryColor = Color(0xFF10B981);
+  static const Color lightBlueBackground = Color(0xFFE6FFF5);
 
   @override
   Widget build(BuildContext context) {

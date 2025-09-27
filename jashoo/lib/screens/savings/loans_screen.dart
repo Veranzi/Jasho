@@ -21,7 +21,7 @@ class _LoansScreenState extends State<LoansScreen> {
     final totalSaved = savings.goals.fold<double>(0, (sum, g) => sum + g.saved);
     final eligibility = (totalSaved * 0.5).toStringAsFixed(0); // 50% of savings
     return Scaffold(
-      appBar: AppBar(title: const Text('Loans by Absa'), backgroundColor: const Color(0xFF0D47A1)),
+      appBar: AppBar(title: const Text('Loans by Absa'), backgroundColor: const Color(0xFF10B981)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(

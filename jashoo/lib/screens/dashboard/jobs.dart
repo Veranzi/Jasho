@@ -7,7 +7,7 @@ class JobsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0D47A1), // JASHO primary blue
+        backgroundColor: const Color(0xFF10B981),
         title: const Text("Jobs Marketplace"),
         actions: [
           IconButton(
@@ -89,7 +89,7 @@ class JobsPage extends StatelessWidget {
                     Navigator.pushNamed(context, '/jobDetail', arguments: id);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0D47A1), // Blue background
+                    backgroundColor: const Color(0xFF10B981),
                     foregroundColor: Colors.white, // White text
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),

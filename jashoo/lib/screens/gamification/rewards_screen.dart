@@ -44,7 +44,7 @@ class _RewardsScreenState extends State<RewardsScreen> with SingleTickerProvider
       {'name': 'USDT Bonus 1', 'cost': 1000, 'type': 'usdt'},
     ];
     return Scaffold(
-      appBar: AppBar(title: const Text('Rewards Store'), backgroundColor: const Color(0xFF0D47A1)),
+      appBar: AppBar(title: const Text('Rewards Store'), backgroundColor: const Color(0xFF10B981)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -104,7 +104,7 @@ class _PointsHeader extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Color(0xFF0D47A1), Color(0xFF1976D2)]),
+        gradient: const LinearGradient(colors: [Color(0xFF10B981), Color(0xFF34D399)]),
         borderRadius: BorderRadius.circular(16),
       ),
       padding: const EdgeInsets.all(16),

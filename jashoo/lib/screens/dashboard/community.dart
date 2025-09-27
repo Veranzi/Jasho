@@ -39,7 +39,7 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
     return Scaffold(
       appBar: AppBar(
         title: const Text("Community"),
-        backgroundColor: const Color(0xFF0D47A1),
+        backgroundColor: const Color(0xFF10B981),
         bottom: TabBar(
           controller: _tabController,
           labelColor: Colors.white,

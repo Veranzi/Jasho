@@ -13,7 +13,7 @@ class AiAssistantScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Jasho Insights'),
-        backgroundColor: const Color(0xFF0D47A1),
+        backgroundColor: const Color(0xFF10B981),
       ),
       body: Column(
         children: [
@@ -61,7 +61,7 @@ class AiAssistantScreen extends StatelessWidget {
                     LineChartBarData(
                       spots: const [FlSpot(0, 1), FlSpot(1, 1.6), FlSpot(2, 2.2), FlSpot(3, 3)],
                       isCurved: true,
-                      color: Colors.blue,
+                      color: Color(0xFF10B981),
                       barWidth: 3,
                       dotData: const FlDotData(show: false),
                     ),
@@ -163,7 +163,7 @@ class AiAssistantScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.trending_up, color: Color(0xFF0D47A1)),
+          const Icon(Icons.trending_up, color: Color(0xFF10B981)),
           const SizedBox(width: 8),
           Expanded(child: Text(text)),
         ],
