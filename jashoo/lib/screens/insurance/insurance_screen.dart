@@ -34,13 +34,33 @@ class _InsuranceScreenState extends State<InsuranceScreen> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
-    final covers = const [
-      {'name': 'Personal Accident Cover', 'premium': 'KES 50/week'},
-      {'name': 'Medical Micro-Insurance', 'premium': 'KES 100/week'},
-      {'name': 'Income Protection', 'premium': 'KES 80/week'},
+    final insuranceCategories = [
+      {
+        'title': 'Medical Insurance',
+        'icon': Icons.health_and_safety,
+        'providers': ['SHA', 'AAR', 'APA', 'Jubilee', 'Britam'],
+        'premium': 'From KES 100/week'
+      },
+      {
+        'title': 'Personal Accident Cover',
+        'icon': Icons.emergency,
+        'providers': ['AAR', 'Madison', 'Standard Chartered', 'Britam'],
+        'premium': 'From KES 50/week'
+      },
+      {
+        'title': 'Income Protection',
+        'icon': Icons.security,
+        'providers': ['Britam', 'Pioneer', 'Stanbic'],
+        'premium': 'From KES 80/week'
+      },
     ];
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Insurance'), backgroundColor: const Color(0xFF10B981)),
+      appBar: AppBar(
+        title: Image.asset('assets/logo1.png', height: 28),
+        centerTitle: true,
+        backgroundColor: const Color(0xFF10B981),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -52,30 +72,27 @@ class _InsuranceScreenState extends State<InsuranceScreen> with SingleTickerProv
               child: _loading
                   ? GridView.builder(
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 12,
+                        crossAxisCount: 1,
+                        childAspectRatio: 2.5,
                         mainAxisSpacing: 12,
-                        childAspectRatio: 0.95,
                       ),
-                      itemCount: 6,
-                      itemBuilder: (_, __) => const Skeleton(height: 160),
+                      itemCount: 3,
+                      itemBuilder: (_, __) => const Skeleton(height: 120),
                     )
                   : FadeTransition(
                       opacity: _fade,
-                      child: GridView.builder(
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                          childAspectRatio: 0.95,
-                        ),
-                        itemCount: covers.length,
+                      child: ListView.builder(
+                        itemCount: insuranceCategories.length,
                         itemBuilder: (_, i) {
-                          final c = covers[i];
-                          return _CoverCard(
-                            name: c['name'] as String,
-                            premium: c['premium'] as String,
-                            onApply: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Applied (stub)'))),
+                          final category = insuranceCategories[i];
+                          return _InsuranceCategoryCard(
+                            title: category['title'] as String,
+                            icon: category['icon'] as IconData,
+                            providers: category['providers'] as List<String>,
+                            premium: category['premium'] as String,
+                            onApply: () => ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Applied for ${category['title']} (stub)'))
+                            ),
                           );
                         },
                       ),
@@ -114,38 +131,135 @@ class _InsuranceHeader extends StatelessWidget {
   }
 }
 
-class _CoverCard extends StatelessWidget {
-  final String name;
+class _InsuranceCategoryCard extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final List<String> providers;
   final String premium;
   final VoidCallback onApply;
-  const _CoverCard({required this.name, required this.premium, required this.onApply});
+  
+  const _InsuranceCategoryCard({
+    required this.title,
+    required this.icon,
+    required this.providers,
+    required this.premium,
+    required this.onApply,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.2)),
+        border: Border.all(color: Colors.grey[300]!),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header with icon and title
           Row(
             children: [
-              Icon(Icons.shield, color: Theme.of(context).colorScheme.primary),
-              const SizedBox(width: 8),
-              Expanded(child: Text(name, maxLines: 2, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold))),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, color: const Color(0xFF10B981), size: 24),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    Text(
+                      premium,
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
-          const Spacer(),
-          Text(premium, style: const TextStyle(fontWeight: FontWeight.bold)),
+          
+          const SizedBox(height: 12),
+          
+          // Providers section
+          Text(
+            'Available Providers:',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[700],
+              fontSize: 14,
+            ),
+          ),
+          
           const SizedBox(height: 8),
+          
+          // Provider chips
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: providers.map((provider) => Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFF10B981).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: const Color(0xFF10B981).withOpacity(0.3)),
+              ),
+              child: Text(
+                provider,
+                style: const TextStyle(
+                  color: Color(0xFF10B981),
+                  fontWeight: FontWeight.w500,
+                  fontSize: 12,
+                ),
+              ),
+            )).toList(),
+          ),
+          
+          const SizedBox(height: 16),
+          
+          // Apply button
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton(onPressed: onApply, child: const Text('Apply')),
-          )
+            child: ElevatedButton(
+              onPressed: onApply,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF10B981),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: const Text(
+                'View Options & Apply',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+            ),
+          ),
         ],
       ),
     );
