@@ -20,45 +20,36 @@ class ProfileDrawer extends StatelessWidget {
                 margin: EdgeInsets.zero,
                 padding: const EdgeInsets.all(16),
                 decoration: const BoxDecoration(color: Color(0xFF10B981)),
-                child: Row(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Profile image on the left
+                    // Profile image at the top
                     const CircleAvatar(
                       radius: 30,
                       backgroundColor: Colors.white,
                       child: Icon(Icons.person, size: 40, color: Color(0xFF10B981)),
                     ),
-                    const SizedBox(width: 16),
-                    // Name and work info on the right, left-aligned
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 8),
-                          Text(
-                            "John Doe",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.bold,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            maxLines: 1,
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            "Gig Worker",
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 14.sp,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            maxLines: 1,
-                          ),
-                        ],
+                    const SizedBox(height: 12),
+                    // Name and work info below the image, left-aligned
+                    Text(
+                      "John Doe",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18.sp,
+                        fontWeight: FontWeight.bold,
+                        overflow: TextOverflow.ellipsis,
                       ),
+                      maxLines: 1,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      "Gig Worker",
+                      style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 14.sp,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      maxLines: 1,
                     ),
                   ],
                 ),
