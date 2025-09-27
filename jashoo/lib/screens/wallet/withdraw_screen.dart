@@ -23,7 +23,9 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Withdraw'), backgroundColor: const Color(0xFF0D47A1)),
-      body: Padding(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
@@ -91,6 +93,8 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
               child: Text('Withdraw to $_method'),
             ),
           ],
+        ),
+          ),
         ),
       ),
     );

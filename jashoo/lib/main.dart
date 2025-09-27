@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'routes.dart';
 import 'providers/auth_provider.dart';
 import 'providers/user_provider.dart';
@@ -32,7 +33,8 @@ class JashoApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => PinProvider()),
       ],
-      child: MaterialApp(
+      child: Consumer<LocaleProvider>(
+        builder: (context, localeProvider, _) => MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'JASHO',
         theme: ThemeData(
@@ -40,8 +42,19 @@ class JashoApp extends StatelessWidget {
           useMaterial3: true,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
+        locale: Locale(localeProvider.languageCode),
+        supportedLocales: const [
+          Locale('en'),
+          Locale('sw'),
+        ],
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
         initialRoute: '/splash',
         routes: appRoutes,
+      ),
       ),
     );
   }

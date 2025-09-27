@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -14,6 +15,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
+  String? _fullPhoneE164;
 
   // State vars
   List<String> selectedHustles = [];
@@ -95,10 +97,27 @@ class _SignupScreenState extends State<SignupScreen> {
                   _buildTextField(usernameController, "Full Name", Icons.person_outline,
                       validator: (val) =>
                           val == null || val.isEmpty ? "Enter username" : null),
-                  _buildTextField(phoneController, "Phone Number", Icons.phone_outlined,
-                      keyboardType: TextInputType.phone,
-                      validator: (val) =>
-                          val == null || val.isEmpty ? "Enter phone number" : null),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: IntlPhoneField(
+                      controller: phoneController,
+                      decoration: InputDecoration(
+                        labelText: 'Phone Number',
+                        border:
+                            OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+                      ),
+                      initialCountryCode: selectedCountry == 'South Africa' ? 'ZA' : 'KE',
+                      onChanged: (phone) {
+                        _fullPhoneE164 = phone.completeNumber;
+                      },
+                      validator: (val) {
+                        if (val == null || val.number.isEmpty) {
+                          return 'Enter phone number';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
                   _buildTextField(emailController, "Email", Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
                       validator: (val) {
@@ -175,6 +194,12 @@ class _SignupScreenState extends State<SignupScreen> {
                         if (selectedHustles.isEmpty) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text("Please select at least one hustle")),
+                          );
+                          return;
+                        }
+                        if (_fullPhoneE164 == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Please enter a valid phone number")),
                           );
                           return;
                         }
