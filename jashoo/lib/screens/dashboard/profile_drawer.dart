@@ -16,25 +16,25 @@ class ProfileDrawer extends StatelessWidget {
         child: SingleChildScrollView( // ✅ prevents vertical overflow
           child: Column(
             children: [
-              DrawerHeader(
-                margin: EdgeInsets.zero,
+              // Profile image - separate from header
+              Container(
                 padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(color: Color(0xFF10B981)),
+                child: const CircleAvatar(
+                  radius: 30,
+                  backgroundColor: Color(0xFF10B981),
+                  child: Icon(Icons.person, size: 40, color: Colors.white),
+                ),
+              ),
+              
+              // Name and work info - separate from image
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Profile image at the top
-                    const CircleAvatar(
-                      radius: 30,
-                      backgroundColor: Colors.white,
-                      child: Icon(Icons.person, size: 40, color: Color(0xFF10B981)),
-                    ),
-                    const SizedBox(height: 12),
-                    // Name and work info below the image, left-aligned
                     Text(
                       "John Doe",
                       style: TextStyle(
-                        color: Colors.white,
                         fontSize: 18.sp,
                         fontWeight: FontWeight.bold,
                         overflow: TextOverflow.ellipsis,
@@ -45,12 +45,14 @@ class ProfileDrawer extends StatelessWidget {
                     Text(
                       "Gig Worker",
                       style: TextStyle(
-                        color: Colors.white70,
+                        color: Colors.grey[600],
                         fontSize: 14.sp,
                         overflow: TextOverflow.ellipsis,
                       ),
                       maxLines: 1,
                     ),
+                    const SizedBox(height: 16),
+                    const Divider(),
                   ],
                 ),
               ),
