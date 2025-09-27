@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/wallet_provider.dart';
 import '../../providers/user_provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DepositScreen extends StatefulWidget {
   const DepositScreen({super.key});
@@ -20,7 +21,7 @@ class _DepositScreenState extends State<DepositScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Deposit'), backgroundColor: const Color(0xFF10B981)),
+      appBar: AppBar(title: Text('Deposit', style: TextStyle(fontSize: 16.sp)), backgroundColor: const Color(0xFF10B981)),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -35,7 +36,7 @@ class _DepositScreenState extends State<DepositScreen> {
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   value: _method,
-                  decoration: const InputDecoration(labelText: 'Method'),
+                  decoration: InputDecoration(labelText: 'Method', labelStyle: TextStyle(fontSize: 14.sp)),
                   items: const [
                     DropdownMenuItem(value: 'M-PESA', child: Text('M-PESA')),
                     DropdownMenuItem(value: 'ABSA Bank', child: Text('ABSA Bank')),
@@ -58,7 +59,7 @@ class _DepositScreenState extends State<DepositScreen> {
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   value: _selectedHustle,
-                  decoration: const InputDecoration(labelText: 'Hustle (source)'),
+                  decoration: InputDecoration(labelText: 'Hustle (source)', labelStyle: TextStyle(fontSize: 14.sp)),
                   items: (context.read<UserProvider>().profile?.skills ?? [])
                       .map((h) => DropdownMenuItem(value: h, child: Text(h)))
                       .toList(),
@@ -77,7 +78,7 @@ class _DepositScreenState extends State<DepositScreen> {
                         );
                     Navigator.pop(context);
                   },
-                  child: Text('Deposit via $_method'),
+                  child: Text('Deposit via $_method', style: TextStyle(fontSize: 14.sp)),
                 ),
               ],
             ),
