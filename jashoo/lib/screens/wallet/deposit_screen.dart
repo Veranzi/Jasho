@@ -24,6 +24,7 @@ class _DepositScreenState extends State<DepositScreen> {
       appBar: AppBar(title: Text('Deposit', style: TextStyle(fontSize: 16.sp)), backgroundColor: const Color(0xFF10B981)),
       body: SafeArea(
         child: SingleChildScrollView(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom + 16),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -31,12 +32,19 @@ class _DepositScreenState extends State<DepositScreen> {
                 TextField(
                   controller: _amountController,
                   keyboardType: TextInputType.number,
-                  decoration: const InputDecoration(labelText: 'Amount (KES)'),
+                  decoration: const InputDecoration(
+                    labelText: 'Amount (KES)',
+                    border: OutlineInputBorder(),
+                  ),
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   value: _method,
-                  decoration: InputDecoration(labelText: 'Method', labelStyle: TextStyle(fontSize: 14.sp)),
+                  decoration: InputDecoration(
+                    labelText: 'Method', 
+                    labelStyle: TextStyle(fontSize: 14.sp),
+                    border: const OutlineInputBorder(),
+                  ),
                   items: const [
                     DropdownMenuItem(value: 'M-PESA', child: Text('M-PESA')),
                     DropdownMenuItem(value: 'ABSA Bank', child: Text('ABSA Bank')),
@@ -48,37 +56,53 @@ class _DepositScreenState extends State<DepositScreen> {
                   TextField(
                     controller: _mpesaNumberController,
                     keyboardType: TextInputType.phone,
-                    decoration: const InputDecoration(labelText: 'M-PESA Number'),
+                    decoration: const InputDecoration(
+                      labelText: 'M-PESA Number',
+                      border: OutlineInputBorder(),
+                    ),
                   )
                 else
                   TextField(
                     controller: _absaAccountController,
                     keyboardType: TextInputType.text,
-                    decoration: const InputDecoration(labelText: 'ABSA Account Number'),
+                    decoration: const InputDecoration(
+                      labelText: 'ABSA Account Number',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   value: _selectedHustle,
-                  decoration: InputDecoration(labelText: 'Hustle (source)', labelStyle: TextStyle(fontSize: 14.sp)),
+                  decoration: InputDecoration(
+                    labelText: 'Hustle (source)', 
+                    labelStyle: TextStyle(fontSize: 14.sp),
+                    border: const OutlineInputBorder(),
+                  ),
                   items: (context.read<UserProvider>().profile?.skills ?? [])
                       .map((h) => DropdownMenuItem(value: h, child: Text(h)))
                       .toList(),
                   onChanged: (v) => setState(() => _selectedHustle = v),
                 ),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    final amt = double.tryParse(_amountController.text.trim());
-                    if (amt == null || amt <= 0) return;
-                    context.read<WalletProvider>().depositKes(
-                          amt,
-                          description: '$_method Deposit',
-                          method: _method,
-                          hustle: _selectedHustle,
-                        );
-                    Navigator.pop(context);
-                  },
-                  child: Text('Deposit via $_method', style: TextStyle(fontSize: 14.sp)),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      final amt = double.tryParse(_amountController.text.trim());
+                      if (amt == null || amt <= 0) return;
+                      context.read<WalletProvider>().depositKes(
+                            amt,
+                            description: '$_method Deposit',
+                            method: _method,
+                            hustle: _selectedHustle,
+                          );
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: Text('Deposit via $_method', style: TextStyle(fontSize: 16.sp)),
+                  ),
                 ),
               ],
             ),

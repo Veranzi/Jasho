@@ -193,28 +193,70 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    OutlinedButton.icon(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/phoneAuth');
-                      },
-                      icon: const Icon(Icons.sms),
-                      label: const Text('Login with Phone'),
-                    ),
-                    OutlinedButton.icon(
-                      onPressed: () {
-                        // stub Google login
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Google Sign-In (stub)')),
-                        );
-                        Navigator.pushReplacementNamed(context, '/dashboard');
-                      },
-                      icon: const Icon(Icons.account_circle),
-                      label: const Text('Google'),
-                    ),
-                  ],
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    if (constraints.maxWidth > 350) {
+                      // Two buttons side by side for larger screens
+                      return Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/phoneAuth');
+                              },
+                              icon: const Icon(Icons.sms),
+                              label: const Text('Phone'),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () {
+                                // stub Google login
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Google Sign-In (stub)')),
+                                );
+                                Navigator.pushReplacementNamed(context, '/dashboard');
+                              },
+                              icon: const Icon(Icons.account_circle),
+                              label: const Text('Google'),
+                            ),
+                          ),
+                        ],
+                      );
+                    } else {
+                      // Stacked buttons for smaller screens
+                      return Column(
+                        children: [
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/phoneAuth');
+                              },
+                              icon: const Icon(Icons.sms),
+                              label: const Text('Login with Phone'),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              onPressed: () {
+                                // stub Google login
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Google Sign-In (stub)')),
+                                );
+                                Navigator.pushReplacementNamed(context, '/dashboard');
+                              },
+                              icon: const Icon(Icons.account_circle),
+                              label: const Text('Login with Google'),
+                            ),
+                          ),
+                        ],
+                      );
+                    }
+                  },
                 )
               ],
             ),
