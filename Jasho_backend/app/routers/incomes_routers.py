@@ -1,11 +1,11 @@
 # app/routers/incomes_router.py
-from app.models import Wallet
+from app.models.models import Wallet
 from fastapi import APIRouter, Depends, HTTPException, Header
 from typing import List
 from sqlmodel import Session, select
-from app.db.database import get_session
-from app.models import Income, User
-from app.schemas import IncomeCreate
+from app.database import get_session
+from app.models.models import Income, User
+from app.schemas.schemas import IncomeCreate
 from app.auth import decode_token
 from app.ai_stub import forecast_income, compute_trust_score
 

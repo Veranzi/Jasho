@@ -1,9 +1,9 @@
 # app/routers/wallet_router.py
 from fastapi import APIRouter, Depends, Header, HTTPException
 from sqlmodel import Session, select
-from app.db.database import get_session
-from app.models import Wallet, User
-from app.schemas import WalletTopup
+from app.database import get_session
+from app.models.models import Wallet, User
+from app.schemas.schemas import WalletTopup
 from app.auth import decode_token
 
 router = APIRouter(prefix="/wallet", tags=["wallet"])
@@ -92,3 +92,5 @@ def update_fraud_report(report_id: int, title: str = None, details: str = None, 
 def get_all_user_balances(session: Session = Depends(get_session)):
     wallets = session.exec(select(Wallet)).all()
     return {"wallets": wallets}
+
+
