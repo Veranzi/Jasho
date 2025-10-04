@@ -83,8 +83,8 @@ async def chatbot_image(file: UploadFile = File(...)):
 async def jobs_heatmap():
     # Placeholder: In production call a jobs API, cluster by geohash, return heat weights
     grid = [
-        {"lat": -1.286389, "lng": 36.817223, "job": "Driver", "weight": 12},  # Nairobi CBD
-        {"lat": -1.303205, "lng": 36.707309, "job": "Cook", "weight": 5},
-        {"lat": -1.292066, "lng": 36.821945, "job": "Cleaner", "weight": 8},
+        {"lat": -1.286389, "lng": 36.817223, "job": "Driver", "weight": 12, "color": "#ff0000"},
+        {"lat": -1.303205, "lng": 36.707309, "job": "Cook", "weight": 5, "color": "#00ff00"},
+        {"lat": -1.292066, "lng": 36.821945, "job": "Cleaner", "weight": 8, "color": "#0000ff"},
     ]
     return {"points": grid}

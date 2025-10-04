@@ -16,6 +16,7 @@ from app.routers import (
     mpesa_router,
 )
 from app.routers import insights_router
+from app.routers import safety_router
 
 limiter = Limiter(key_func=get_remote_address, default_limits=["200/minute", "10/second"])
 
@@ -41,6 +42,7 @@ app.include_router(ussd_router.router, prefix="/ussd", tags=["USSD"])
 app.include_router(chatbot_router.router, prefix="/chatbot", tags=["Chatbot"])
 app.include_router(mpesa_router.router, prefix="/mpesa", tags=["Mpesa"])
 app.include_router(insights_router.router, prefix="/insights", tags=["Insights"])
+app.include_router(safety_router.router, prefix="/safety", tags=["Safety"])
 
 
 @app.on_event("startup")
