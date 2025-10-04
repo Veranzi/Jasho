@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class JobsPage extends StatelessWidget {
   const JobsPage({super.key});
@@ -7,8 +8,9 @@ class JobsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF0D47A1), // JASHO primary blue
-        title: const Text("Jobs Marketplace"),
+        backgroundColor: const Color(0xFF10B981),
+        title: Image.asset('assets/logo1.png', height: 28),
+        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.add_circle_outline),
@@ -20,9 +22,9 @@ class JobsPage extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const Text(
+          Text(
             "Available Gigs",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 16),
 
@@ -71,17 +73,17 @@ class JobsPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(title,
-                style: const TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.bold)),
+                style: TextStyle(
+                    fontSize: 18.sp, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Text(description, style: const TextStyle(fontSize: 14)),
+            Text(description, style: TextStyle(fontSize: 14.sp)),
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(price,
-                    style: const TextStyle(
-                        fontSize: 14,
+                    style: TextStyle(
+                        fontSize: 14.sp,
                         fontWeight: FontWeight.bold,
                         color: Colors.green)),
                 ElevatedButton(
@@ -89,7 +91,7 @@ class JobsPage extends StatelessWidget {
                     Navigator.pushNamed(context, '/jobDetail', arguments: id);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0D47A1), // Blue background
+                    backgroundColor: const Color(0xFF10B981),
                     foregroundColor: Colors.white, // White text
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -99,7 +101,7 @@ class JobsPage extends StatelessWidget {
                     textStyle: const TextStyle(
                         fontSize: 14, fontWeight: FontWeight.bold),
                   ),
-                  child: const Text("Apply"),
+                  child: Text("Apply", style: TextStyle(fontSize: 14.sp)),
                 ),
               ],
             )

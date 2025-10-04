@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'l10n/app_localizations.dart';
+import 'package:responsive_framework/responsive_framework.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'routes.dart';
 import 'providers/auth_provider.dart';
 import 'providers/user_provider.dart';
@@ -32,16 +36,43 @@ class JashoApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => PinProvider()),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'JASHO',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0D47A1)),
-          useMaterial3: true,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
+      child: Consumer<LocaleProvider>(
+        builder: (context, localeProvider, _) => ScreenUtilInit(
+          designSize: const Size(390, 844),
+          minTextAdapt: true,
+          splitScreenMode: true,
+          builder: (_, __) => MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Jasho',
+            theme: ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF10B981)),
+              useMaterial3: true,
+              visualDensity: VisualDensity.adaptivePlatformDensity,
+            ),
+            locale: Locale(localeProvider.languageCode),
+            supportedLocales: const [
+              Locale('en'),
+              Locale('sw'),
+            ],
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            initialRoute: '/splash',
+            routes: appRoutes,
+            builder: (context, child) => ResponsiveBreakpoints.builder(
+              child: child!,
+              breakpoints: const [
+                Breakpoint(start: 0, end: 600, name: MOBILE),
+                Breakpoint(start: 601, end: 900, name: TABLET),
+                Breakpoint(start: 901, end: 1200, name: DESKTOP),
+                Breakpoint(start: 1201, end: double.infinity, name: '4K'),
+              ],
+            ),
+          ),
         ),
-        initialRoute: '/splash',
-        routes: appRoutes,
       ),
     );
   }

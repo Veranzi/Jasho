@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -14,6 +16,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
+  String? _fullPhoneE164;
 
   // State vars
   List<String> selectedHustles = [];
@@ -66,8 +69,10 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom + 16),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
             child: Form(
@@ -81,12 +86,12 @@ class _SignupScreenState extends State<SignupScreen> {
                   ),
                   const SizedBox(height: 20),
 
-                  const Text(
+                  Text(
                     "Sign Up",
                     style: TextStyle(
-                      fontSize: 32,
+                      fontSize: 32.sp,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF0D47A1),
+                      color: Color(0xFF10B981),
                     ),
                   ),
                   const SizedBox(height: 30),
@@ -95,10 +100,27 @@ class _SignupScreenState extends State<SignupScreen> {
                   _buildTextField(usernameController, "Full Name", Icons.person_outline,
                       validator: (val) =>
                           val == null || val.isEmpty ? "Enter username" : null),
-                  _buildTextField(phoneController, "Phone Number", Icons.phone_outlined,
-                      keyboardType: TextInputType.phone,
-                      validator: (val) =>
-                          val == null || val.isEmpty ? "Enter phone number" : null),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: IntlPhoneField(
+                      controller: phoneController,
+                      decoration: InputDecoration(
+                        labelText: 'Phone Number',
+                        border:
+                            OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+                      ),
+                      initialCountryCode: selectedCountry == 'South Africa' ? 'ZA' : 'KE',
+                      onChanged: (phone) {
+                        _fullPhoneE164 = phone.completeNumber;
+                      },
+                      validator: (val) {
+                        if (val == null || val.number.isEmpty) {
+                          return 'Enter phone number';
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
                   _buildTextField(emailController, "Email", Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
                       validator: (val) {
@@ -178,6 +200,12 @@ class _SignupScreenState extends State<SignupScreen> {
                           );
                           return;
                         }
+                        if (_fullPhoneE164 == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text("Please enter a valid phone number")),
+                          );
+                          return;
+                        }
                         if (selectedCountry == null ||
                             selectedCounty == null ||
                             selectedWard == null) {
@@ -199,15 +227,15 @@ class _SignupScreenState extends State<SignupScreen> {
                       }
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF0D47A1),
+                      backgroundColor: const Color(0xFF10B981),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       "Register",
-                      style: TextStyle(fontSize: 18, color: Colors.white),
+                      style: TextStyle(fontSize: 18.sp, color: Colors.white),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -255,16 +283,23 @@ class _SignupScreenState extends State<SignupScreen> {
 
   Widget _buildPasswordField(TextEditingController controller, String label,
       {String? Function(String?)? validator}) {
+    bool obscure = true;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: TextFormField(
-        controller: controller,
-        obscureText: true,
-        validator: validator,
-        decoration: InputDecoration(
-          labelText: label,
-          prefixIcon: const Icon(Icons.lock_outline),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+      child: StatefulBuilder(
+        builder: (context, setState) => TextFormField(
+          controller: controller,
+          obscureText: obscure,
+          validator: validator,
+          decoration: InputDecoration(
+            labelText: label,
+            prefixIcon: const Icon(Icons.lock_outline),
+            suffixIcon: IconButton(
+              icon: Icon(obscure ? Icons.visibility_off : Icons.visibility),
+              onPressed: () => setState(() => obscure = !obscure),
+            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+          ),
         ),
       ),
     );
@@ -300,24 +335,39 @@ class _SignupScreenState extends State<SignupScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
-          Wrap(
-            spacing: 8.0,
-            children: options.map((hustle) {
-              final isSelected = selectedHustles.contains(hustle);
-              return FilterChip(
-                label: Text(hustle),
-                selected: isSelected,
-                onSelected: (selected) {
-                  setState(() {
-                    if (selected) {
-                      selectedHustles.add(hustle);
-                    } else {
-                      selectedHustles.remove(hustle);
-                    }
-                  });
-                },
+          const SizedBox(height: 8),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              return Wrap(
+                spacing: 8.0,
+                runSpacing: 8.0,
+                children: options.map((hustle) {
+                  final isSelected = selectedHustles.contains(hustle);
+                  return ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: constraints.maxWidth > 300 ? 120 : 100,
+                    ),
+                    child: FilterChip(
+                      label: Text(
+                        hustle,
+                        style: const TextStyle(fontSize: 12),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      selected: isSelected,
+                      onSelected: (selected) {
+                        setState(() {
+                          if (selected) {
+                            selectedHustles.add(hustle);
+                          } else {
+                            selectedHustles.remove(hustle);
+                          }
+                        });
+                      },
+                    ),
+                  );
+                }).toList(),
               );
-            }).toList(),
+            },
           ),
         ],
       ),

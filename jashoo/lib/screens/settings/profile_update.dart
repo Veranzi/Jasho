@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../providers/user_provider.dart';
 
 class UpdateProfilePage extends StatefulWidget {
   const UpdateProfilePage({super.key});
@@ -15,6 +17,18 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
   final emailController = TextEditingController();
   final addressController = TextEditingController();
   final pincodeController = TextEditingController();
+  final absaAccountController = TextEditingController();
+  bool _maskAbsa = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // Preload Absa account if available
+    final profile = context.read<UserProvider>().profile;
+    if (profile?.absaAccountNumber != null) {
+      absaAccountController.text = profile!.absaAccountNumber!;
+    }
+  }
 
   @override
   void dispose() {
@@ -23,12 +37,16 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
     emailController.dispose();
     addressController.dispose();
     pincodeController.dispose();
+    absaAccountController.dispose();
     super.dispose();
   }
 
   void _updateProfile() {
     if (_formKey.currentState!.validate()) {
-      // TODO: Hook up to backend / Firebase
+      final absa = absaAccountController.text.trim();
+      if (absa.isNotEmpty) {
+        context.read<UserProvider>().linkAbsaAccount(absa);
+      }
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Profile updated successfully!")),
       );
@@ -118,6 +136,30 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
                 keyboardType: TextInputType.number,
                 validator: (value) =>
                     value == null || value.isEmpty ? "Enter postal code" : null,
+              ),
+              const SizedBox(height: 20),
+
+              // Absa account number
+              TextFormField(
+                controller: absaAccountController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: "Absa Account Number",
+                  helperText: "Used for loan settlement",
+                  prefixIcon: const Icon(Icons.account_balance),
+                  suffixIcon: IconButton(
+                    onPressed: () => setState(() => _maskAbsa = !_maskAbsa),
+                    icon: Icon(_maskAbsa ? Icons.visibility : Icons.visibility_off),
+                  ),
+                ),
+                obscureText: _maskAbsa,
+                validator: (value) {
+                  final v = (value ?? '').trim();
+                  if (v.isEmpty) return null; // optional
+                  if (v.length < 8 || v.length > 20) return "Enter a valid account number";
+                  if (!RegExp(r'^\d+$').hasMatch(v)) return "Digits only";
+                  return null;
+                },
               ),
               const SizedBox(height: 20),
 

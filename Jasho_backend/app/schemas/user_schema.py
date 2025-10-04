@@ -46,12 +46,6 @@ class FraudReport(BaseModel):
     details: Optional[str] = None
     class Config:
         orm_mode = True
-    
-    
-        
-        
-    
-    
-    
+
     
     

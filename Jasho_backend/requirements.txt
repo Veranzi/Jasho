@@ -9,3 +9,84 @@ python-dotenv
 alembic
 pytest
 pytest-asyncio
+
+# Firebase and Authentication
+firebase-admin
+pyrebase4
+firebase
+
+# Security and Encryption
+cryptography
+pycryptodome
+argon2-cffi
+bcrypt
+
+# AI and Machine Learning
+openai
+tensorflow
+scikit-learn
+pandas
+numpy
+transformers
+torch
+spacy
+nltk
+sentiment-analysis
+
+# Voice Processing
+speechrecognition
+pydub
+gTTS
+pyttsx3
+librosa
+soundfile
+
+# Document Processing and Security
+pytesseract
+opencv-python
+pillow
+pdf2image
+python-magic
+clamd
+yara-python
+
+# Blockchain Integration
+web3
+eth-account
+eth-utils
+bitcoin
+pycoin
+
+# SMS and Communication
+twilio
+africastalking
+requests
+
+# Database and Caching
+redis
+aioredis
+motor
+pymongo
+
+# Image and QR Code Processing
+qrcode
+pyzbar
+opencv-python
+scikit-image
+
+# Security Scanning
+requests-html
+beautifulsoup4
+urllib3
+dnspython
+
+# Monitoring and Logging
+prometheus-client
+structlog
+loguru
+
+# Additional Utilities
+celery
+pydantic-settings
+python-multipart
+aiofiles

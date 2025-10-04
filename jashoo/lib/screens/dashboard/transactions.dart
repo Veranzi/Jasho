@@ -14,7 +14,7 @@ class TransactionHistoryScreen extends StatefulWidget {
 
 class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
   // Define colors and styles for consistency
-  static const Color primaryColor = Color(0xFF0D47A1);
+  static const Color primaryColor = Color(0xFF10B981);
   static const Color pendingColor = Colors.blueAccent;
 
   // Dummy data for the transaction list

@@ -8,18 +8,22 @@ class ForgotPass extends StatelessWidget {
     final emailController = TextEditingController();
     return Scaffold(
       appBar: AppBar(title: const Text("Forgot Password")),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            TextField(controller: emailController, decoration: const InputDecoration(labelText: "Enter your email")),
-            const SizedBox(height: 20),
-            ElevatedButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Reset link sent!")));
-                },
-                child: const Text("Send Reset Link")),
-          ],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              children: [
+                TextField(controller: emailController, decoration: const InputDecoration(labelText: "Enter your email")),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Reset link sent!")));
+                    },
+                    child: const Text("Send Reset Link")),
+              ],
+            ),
+          ),
         ),
       ),
     );

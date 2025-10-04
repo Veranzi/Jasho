@@ -6,7 +6,7 @@ class SecurityScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Security'), backgroundColor: const Color(0xFF0D47A1)),
+      appBar: AppBar(title: const Text('Security'), backgroundColor: const Color(0xFF10B981)),
       body: ListView(
         children: [
           SwitchListTile(

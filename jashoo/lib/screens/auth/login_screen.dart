@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'signup_screen.dart'; // This navigates to your signup screen
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -19,8 +20,10 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom + 16),
           child: Padding(
             padding:
                 const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
@@ -37,12 +40,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 30),
 
                 // 2. Title
-                const Text(
+                Text(
                   "Login",
                   style: TextStyle(
-                    fontSize: 30,
+                    fontSize: 30.sp,
                     fontWeight: FontWeight.w700,
-                    color: Color(0xFF0D47A1),
+                    color: const Color(0xFF10B981),
                   ),
                   textAlign: TextAlign.left,
                 ),
@@ -55,7 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: InputDecoration(
                     hintText: "Enter your mobile number",
                     prefixIcon: const Icon(Icons.phone_android,
-                        color: Color(0xFF0D47A1)),
+                        color: Color(0xFF10B981)),
                     filled: true,
                     fillColor: Colors.grey.shade100,
                     contentPadding: const EdgeInsets.symmetric(vertical: 18),
@@ -75,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   decoration: InputDecoration(
                     hintText: "Enter your password",
                     prefixIcon: const Icon(Icons.lock_outline,
-                        color: Color(0xFF0D47A1)),
+                        color: Color(0xFF10B981)),
                     suffixIcon: IconButton(
                       icon: Icon(
                         _isPasswordVisible
@@ -113,7 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               _rememberMe = value ?? false;
                             });
                           },
-                          activeColor: const Color(0xFF0D47A1),
+                          activeColor: const Color(0xFF10B981),
                         ),
                         const Text("Remember me"),
                       ],
@@ -125,7 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text(
                         "Forgot password?",
                         style: TextStyle(
-                          color: Color(0xFF0D47A1),
+                          color: Color(0xFF10B981),
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -140,16 +143,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     Navigator.pushReplacementNamed(context, '/dashboard');
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF0D47A1),
+                    backgroundColor: const Color(0xFF10B981),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     elevation: 2,
                   ),
-                  child: const Text(
+                  child: Text(
                     "Login",
-                    style: TextStyle(fontSize: 18, color: Colors.white),
+                    style: TextStyle(fontSize: 18.sp, color: Colors.white),
                   ),
                 ),
                 const SizedBox(height: 18),
@@ -178,38 +181,43 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    side: const BorderSide(color: Color(0xFF0D47A1)),
+                    side: const BorderSide(color: Color(0xFF10B981)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  child: const Text(
+                  child: Text(
                     "Create Account",
                     style: TextStyle(
-                        fontSize: 18, color: Color(0xFF0D47A1)),
+                        fontSize: 18.sp, color: const Color(0xFF10B981)),
                   ),
                 ),
                 const SizedBox(height: 10),
+                // Login with Phone and Google in same row
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    OutlinedButton.icon(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/phoneAuth');
-                      },
-                      icon: const Icon(Icons.sms),
-                      label: const Text('Login with Phone'),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/phoneAuth');
+                        },
+                        icon: const Icon(Icons.sms),
+                        label: const Text('Phone'),
+                      ),
                     ),
-                    OutlinedButton.icon(
-                      onPressed: () {
-                        // stub Google login
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Google Sign-In (stub)')),
-                        );
-                        Navigator.pushReplacementNamed(context, '/dashboard');
-                      },
-                      icon: const Icon(Icons.account_circle),
-                      label: const Text('Google'),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          // stub Google login
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Google Sign-In (stub)')),
+                          );
+                          Navigator.pushReplacementNamed(context, '/dashboard');
+                        },
+                        icon: const Icon(Icons.account_circle),
+                        label: const Text('Google'),
+                      ),
                     ),
                   ],
                 )

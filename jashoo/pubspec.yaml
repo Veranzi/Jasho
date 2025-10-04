@@ -30,6 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   provider: ^6.1.5+1
   shared_preferences: ^2.3.2
   local_auth: ^2.3.0
@@ -39,15 +41,21 @@ dependencies:
   fl_chart: ^0.69.0
   pdf: ^3.10.8
   printing: ^5.13.4
+  image_picker: ^1.0.7
+  mobile_scanner: ^5.0.3
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   intl: ^0.20.2
+  intl_phone_field: ^3.2.0
+  responsive_framework: ^1.5.1
+  flutter_screenutil: ^5.9.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.1
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -68,14 +76,31 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  assets:
-    - assets/logo.png
-    - assets/sign_illustration.jpg
-    - assets/login_illustration.png
-    - assets/signup.png
-    - assets/login.png
+ # assets:
+    #- assets/logo.png
+    #- assets/logo1.png
+    #- assets/sign_illustration.jpg
+    #- assets/login_illustration.png
+    #- assets/signup.png
+    #- assets/login.png
     # or you can use this to include everything:
     # - assets/
+   # flutter:
+  #uses-material-design: true
+  assets:
+    - assets/
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/logo1.png
+  min_sdk_android: 21
+  adaptive_icon_background: "#10B981"
+  adaptive_icon_foreground: assets/logo1.png
+  remove_alpha_ios: true
+  image_path_ios: assets/logo1.png
+  image_path_android: assets/logo1.png
+
   
 
   # An image asset can refer to one or more resolution-specific "variants", see
