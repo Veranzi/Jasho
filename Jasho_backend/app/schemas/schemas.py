@@ -19,6 +19,12 @@ class IncomeCreate(BaseModel):
 class WalletTopup(BaseModel):
     amount: float
 
+
+class IncomeCreate(BaseModel):
+    source: str
+    amount: float
+    description: Optional[str] = None
+
 class FraudReportCreate(BaseModel):
     title: str
     details: Optional[str] = None

@@ -8,6 +8,8 @@ from app.models.models import Income, User
 from app.schemas.schemas import IncomeCreate
 from app.auth import decode_token
 from app.ai_stub import forecast_income, compute_trust_score
+import time
+from app.services.blockchain_simulator import BlockchainClient
 
 router = APIRouter(prefix="/incomes", tags=["incomes"])
 
@@ -35,6 +37,16 @@ def add_income(payload: IncomeCreate, user: User = Depends(get_current_user), se
         wallet.balance += payload.amount
         session.add(wallet)
         session.commit()
+    try:
+        bc = BlockchainClient()
+        bc.log_transaction_on_chain({
+            "type": "income",
+            "user_id": user.id,
+            "amount": payload.amount,
+            "ts": int(time.time())
+        })
+    except Exception:
+        pass
     return {"id": inc.id, "status": "added", "new_balance": wallet.balance if wallet else None}
 
 @router.get("/forecast", response_model=dict)

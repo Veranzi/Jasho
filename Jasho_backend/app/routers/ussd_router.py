@@ -10,8 +10,8 @@ def ussd_hook(sessionId: str = Form(...), serviceCode: str = Form(...), phoneNum
     # Here we return a text response for demo (Africa's Talking expects 'CON' or 'END')
     if text == "":
         response = "CON Welcome to Jasho\n1. Log gig\n2. Check balance\n3. Savings"
-    elif text == "1":
-        response = "CON Enter gig source and amount, e.g., 'kibandaski,500'"
+    elif text == "2":
+        response = "END Balance masked. Open app to unmask securely."
     else:
         response = "END Feature under development"
     return {"message": response}
