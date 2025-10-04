@@ -37,6 +37,7 @@ const aiRoutes = require('./routes/ai');
 const chatbotRoutes = require('./routes/chatbot');
 const heatmapRoutes = require('./routes/heatmap');
 const creditScoreRoutes = require('./routes/credit-score');
+const profileImageRoutes = require('./routes/profile-image');
 
 const app = express();
 
@@ -199,6 +200,7 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/heatmap', heatmapRoutes);
 app.use('/api/credit-score', creditScoreRoutes);
+app.use('/api/profile-image', profileImageRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

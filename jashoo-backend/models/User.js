@@ -116,6 +116,21 @@ const userSchema = new mongoose.Schema({
       type: String,
       default: null
     },
+    photoMetadata: {
+      width: Number,
+      height: Number,
+      format: String,
+      size: Number,
+      processedAt: Date,
+      sizes: {
+        original: String,
+        large: String,
+        medium: String,
+        small: String,
+        thumbnail: String
+      },
+      hash: String
+    },
     documentUrls: [{
       type: String
     }],

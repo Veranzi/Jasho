@@ -124,6 +124,7 @@ create_directories() {
         "uploads/chatbot"
         "uploads/documents"
         "uploads/images"
+        "uploads/profile-images"
         "logs"
         "backups"
         "models"

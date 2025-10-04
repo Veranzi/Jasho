@@ -204,6 +204,16 @@ The API will be available at `http://localhost:3000`
 | GET | `/factors` | Get credit factors | Yes |
 | GET | `/comparison` | Get peer comparison | Yes |
 
+### Profile Image (`/api/profile-image`)
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/upload` | Upload profile image | Yes |
+| PUT | `/` | Update profile image | Yes |
+| GET | `/:userId` | Get user profile image | No |
+| DELETE | `/` | Delete profile image | Yes |
+| POST | `/validate` | Validate image before upload | Yes |
+| GET | `/serve/:filename` | Serve image file | No |
+
 ## 🔧 Configuration
 
 ### Environment Variables
@@ -220,6 +230,8 @@ The API will be available at `http://localhost:3000`
 | `CONTRACT_SALT` | Contract salt | Required |
 | `MAX_FILE_SIZE` | Max file upload size | 10485760 |
 | `UPLOAD_PATH` | File upload directory | uploads/ |
+| `MAX_PROFILE_IMAGE_SIZE` | Max profile image size | 5242880 |
+| `PROFILE_IMAGE_ALLOWED_TYPES` | Allowed image formats | jpg,jpeg,png,webp |
 | `RATE_LIMIT_MAX_REQUESTS` | Max requests per window | 100 |
 | `CORS_ORIGIN` | CORS allowed origins | http://localhost:3000 |
 | `ETHEREUM_RPC_URL` | Ethereum RPC URL | Required for blockchain |
