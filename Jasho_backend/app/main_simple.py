@@ -15,6 +15,7 @@ from app.routers import (
     ussd_router,
     chatbot_router,
     mpesa_router,
+    user_router,
 )
 
 # Import core systems (simplified)
@@ -58,6 +59,7 @@ security = HTTPBearer(auto_error=False)
 
 # Include existing routers
 app.include_router(auth_router.router, prefix="/auth", tags=["Authentication"])
+app.include_router(user_router.router, prefix="/user", tags=["User Management"])
 app.include_router(incomes_routers.router, prefix="/incomes", tags=["Income Management"])
 app.include_router(wallet_router.router, prefix="/wallet", tags=["Wallet Operations"])
 app.include_router(ussd_router.router, prefix="/ussd", tags=["USSD Services"])

@@ -45,7 +45,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: _method,
+                  initialValue: _method,
                   decoration: InputDecoration(
                     labelText: 'Method', 
                     labelStyle: TextStyle(fontSize: 14.sp),
@@ -78,7 +78,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                   ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: _category,
+                  initialValue: _category,
                   decoration: InputDecoration(
                     labelText: 'Category', 
                     labelStyle: TextStyle(fontSize: 14.sp),
@@ -96,7 +96,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: _selectedHustle,
+                  initialValue: _selectedHustle,
                   decoration: InputDecoration(
                     labelText: 'Hustle (source)', 
                     labelStyle: TextStyle(fontSize: 14.sp),
@@ -116,7 +116,7 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                       if (amt == null || amt <= 0) return;
                       final ok = await _verifyPin(context);
                       if (!ok) return;
-                      context.read<WalletProvider>().withdrawKes(amt, category: _category, method: _method, hustle: _selectedHustle);
+                      context.read<WalletProvider>().withdrawKes(amount: amt, category: _category, method: _method, hustle: _selectedHustle);
                       Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(

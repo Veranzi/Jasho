@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import '../../providers/wallet_provider.dart';
 import 'profile_drawer.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:provider/provider.dart';
 import '../../providers/jobs_provider.dart';
 import 'ai_assistant_screen.dart';
 import 'transactions.dart';
@@ -157,7 +156,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   Widget _buildWalletCard() {
     final wallet = context.watch<WalletProvider>();
     final isKes = wallet.displayCurrency == Currency.kes;
-    final balance = isKes ? wallet.kesBalance : wallet.usdtBalance;
+    final balance = isKes ? wallet.balance?.kesBalance ?? 0.0 : wallet.balance?.usdtBalance ?? 0.0;
     final label = isKes ? 'KES' : 'USDT';
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),

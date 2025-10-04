@@ -45,7 +45,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
     if (_formKey.currentState!.validate()) {
       final absa = absaAccountController.text.trim();
       if (absa.isNotEmpty) {
-        context.read<UserProvider>().linkAbsaAccount(absa);
+        context.read<UserProvider>().linkAbsaAccount();
       }
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Profile updated successfully!")),

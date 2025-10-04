@@ -43,7 +43,7 @@ class _DepositScreenState extends State<DepositScreen> {
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: _method,
+                  initialValue: _method,
                   decoration: InputDecoration(
                     labelText: 'Method', 
                     labelStyle: TextStyle(fontSize: 14.sp),
@@ -76,7 +76,7 @@ class _DepositScreenState extends State<DepositScreen> {
                   ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
-                  value: _selectedHustle,
+                  initialValue: _selectedHustle,
                   decoration: InputDecoration(
                     labelText: 'Hustle (source)', 
                     labelStyle: TextStyle(fontSize: 14.sp),
@@ -95,7 +95,7 @@ class _DepositScreenState extends State<DepositScreen> {
                       final amt = double.tryParse(_amountController.text.trim());
                       if (amt == null || amt <= 0) return;
                       context.read<WalletProvider>().depositKes(
-                            amt,
+                            amount: amt,
                             description: '$_method Deposit',
                             method: _method,
                             hustle: _selectedHustle,

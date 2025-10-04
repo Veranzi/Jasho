@@ -35,7 +35,7 @@ class _ConvertScreenState extends State<ConvertScreen> {
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
-              value: _direction,
+              initialValue: _direction,
               decoration: const InputDecoration(labelText: 'Direction'),
               items: const [
                 DropdownMenuItem(value: 'KES → USDT', child: Text('KES → USDT')),
@@ -56,12 +56,12 @@ class _ConvertScreenState extends State<ConvertScreen> {
                 final rate = double.tryParse(_rateController.text.trim());
                 if (kes == null || kes <= 0 || rate == null || rate <= 0) return;
                 if (_direction == 'KES → USDT') {
-                  context.read<WalletProvider>().convertKesToUsdt(kes, rate);
+                  context.read<WalletProvider>().convertKesToUsdt(kesAmount: kes, rate: rate);
                 } else {
                   // reverse conversion: simple demo
                   final wallet = context.read<WalletProvider>();
                   final requiredKes = kes * rate;
-                  wallet.depositKes(requiredKes, description: 'Convert USDT to KES');
+                  wallet.depositKes(amount: requiredKes, description: 'Convert USDT to KES');
                 }
                 Navigator.pop(context);
               },
