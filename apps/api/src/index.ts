@@ -12,6 +12,7 @@ import { securityRouter } from "./routes/security";
 import { aiRouter } from "./routes/ai";
 import { chatbotRouter } from "./routes/chatbot";
 import { blockchainRouter } from "./routes/blockchain";
+import { heatmapRouter } from "./routes/heatmap";
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.use("/security", securityRouter);
 app.use("/ai", aiRouter);
 app.use("/chatbot", chatbotRouter);
 app.use("/blockchain", blockchainRouter);
+app.use("/heatmap", heatmapRouter);
 
 const port = process.env.PORT || 4000;
 app.listen(port, () => console.log(`API listening on :${port}`));
