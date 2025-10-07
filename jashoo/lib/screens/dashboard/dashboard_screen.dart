@@ -157,7 +157,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   Widget _buildWalletCard() {
     final wallet = context.watch<WalletProvider>();
     final isKes = wallet.displayCurrency == Currency.kes;
-    final balance = isKes ? wallet.kesBalance : wallet.usdtBalance;
+    final balance = wallet.currentBalance;
     final label = isKes ? 'KES' : 'USDT';
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
