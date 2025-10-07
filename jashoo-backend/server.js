@@ -1,379 +1,105 @@
-const express = require('express');
-// MongoDB removed — using Firebase Firestore only
-const cors = require('cors');
-const helmet = require('helmet');
-const compression = require('compression');
-const morgan = require('morgan');
-const rateLimit = require('express-rate-limit');
-const slowDown = require('express-slow-down');
-const mongoSanitize = require('express-mongo-sanitize');
-const hpp = require('hpp');
-require('dotenv').config();
+// server.js — Firestore only, no MongoDB
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import helmet from 'helmet';
+import hpp from 'hpp';
+import compression from 'compression';
+import rateLimit from 'express-rate-limit';
+import slowDown from 'express-slow-down';
+import morgan from 'morgan';
+import xss from 'xss';
+import { v4 as uuidv4 } from 'uuid';
+import admin from './firebaseAdmin.js';
 
-// Import security middleware
-const {
-  securityHeaders,
-  requestFingerprint,
-  transactionSecurity,
-  sanitizeInput,
-  sessionSecurity,
-  securityAudit,
-  createRateLimit,
-  bruteForce,
-  threatDetection,
-  securityMonitoring,
-  logger
-} = require('./middleware/cybersecurity');
+// Import your route files
+import authRoutes from './routes/auth.js';
+import userRoutes from './routes/user.js';
+import walletRoutes from './routes/wallet.js';
+import transactionRoutes from './routes/transaction.js';
+import aiRoutes from './routes/ai.js';
+import blockchainRoutes from './routes/blockchain.js';
+import cybersecurityRoutes from './routes/cybersecurity.js';
 
-// Import blockchain middleware
-const { blockchainMiddleware } = require('./middleware/blockchain');
-
-// Initialize Firebase Admin (if configured)
-try {
-  require('./firebaseAdmin');
-} catch (e) {
-  // eslint-disable-next-line no-console
-  console.warn('Firebase Admin not initialized:', e?.message || e);
-}
-
-// Import routes
-const authRoutes = require('./routes/auth');
-const userRoutes = require('./routes/user');
-const walletRoutes = require('./routes/wallet');
-const jobsRoutes = require('./routes/jobs');
-const savingsRoutes = require('./routes/savings');
-const gamificationRoutes = require('./routes/gamification');
-const aiRoutes = require('./routes/ai');
-const chatbotRoutes = require('./routes/chatbot');
-const heatmapRoutes = require('./routes/heatmap');
-const creditScoreRoutes = require('./routes/credit-score');
-const profileImageRoutes = require('./routes/profile-image');
+dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-// Enhanced security middleware
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "https:"],
-      connectSrc: ["'self'"],
-      fontSrc: ["'self'"],
-      objectSrc: ["'none'"],
-      mediaSrc: ["'self'"],
-      frameSrc: ["'none'"],
-    },
-  },
-  crossOriginEmbedderPolicy: false,
-  hsts: {
-    maxAge: 31536000,
-    includeSubDomains: true,
-    preload: true
-  }
-}));
-
-app.use(compression());
-
-// Advanced rate limiting with different tiers
-app.use('/api/auth/', createRateLimit(15 * 60 * 1000, 5, 'Too many authentication attempts'));
-app.use('/api/wallet/', createRateLimit(5 * 60 * 1000, 10, 'Too many wallet operations'));
-app.use('/api/', createRateLimit(15 * 60 * 1000, 100, 'Too many requests'));
-
-// Brute force protection for auth endpoints
-app.use('/api/auth/login', bruteForce.prevent);
-app.use('/api/auth/register', bruteForce.prevent);
-
-// CORS configuration
-const corsOptions = {
-  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : ['http://localhost:3000'],
-  credentials: true,
-  optionsSuccessStatus: 200,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin']
-};
-app.use(cors(corsOptions));
-
-// Session security
-app.use(sessionSecurity);
-
-// Request fingerprinting and security audit
-app.use(requestFingerprint);
-app.use(securityAudit);
-app.use(threatDetection);
-app.use(securityMonitoring);
-
-// Body parsing middleware with security
-app.use(express.json({ 
-  limit: process.env.MAX_FILE_SIZE || '10mb',
-  verify: (req, res, buf) => {
-    // Additional security checks on request body
-    if (buf.length > parseInt(process.env.MAX_FILE_SIZE || '10485760')) {
-      throw new Error('Request body too large');
-    }
-  }
-}));
-app.use(express.urlencoded({ extended: true, limit: process.env.MAX_FILE_SIZE || '10mb' }));
-
-// Input sanitization
-app.use(sanitizeInput);
-
-// (Optional) Mongo-style key sanitization
-app.use(mongoSanitize());
-
-// HTTP Parameter Pollution protection
+// ✅ Security and performance middlewares
+app.use(helmet());
 app.use(hpp());
+app.use(compression());
+app.use(cors());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(morgan('dev'));
 
-// Blockchain middleware
-if (process.env.BLOCKCHAIN_ENABLED === 'true') {
-  app.use(blockchainMiddleware);
-}
-
-// Enhanced logging with security context
-if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('combined', {
-    stream: {
-      write: (message) => {
-        logger.info(message.trim());
-      }
-    }
-  }));
-} else {
-  app.use(morgan('combined', {
-    stream: {
-      write: (message) => {
-        logger.info(message.trim());
-      }
-    }
-  }));
-}
-
-// Static files with security headers
-app.use('/uploads', express.static('uploads', {
-  setHeaders: (res, path) => {
-    res.setHeader('X-Content-Type-Options', 'nosniff');
-    res.setHeader('Cache-Control', 'public, max-age=31536000');
-  }
-}));
-
-// Health check endpoint
-app.get('/health', (req, res) => {
-  const healthCheck = {
-    status: 'OK',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    environment: process.env.NODE_ENV,
-    version: process.env.npm_package_version || '1.0.0',
-    services: {
-      database: 'firestore',
-      redis: process.env.REDIS_URL ? 'configured' : 'disabled',
-      blockchain: process.env.BLOCKCHAIN_ENABLED === 'true' ? 'enabled' : 'disabled',
-      ai: process.env.AI_ENABLED === 'true' ? 'enabled' : 'disabled'
-    }
-  };
-  
-  res.status(200).json(healthCheck);
+// ✅ Basic rate limiter
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 150, // limit each IP to 150 requests per windowMs
 });
+app.use(limiter);
 
-// API documentation endpoint
-if (process.env.ENABLE_SWAGGER === 'true') {
-  app.get('/api-docs', (req, res) => {
-    res.json({
-      title: 'Jashoo API Documentation',
-      version: '1.0.0',
-      description: 'Advanced financial services API for gig economy workers',
-      endpoints: {
-        auth: '/api/auth',
-        user: '/api/user',
-        wallet: '/api/wallet',
-        jobs: '/api/jobs',
-        savings: '/api/savings',
-        gamification: '/api/gamification',
-        ai: '/api/ai',
-        chatbot: '/api/chatbot',
-        heatmap: '/api/heatmap',
-        creditScore: '/api/credit-score'
+// ✅ Slow down excessive requests (basic DoS protection)
+const speedLimiter = slowDown({
+  windowMs: 15 * 60 * 1000,
+  delayAfter: 50, // allow 50 requests per 15 minutes, then start slowing down responses
+  delayMs: 500, // add 0.5s delay per request above 50
+});
+app.use(speedLimiter);
+
+// ✅ Sanitize and validate input manually (no Mongo)
+app.use((req, res, next) => {
+  // XSS protection for string inputs
+  if (req.body && typeof req.body === 'object') {
+    Object.keys(req.body).forEach((key) => {
+      if (typeof req.body[key] === 'string') {
+        req.body[key] = xss(req.body[key]);
       }
     });
-  });
-}
+  }
+  next();
+});
 
-// API routes with enhanced security
+// ✅ Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
-app.use('/api/wallet', transactionSecurity, walletRoutes);
-app.use('/api/jobs', jobsRoutes);
-app.use('/api/savings', savingsRoutes);
-app.use('/api/gamification', gamificationRoutes);
+app.use('/api/wallet', walletRoutes);
+app.use('/api/transactions', transactionRoutes);
 app.use('/api/ai', aiRoutes);
-app.use('/api/chatbot', chatbotRoutes);
-app.use('/api/heatmap', heatmapRoutes);
-app.use('/api/credit-score', creditScoreRoutes);
-app.use('/api/profile-image', profileImageRoutes);
+app.use('/api/blockchain', blockchainRoutes);
+app.use('/api/cybersecurity', cybersecurityRoutes);
 
-// 404 handler
-app.use('*', (req, res) => {
-  logger.warn('Route not found', {
-    method: req.method,
-    url: req.url,
-    ip: req.ip,
-    userAgent: req.get('User-Agent'),
-    timestamp: new Date()
+// ✅ Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'running',
+    time: new Date(),
+    server_id: uuidv4(),
   });
-  
+});
+
+// ✅ 404 handler
+app.use((req, res) => {
   res.status(404).json({
-    success: false,
     message: 'Route not found',
-    code: 'ROUTE_NOT_FOUND',
-    path: req.originalUrl
   });
 });
 
-// Global error handler
+// ✅ Global error handler
 app.use((err, req, res, next) => {
-  logger.error('Global error handler', {
-    error: err.message,
-    stack: err.stack,
-    method: req.method,
-    url: req.url,
-    ip: req.ip,
-    userAgent: req.get('User-Agent'),
-    userId: req.user?.userId,
-    timestamp: new Date()
-  });
-  
-  // Handle specific error types
-  if (err.name === 'ValidationError') {
-    return res.status(400).json({
-      success: false,
-      message: 'Validation Error',
-      code: 'VALIDATION_ERROR',
-      errors: Object.values(err.errors).map(e => ({
-        field: e.path,
-        message: e.message,
-        value: e.value
-      }))
-    });
-  }
-  
-  if (err.name === 'CastError') {
-    return res.status(400).json({
-      success: false,
-      message: 'Invalid ID format',
-      code: 'INVALID_ID'
-    });
-  }
-  
-  if (err.code === 11000) {
-    const field = Object.keys(err.keyPattern)[0];
-    return res.status(400).json({
-      success: false,
-      message: `${field} already exists`,
-      code: 'DUPLICATE_FIELD',
-      field
-    });
-  }
-  
-  if (err.name === 'JsonWebTokenError') {
-    return res.status(401).json({
-      success: false,
-      message: 'Invalid token',
-      code: 'INVALID_TOKEN'
-    });
-  }
-  
-  if (err.name === 'TokenExpiredError') {
-    return res.status(401).json({
-      success: false,
-      message: 'Token expired',
-      code: 'TOKEN_EXPIRED'
-    });
-  }
-  
-  // Default error response
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || 'Internal Server Error',
-    code: 'INTERNAL_ERROR',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+  console.error('🔥 Server error:', err);
+  res.status(500).json({
+    error: 'Internal server error',
+    message: err.message,
   });
 });
 
-// Graceful shutdown handling
-process.on('SIGTERM', () => {
-  logger.info('SIGTERM received, shutting down gracefully');
-  server.close(() => {
-    logger.info('Process terminated');
-    process.exit(0);
-  });
+// ✅ Start server
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
 
-process.on('SIGINT', () => {
-  logger.info('SIGINT received, shutting down gracefully');
-  server.close(() => {
-    logger.info('Process terminated');
-    process.exit(0);
-  });
-});
-
-// No-op connect for Firestore-only mode
-const connectDB = async () => {
-  logger.info('Using Firebase Firestore (no MongoDB connection)');
-};
-
-// Start server
-const PORT = process.env.PORT || 3000;
-const HOST = process.env.HOST || 'localhost';
-
-let server;
-
-const startServer = async () => {
-  try {
-    // Connect to database
-    await connectDB();
-    
-    // Start server
-    server = app.listen(PORT, HOST, () => {
-      logger.info(`🚀 Server running on http://${HOST}:${PORT} in ${process.env.NODE_ENV} mode`);
-      logger.info(`📊 Health check: http://${HOST}:${PORT}/health`);
-      logger.info(`📚 API docs: http://${HOST}:${PORT}/api-docs`);
-      logger.info(`🔒 Security monitoring: ${process.env.SECURITY_MONITORING_ENABLED === 'true' ? 'Enabled' : 'Disabled'}`);
-      logger.info(`⛓️ Blockchain: ${process.env.BLOCKCHAIN_ENABLED === 'true' ? 'Enabled' : 'Disabled'}`);
-      logger.info(`🤖 AI features: ${process.env.AI_ENABLED === 'true' ? 'Enabled' : 'Disabled'}`);
-    });
-    
-    // Handle server errors
-    server.on('error', (error) => {
-      if (error.syscall !== 'listen') {
-        throw error;
-      }
-      
-      const bind = typeof PORT === 'string' ? 'Pipe ' + PORT : 'Port ' + PORT;
-      
-      switch (error.code) {
-        case 'EACCES':
-          logger.error(`${bind} requires elevated privileges`);
-          process.exit(1);
-          break;
-        case 'EADDRINUSE':
-          logger.error(`${bind} is already in use`);
-          process.exit(1);
-          break;
-        default:
-          throw error;
-      }
-    });
-    
-  } catch (error) {
-    logger.error('Failed to start server:', error);
-    process.exit(1);
-  }
-};
-
-// Start the server unless disabled for tests/tools
-if (process.env.JASHOO_NO_LISTEN !== 'true') {
-  startServer();
-}
-
-module.exports = app;
+export default app;
