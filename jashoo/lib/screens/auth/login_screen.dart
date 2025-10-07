@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'signup_screen.dart'; // This navigates to your signup screen
+import 'package:intl_phone_field/intl_phone_field.dart';
+import '../../services/api_service.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -51,23 +53,22 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 25),
 
-                // 3. Mobile Number
-                TextFormField(
+                // 3. Mobile Number with country code
+                IntlPhoneField(
                   controller: mobileController,
-                  keyboardType: TextInputType.phone,
                   decoration: InputDecoration(
-                    hintText: "Enter your mobile number",
-                    prefixIcon: const Icon(Icons.phone_android,
-                        color: Color(0xFF10B981)),
+                    labelText: 'Phone Number',
                     filled: true,
                     fillColor: Colors.grey.shade100,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 18),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide.none,
                     ),
                   ),
-                  maxLength: 10,
+                  initialCountryCode: 'KE',
+                  onChanged: (phone) {
+                    // store full E.164
+                  },
                 ),
                 const SizedBox(height: 15),
 
@@ -139,8 +140,28 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 // 6. Login button
                 ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/dashboard');
+                  onPressed: () async {
+                    final phone = mobileController.text.trim();
+                    final password = passwordController.text;
+                    try {
+                      final resp = phone.contains('@')
+                          ? await ApiService().login(email: phone, password: password)
+                          : await ApiService().loginWithPhone(phoneNumber: phone, password: password, rememberMe: _rememberMe);
+                      if (resp['success'] == true) {
+                        if (!mounted) return;
+                        Navigator.pushReplacementNamed(context, '/dashboard');
+                      } else {
+                        if (!mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(resp['message'] ?? 'Login failed')),
+                        );
+                      }
+                    } catch (e) {
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error: $e')),
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF10B981),
