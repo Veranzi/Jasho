@@ -220,6 +220,24 @@ class ApiService {
     return response;
   }
 
+  Future<Map<String, dynamic>> loginWithPhone({
+    required String phoneNumber,
+    required String password,
+    bool rememberMe = false,
+  }) async {
+    final response = await _makeRequest('POST', '/auth/login', body: {
+      'phoneNumber': phoneNumber,
+      'password': password,
+      'rememberMe': rememberMe,
+    }, includeAuth: false);
+
+    if (response['success'] == true && response['data']?['token'] != null) {
+      await setToken(response['data']['token']);
+    }
+
+    return response;
+  }
+
   Future<Map<String, dynamic>> logout() async {
     final response = await _makeRequest('POST', '/auth/logout');
     await clearToken();

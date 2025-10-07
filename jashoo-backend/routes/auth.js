@@ -193,13 +193,15 @@ router.post('/register', validateUserRegistration, async (req, res) => {
 // Login user
 router.post('/login', validateUserLogin, async (req, res) => {
   try {
-    const { email, password, rememberMe = false } = req.body;
+    const { email, phoneNumber, password, rememberMe = false } = req.body;
 
-    // Find user by email
-    const user = await User.findOne({ 
-      email: email.toLowerCase(), 
-      isActive: true 
-    });
+    // Find user by email or phone
+    let user = null;
+    if (email) {
+      user = await User.findOne({ email: email.toLowerCase(), isActive: true });
+    } else if (phoneNumber) {
+      user = await User.findOne({ phoneNumber, isActive: true });
+    }
 
     if (!user) {
       return res.status(401).json({

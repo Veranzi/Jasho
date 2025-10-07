@@ -101,9 +101,14 @@ const validateUserRegistration = [
 
 const validateUserLogin = [
   body('email')
+    .optional()
     .isEmail()
     .normalizeEmail()
     .withMessage('Valid email is required'),
+  body('phoneNumber')
+    .optional()
+    .isMobilePhone('any')
+    .withMessage('Valid phone number is required'),
   body('password')
     .notEmpty()
     .withMessage('Password is required')
@@ -113,7 +118,16 @@ const validateUserLogin = [
     .optional()
     .isBoolean()
     .withMessage('Remember me must be a boolean'),
-  handleValidationErrors
+  (req, res, next) => {
+    if (!req.body.email && !req.body.phoneNumber) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email or phone number is required',
+        code: 'IDENTIFIER_REQUIRED'
+      });
+    }
+    return handleValidationErrors(req, res, next);
+  }
 ];
 
 const validateEmailVerification = [
