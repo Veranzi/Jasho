@@ -97,7 +97,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
                             smsCode: _codeController.text.trim(),
                           );
                           await FirebaseAuth.instance.signInWithCredential(credential);
-                          final idToken = await FirebaseAuth.instance.currentUser!.getIdToken(true);
+                          final idToken = await FirebaseAuth.instance.currentUser!.getIdToken(true) ?? '';
                           final resp = await ApiService().loginWithFirebasePhone(
                             idToken: idToken,
                           );
