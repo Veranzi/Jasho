@@ -1,5 +1,5 @@
 const express = require('express');
-const { Job, JobApplication } = require('../models/Job');
+const { Job, JobApplication } = require('../models/Jobs');
 const { Transaction } = require('../models/Wallet');
 const { Gamification } = require('../models/Gamification');
 const { authenticateToken, requireVerification } = require('../middleware/auth');
