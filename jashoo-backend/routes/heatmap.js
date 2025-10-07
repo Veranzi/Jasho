@@ -2,7 +2,7 @@ const express = require('express');
 const { authenticateToken, optionalAuth } = require('../middleware/auth');
 const { validatePagination } = require('../middleware/validation');
 const { logger } = require('../middleware/cybersecurity');
-const { Job } = require('../models/Job');
+const { Job } = require('../models/Jobs');
 
 const router = express.Router();
 
