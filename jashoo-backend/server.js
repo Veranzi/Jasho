@@ -6,6 +6,8 @@ const compression = require('compression');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const slowDown = require('express-slow-down');
+const mongoSanitize = require('express-mongo-sanitize');
+const hpp = require('hpp');
 require('dotenv').config();
 
 // Import security middleware
@@ -25,6 +27,14 @@ const {
 
 // Import blockchain middleware
 const { blockchainMiddleware } = require('./middleware/blockchain');
+
+// Initialize Firebase Admin (if configured)
+try {
+  require('./firebaseAdmin');
+} catch (e) {
+  // eslint-disable-next-line no-console
+  console.warn('Firebase Admin not initialized:', e?.message || e);
+}
 
 // Import routes
 const authRoutes = require('./routes/auth');
