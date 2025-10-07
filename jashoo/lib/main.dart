@@ -6,8 +6,7 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'routes.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'providers/auth_provider.dart';
+import 'providers/auth_provider.dart' as app_auth;
 import 'providers/user_provider.dart';
 import 'providers/wallet_provider.dart';
 import 'providers/jobs_provider.dart';
@@ -30,7 +29,7 @@ class JashoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => app_auth.AuthProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()..loadDummyProfile()),
         ChangeNotifierProvider(create: (_) => WalletProvider()),
         ChangeNotifierProvider(create: (_) => JobsProvider()),
