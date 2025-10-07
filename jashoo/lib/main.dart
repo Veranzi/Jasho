@@ -15,10 +15,16 @@ import 'providers/ai_provider.dart';
 import 'providers/savings_provider.dart';
 import 'providers/locale_provider.dart';
 import 'providers/pin_provider.dart';
+import 'screens/auth/splash_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    // Continue without Firebase (e.g., web without configured options)
+    debugPrint('Firebase initialization skipped: $e');
+  }
   runApp(const JashoApp());
 }
 
@@ -63,10 +69,10 @@ class JashoApp extends StatelessWidget {
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
-            initialRoute: '/splash',
+            home: const SplashScreen(),
             routes: appRoutes,
             builder: (context, child) => ResponsiveBreakpoints.builder(
-              child: child!,
+              child: child ?? const SizedBox.shrink(),
               breakpoints: const [
                 Breakpoint(start: 0, end: 600, name: MOBILE),
                 Breakpoint(start: 601, end: 900, name: TABLET),
