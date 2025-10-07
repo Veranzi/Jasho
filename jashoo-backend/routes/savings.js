@@ -306,7 +306,7 @@ router.post('/goals/:id/contribute', authenticateToken, validateContribution, as
       description: `Savings contribution: ${goal.name}`,
       category: 'Savings',
       method: 'wallet',
-      savingsGoalId: goal._id,
+      savingsGoalId: goal.id,
       source: 'wallet',
       destination: 'savings',
       status: 'completed',
@@ -320,7 +320,7 @@ router.post('/goals/:id/contribute', authenticateToken, validateContribution, as
         userAgent: req.get('User-Agent')
       },
       metadata: {
-        goalId: goal._id.toString(),
+        goalId: goal.id,
         goalName: goal.name,
         hustle,
         pointsEarned: contribution.pointsEarned

@@ -64,15 +64,10 @@ router.post('/register', validateUserRegistration, async (req, res) => {
     await user.save();
 
     // Initialize wallet
-    const wallet = new Wallet({
-      userId: user.userId,
-      balances: {
-        KES: 0,
-        USDT: 0,
-        USD: 0
-      }
-    });
-    await wallet.save();
+    let wallet = await Wallet.findByUserId(user.userId);
+    if (!wallet) {
+      wallet = await Wallet.createWallet(user.userId);
+    }
 
     // Initialize gamification profile
     const gamification = new Gamification({
@@ -103,6 +98,24 @@ router.post('/register', validateUserRegistration, async (req, res) => {
       }
     });
     await creditScore.save();
+
+    // Optional: create starter savings goal
+    try {
+      if (String(process.env.STARTER_GOAL_AUTO_CREATE || 'true').toLowerCase() === 'true') {
+        const { SavingsGoal } = require('../models/Savings');
+        const starter = new SavingsGoal({
+          userId: user.userId,
+          name: 'Starter Emergency Fund',
+          target: 10000,
+          saved: 0,
+          category: 'Personal',
+          metadata: { starter: true }
+        });
+        await starter.save();
+      }
+    } catch (e) {
+      logger.warn('Starter goal creation skipped', { error: e.message });
+    }
 
     // Generate email verification token
     const emailToken = user.generateEmailVerificationToken();
@@ -620,6 +633,16 @@ router.post('/firebase-phone', async (req, res) => {
     let user = await User.findByPhone(phoneNumber);
 
     if (!user) {
+      const autoCreate = String(process.env.FIREBASE_PHONE_AUTO_CREATE || 'true').toLowerCase() === 'true';
+      if (!autoCreate) {
+        return res.status(404).json({
+          success: false,
+          message: 'No account found for this phone number. Please register first.',
+          code: 'USER_NOT_FOUND',
+          data: { requiresRegistration: true }
+        });
+      }
+
       const userId = `user_${Date.now()}_${(firebaseUid || Math.random().toString(36)).toString().slice(-6)}`;
       user = new User({
         userId,
@@ -653,6 +676,24 @@ router.post('/firebase-phone', async (req, res) => {
       let creditScore = await CreditScore.findByUser(user.userId);
       if (!creditScore) {
         creditScore = await CreditScore.createProfile(user.userId);
+      }
+
+      // Optional: create starter savings goal on phone sign-in
+      try {
+        if (String(process.env.STARTER_GOAL_AUTO_CREATE || 'true').toLowerCase() === 'true') {
+          const { SavingsGoal } = require('../models/Savings');
+          const starter = new SavingsGoal({
+            userId: user.userId,
+            name: 'Starter Emergency Fund',
+            target: 10000,
+            saved: 0,
+            category: 'Personal',
+            metadata: { starter: true }
+          });
+          await starter.save();
+        }
+      } catch (e) {
+        logger.warn('Starter goal creation skipped (phone)', { error: e.message });
       }
     }
 

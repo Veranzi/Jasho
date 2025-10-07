@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import '../../services/api_service.dart';
@@ -18,6 +19,7 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
   String? _fullPhoneE164;
   String? _verificationId;
   bool _loading = false;
+  String _initialCountry = 'KE';
 
   @override
   Widget build(BuildContext context) {
@@ -29,10 +31,12 @@ class _PhoneAuthScreenState extends State<PhoneAuthScreen> {
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
+                Image.asset('assets/login.png', height: 140.h),
+                const SizedBox(height: 16),
                 IntlPhoneField(
                   controller: _phoneController,
                   decoration: const InputDecoration(labelText: 'Phone Number'),
-                  initialCountryCode: 'KE',
+                  initialCountryCode: _initialCountry,
                   onChanged: (val) => _fullPhoneE164 = val.completeNumber,
                   validator: (val) {
                     if (val == null || val.number.isEmpty) return 'Enter phone number';
