@@ -4,8 +4,7 @@ const { validatePagination } = require('../middleware/validation');
 const { logger } = require('../middleware/cybersecurity');
 const { CreditScore, AICreditScorer } = require('../models/CreditScore');
 const { Wallet, Transaction } = require('../models/Wallet');
-const { Job } = require('../models/Job');
-const { SavingsGoal, LoanRequest } = require('../models/Savings');
+const { SavingsGoal, LoanRequest, Contribution } = require('../models/Savings');
 const User = require('../models/User');
 
 const router = express.Router();
@@ -324,16 +323,14 @@ async function gatherUserFinancialData(userId) {
   });
 
   // Get job history
-  const jobs = await Job.findByUser(userId, 'assigned', {
-    startDate: new Date(Date.now() - 365 * 24 * 60 * 60 * 1000)
-  });
+  const jobs = []; // Jobs Firestore migration pending; leave empty for now
 
   // Get savings data
-  const savingsGoals = await SavingsGoal.find({ userId });
-  const contributions = await Contribution.find({ userId });
+  const savingsGoals = await SavingsGoal.findByUser(userId);
+  const contributions = await Contribution.findByUser(userId);
 
   // Get loan history
-  const loans = await LoanRequest.findByUser(userId);
+  const loans = await LoanRequest.find({ userId });
 
   // Calculate financial metrics
   const monthlyIncome = calculateMonthlyIncome(transactions, jobs);

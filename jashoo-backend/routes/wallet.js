@@ -216,7 +216,7 @@ router.post('/verify-pin', authenticateToken, async (req, res) => {
 // Deposit money - matches Flutter WalletProvider.depositKes()
 router.post('/deposit', authenticateToken, validateTransaction, async (req, res) => {
   try {
-    const { amount, currencyCode = 'KES', description = 'Deposit', method, hustle, category = 'Deposit' } = req.body;
+    const { amount, currencyCode = 'KES', description = 'Deposit', method, hustle, category = 'Deposit', network } = req.body;
 
     let wallet = await Wallet.findByUserId(req.user.userId);
 
@@ -252,6 +252,30 @@ router.post('/deposit', authenticateToken, validateTransaction, async (req, res)
 
     await transaction.save();
 
+    // Optionally record on blockchain
+    try {
+      if (req.blockchain) {
+        const bc = await req.blockchain.recordTransaction(
+          req.user.userId,
+          amount,
+          currencyCode,
+          'deposit',
+          network || 'ethereum'
+        );
+        transaction.blockchain = bc.success ? {
+          recorded: true,
+          network: network || 'ethereum',
+          txHash: bc.transactionHash
+        } : {
+          recorded: false,
+          network: network || 'ethereum',
+          error: bc.error
+        };
+      }
+    } catch (e) {
+      transaction.blockchain = { recorded: false, error: e.message };
+    }
+
     // Update wallet balance
     await wallet.updateBalance(amount, currencyCode, 'deposit');
 
@@ -269,7 +293,8 @@ router.post('/deposit', authenticateToken, validateTransaction, async (req, res)
       description: transaction.description,
       category: transaction.category,
       method: transaction.method,
-      hustle: transaction.metadata?.hustle || null
+      hustle: transaction.metadata?.hustle || null,
+      blockchain: transaction.blockchain || null
     };
 
     res.json({
@@ -302,7 +327,7 @@ router.post('/deposit', authenticateToken, validateTransaction, async (req, res)
 // Withdraw money - matches Flutter WalletProvider.withdrawKes()
 router.post('/withdraw', authenticateToken, validateTransaction, async (req, res) => {
   try {
-    const { amount, currencyCode = 'KES', pin, category = 'Expense', method, hustle } = req.body;
+    const { amount, currencyCode = 'KES', pin, category = 'Expense', method, hustle, network } = req.body;
 
     if (!pin) {
       return res.status(400).json({
@@ -375,6 +400,30 @@ router.post('/withdraw', authenticateToken, validateTransaction, async (req, res
 
     await transaction.save();
 
+    // Optionally record on blockchain
+    try {
+      if (req.blockchain) {
+        const bc = await req.blockchain.recordTransaction(
+          req.user.userId,
+          amount,
+          currencyCode,
+          'withdrawal',
+          network || 'ethereum'
+        );
+        transaction.blockchain = bc.success ? {
+          recorded: true,
+          network: network || 'ethereum',
+          txHash: bc.transactionHash
+        } : {
+          recorded: false,
+          network: network || 'ethereum',
+          error: bc.error
+        };
+      }
+    } catch (e) {
+      transaction.blockchain = { recorded: false, error: e.message };
+    }
+
     // Update wallet balance
     await wallet.updateBalance(amount, currencyCode, 'withdrawal');
 
@@ -392,7 +441,8 @@ router.post('/withdraw', authenticateToken, validateTransaction, async (req, res
       description: transaction.description,
       category: transaction.category,
       method: transaction.method,
-      hustle: transaction.metadata?.hustle || null
+      hustle: transaction.metadata?.hustle || null,
+      blockchain: transaction.blockchain || null
     };
 
     res.json({
@@ -425,7 +475,7 @@ router.post('/withdraw', authenticateToken, validateTransaction, async (req, res
 // Convert currency - matches Flutter WalletProvider.convertKesToUsdt()
 router.post('/convert', authenticateToken, validateTransaction, async (req, res) => {
   try {
-    const { fromCurrency = 'KES', toCurrency = 'USDT', amount, pin, rate } = req.body;
+    const { fromCurrency = 'KES', toCurrency = 'USDT', amount, pin, rate, network } = req.body;
 
     if (!pin) {
       return res.status(400).json({
@@ -507,6 +557,30 @@ router.post('/convert', authenticateToken, validateTransaction, async (req, res)
 
     await transaction.save();
 
+    // Optionally record on blockchain
+    try {
+      if (req.blockchain) {
+        const bc = await req.blockchain.recordTransaction(
+          req.user.userId,
+          amount,
+          fromCurrency,
+          'convert',
+          network || 'ethereum'
+        );
+        transaction.blockchain = bc.success ? {
+          recorded: true,
+          network: network || 'ethereum',
+          txHash: bc.transactionHash
+        } : {
+          recorded: false,
+          network: network || 'ethereum',
+          error: bc.error
+        };
+      }
+    } catch (e) {
+      transaction.blockchain = { recorded: false, error: e.message };
+    }
+
     // Update wallet balances
     await wallet.updateBalance(amount, fromCurrency, 'withdrawal');
     await wallet.updateBalance(convertedAmount, toCurrency, 'deposit');
@@ -522,7 +596,8 @@ router.post('/convert', authenticateToken, validateTransaction, async (req, res)
       description: transaction.description,
       category: transaction.category,
       method: null,
-      hustle: null
+      hustle: null,
+      blockchain: transaction.blockchain || null
     };
 
     res.json({
@@ -556,7 +631,7 @@ router.post('/convert', authenticateToken, validateTransaction, async (req, res)
 // Transfer to another user - matches Flutter WalletProvider transfer functionality
 router.post('/transfer', authenticateToken, validateTransfer, async (req, res) => {
   try {
-    const { recipientUserId, amount, currencyCode = 'KES', description, pin } = req.body;
+    const { recipientUserId, amount, currencyCode = 'KES', description, pin, network } = req.body;
 
     const wallet = await Wallet.findByUserId(req.user.userId);
 
@@ -642,6 +717,30 @@ router.post('/transfer', authenticateToken, validateTransfer, async (req, res) =
 
     await transaction.save();
 
+    // Optionally record on blockchain
+    try {
+      if (req.blockchain) {
+        const bc = await req.blockchain.recordTransaction(
+          req.user.userId,
+          amount,
+          currencyCode,
+          'transfer',
+          network || 'ethereum'
+        );
+        transaction.blockchain = bc.success ? {
+          recorded: true,
+          network: network || 'ethereum',
+          txHash: bc.transactionHash
+        } : {
+          recorded: false,
+          network: network || 'ethereum',
+          error: bc.error
+        };
+      }
+    } catch (e) {
+      transaction.blockchain = { recorded: false, error: e.message };
+    }
+
     // Update sender wallet balance
     await wallet.updateBalance(amount, currencyCode, 'withdrawal');
 
@@ -662,7 +761,8 @@ router.post('/transfer', authenticateToken, validateTransfer, async (req, res) =
       description: transaction.description,
       category: transaction.category,
       method: 'wallet',
-      hustle: null
+      hustle: null,
+      blockchain: transaction.blockchain || null
     };
 
     res.json({

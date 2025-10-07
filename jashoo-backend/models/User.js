@@ -1,580 +1,266 @@
-const mongoose = require('mongoose');
+const { db } = require('../firebaseAdmin');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 
-const userSchema = new mongoose.Schema({
-  // Basic Information
-  userId: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-    index: true
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-    trim: true,
-    index: true,
-    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Please enter a valid email']
-  },
-  phoneNumber: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-    index: true,
-    match: [/^\+?[1-9]\d{1,14}$/, 'Please enter a valid phone number']
-  },
-  password: {
-    type: String,
-    required: true,
-    minlength: 6,
-    select: false // Don't include password in queries by default
-  },
-  
-  // Personal Information
-  fullName: {
-    type: String,
-    required: true,
-    trim: true,
-    minlength: 2,
-    maxlength: 100
-  },
-  dateOfBirth: {
-    type: Date,
-    required: false
-  },
-  gender: {
-    type: String,
-    enum: ['male', 'female', 'other', 'prefer_not_to_say'],
-    required: false
-  },
-  
-  // Professional Information
-  skills: [{
-    type: String,
-    trim: true,
-    maxlength: 50
-  }],
-  location: {
-    type: String,
-    required: true,
-    trim: true,
-    maxlength: 100
-  },
-  coordinates: {
-    latitude: {
-      type: Number,
-      min: -90,
-      max: 90
-    },
-    longitude: {
-      type: Number,
-      min: -180,
-      max: 180
-    }
-  },
-  
-  // Rating and Verification
-  rating: {
-    type: Number,
-    default: 0,
-    min: 0,
-    max: 5,
-    set: v => Math.round(v * 10) / 10 // Round to 1 decimal place
-  },
-  totalRatings: {
-    type: Number,
-    default: 0
-  },
-  isVerified: {
-    type: Boolean,
-    default: false
-  },
-  verificationLevel: {
-    type: String,
-    enum: ['unverified', 'phone_verified', 'email_verified', 'kyc_verified', 'fully_verified'],
-    default: 'unverified'
-  },
-  
-  // KYC Information
-  kyc: {
-    idType: {
-      type: String,
-      enum: ['ID', 'Passport', 'Driving_License'],
-      default: null
-    },
-    idNumber: {
-      type: String,
-      default: null,
-      trim: true
-    },
-    photoUrl: {
-      type: String,
-      default: null
-    },
-    photoMetadata: {
-      width: Number,
-      height: Number,
-      format: String,
-      size: Number,
-      processedAt: Date,
-      sizes: {
-        original: String,
-        large: String,
-        medium: String,
-        small: String,
-        thumbnail: String
-      },
-      hash: String
-    },
-    documentUrls: [{
-      type: String
-    }],
-    verifiedAt: {
-      type: Date,
-      default: null
-    },
-    verifiedBy: {
-      type: String,
-      default: null
-    },
-    rejectionReason: {
-      type: String,
-      default: null
-    }
-  },
-  
-  // Financial Information
-  absaAccountNumber: {
-    type: String,
-    default: null,
-    trim: true
-  },
-  bankDetails: {
-    bankName: {
-      type: String,
-      default: null
-    },
-    accountNumber: {
-      type: String,
-      default: null
-    },
-    accountName: {
-      type: String,
-      default: null
-    },
-    branchCode: {
-      type: String,
-      default: null
-    }
-  },
-  
-  // Preferences
-  preferences: {
-    language: {
-      type: String,
-      enum: ['en', 'sw'],
-      default: 'en'
-    },
-    currency: {
-      type: String,
-      enum: ['KES', 'USD'],
-      default: 'KES'
-    },
-    notifications: {
-      email: {
-        type: Boolean,
-        default: true
-      },
-      sms: {
-        type: Boolean,
-        default: true
-      },
-      push: {
-        type: Boolean,
-        default: true
-      },
-      marketing: {
-        type: Boolean,
-        default: false
-      }
-    },
-    privacy: {
-      profileVisibility: {
-        type: String,
-        enum: ['public', 'private', 'contacts_only'],
-        default: 'public'
-      },
-      showLocation: {
-        type: Boolean,
-        default: true
-      },
-      showRating: {
-        type: Boolean,
-        default: true
-      }
-    }
-  },
-  
-  // Security Information
-  security: {
-    twoFactorEnabled: {
-      type: Boolean,
-      default: false
-    },
-    twoFactorSecret: {
-      type: String,
-      default: null,
-      select: false
-    },
-    loginAttempts: {
-      type: Number,
-      default: 0
-    },
-    lockUntil: {
-      type: Date,
-      default: null
-    },
-    passwordResetToken: {
-      type: String,
-      default: null,
-      select: false
-    },
-    passwordResetExpires: {
-      type: Date,
-      default: null,
-      select: false
-    },
-    emailVerificationToken: {
-      type: String,
-      default: null,
-      select: false
-    },
-    emailVerificationExpires: {
-      type: Date,
-      default: null,
-      select: false
-    },
-    phoneVerificationCode: {
-      type: String,
-      default: null,
-      select: false
-    },
-    phoneVerificationExpires: {
-      type: Date,
-      default: null,
-      select: false
-    }
-  },
-  
-  // Status and Activity
-  isActive: {
-    type: Boolean,
-    default: true
-  },
-  isBlocked: {
-    type: Boolean,
-    default: false
-  },
-  blockedReason: {
-    type: String,
-    default: null
-  },
-  lastLogin: {
-    type: Date,
-    default: null
-  },
-  lastActive: {
-    type: Date,
-    default: Date.now
-  },
-  
-  // Statistics
-  statistics: {
-    totalJobsCompleted: {
-      type: Number,
-      default: 0
-    },
-    totalEarnings: {
-      type: Number,
-      default: 0
-    },
-    totalSavings: {
-      type: Number,
-      default: 0
-    },
-    totalWithdrawals: {
-      type: Number,
-      default: 0
-    },
-    joinDate: {
-      type: Date,
-      default: Date.now
-    },
-    profileViews: {
-      type: Number,
-      default: 0
-    }
-  },
-  
-  // Metadata
-  metadata: {
-    source: {
-      type: String,
-      default: 'web'
-    },
-    userAgent: {
-      type: String,
-      default: null
-    },
-    ipAddress: {
-      type: String,
-      default: null
-    },
-    referrer: {
-      type: String,
-      default: null
-    }
-  }
-}, {
-  timestamps: true,
-  toJSON: { virtuals: true },
-  toObject: { virtuals: true }
-});
+const USERS_COLLECTION = 'users';
 
-// Indexes for performance
-userSchema.index({ email: 1 });
-userSchema.index({ phoneNumber: 1 });
-userSchema.index({ userId: 1 });
-userSchema.index({ location: 1 });
-userSchema.index({ skills: 1 });
-userSchema.index({ rating: -1 });
-userSchema.index({ isVerified: 1 });
-userSchema.index({ isActive: 1 });
-userSchema.index({ createdAt: -1 });
-userSchema.index({ 'coordinates.latitude': 1, 'coordinates.longitude': 1 });
-
-// Virtual fields
-userSchema.virtual('fullProfile').get(function() {
+function defaultUser(data) {
+  const now = new Date();
   return {
-    userId: this.userId,
-    email: this.email,
-    phoneNumber: this.phoneNumber,
-    fullName: this.fullName,
-    skills: this.skills,
-    location: this.location,
-    rating: this.rating,
-    totalRatings: this.totalRatings,
-    isVerified: this.isVerified,
-    verificationLevel: this.verificationLevel,
-    joinDate: this.statistics.joinDate,
-    totalJobsCompleted: this.statistics.totalJobsCompleted,
-    totalEarnings: this.statistics.totalEarnings
+    // Identifiers
+    userId: data.userId,
+    email: data.email?.toLowerCase(),
+    phoneNumber: data.phoneNumber,
+
+    // Auth
+    password: data.password, // hashed before save
+
+    // Profile
+    fullName: data.fullName,
+    dateOfBirth: data.dateOfBirth || null,
+    gender: data.gender || null,
+    skills: Array.isArray(data.skills) ? data.skills : [],
+    location: data.location,
+    coordinates: data.coordinates || { latitude: null, longitude: null },
+
+    // Verification
+    rating: data.rating || 0,
+    totalRatings: data.totalRatings || 0,
+    isVerified: !!data.isVerified,
+    verificationLevel: data.verificationLevel || 'unverified',
+
+    // KYC
+    kyc: data.kyc || {
+      idType: null,
+      idNumber: null,
+      photoUrl: null,
+      photoMetadata: null,
+      documentUrls: [],
+      verifiedAt: null,
+      verifiedBy: null,
+      rejectionReason: null,
+    },
+
+    // Financial
+    absaAccountNumber: data.absaAccountNumber || null,
+    bankDetails: data.bankDetails || {
+      bankName: null,
+      accountNumber: null,
+      accountName: null,
+      branchCode: null,
+    },
+
+    // Preferences
+    preferences: data.preferences || {
+      language: 'en',
+      currency: 'KES',
+      notifications: { email: true, sms: true, push: true, marketing: false },
+      privacy: { profileVisibility: 'public', showLocation: true, showRating: true },
+    },
+
+    // Security
+    security: data.security || {
+      twoFactorEnabled: false,
+      twoFactorSecret: null,
+      loginAttempts: 0,
+      lockUntil: null,
+      passwordResetToken: null,
+      passwordResetExpires: null,
+      emailVerificationToken: null,
+      emailVerificationExpires: null,
+      phoneVerificationCode: null,
+      phoneVerificationExpires: null,
+    },
+
+    // Status
+    isActive: data.isActive !== undefined ? data.isActive : true,
+    isBlocked: data.isBlocked || false,
+    blockedReason: data.blockedReason || null,
+
+    // Activity
+    lastLogin: data.lastLogin || null,
+    lastActive: data.lastActive || now,
+
+    // Statistics
+    statistics: data.statistics || {
+      totalJobsCompleted: 0,
+      totalEarnings: 0,
+      totalSavings: 0,
+      totalWithdrawals: 0,
+      joinDate: now,
+      profileViews: 0,
+    },
+
+    // Metadata
+    metadata: data.metadata || {
+      source: 'web',
+      userAgent: null,
+      ipAddress: null,
+      referrer: null,
+    },
+
+    createdAt: data.createdAt || now,
+    updatedAt: data.updatedAt || now,
   };
-});
+}
 
-userSchema.virtual('isLocked').get(function() {
-  return !!(this.security.lockUntil && this.security.lockUntil > Date.now());
-});
-
-userSchema.virtual('accountAge').get(function() {
-  return Math.floor((Date.now() - this.statistics.joinDate) / (1000 * 60 * 60 * 24));
-});
-
-// Pre-save middleware
-userSchema.pre('save', async function(next) {
-  // Hash password if it's modified
-  if (!this.isModified('password')) return next();
-  
-  try {
-    const salt = await bcrypt.genSalt(12);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error);
+class User {
+  constructor(data) {
+    const normalized = defaultUser(data || {});
+    Object.assign(this, normalized);
   }
-});
 
-userSchema.pre('save', function(next) {
-  // Update lastActive on save
-  this.lastActive = new Date();
-  next();
-});
-
-// Instance methods
-userSchema.methods.comparePassword = async function(candidatePassword) {
-  if (!this.password) return false;
-  return bcrypt.compare(candidatePassword, this.password);
-};
-
-userSchema.methods.generatePasswordResetToken = function() {
-  const resetToken = crypto.randomBytes(32).toString('hex');
-  this.security.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-  this.security.passwordResetExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
-  return resetToken;
-};
-
-userSchema.methods.generateEmailVerificationToken = function() {
-  const verificationToken = crypto.randomBytes(32).toString('hex');
-  this.security.emailVerificationToken = crypto.createHash('sha256').update(verificationToken).digest('hex');
-  this.security.emailVerificationExpires = Date.now() + 24 * 60 * 60 * 1000; // 24 hours
-  return verificationToken;
-};
-
-userSchema.methods.generatePhoneVerificationCode = function() {
-  const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit code
-  this.security.phoneVerificationCode = crypto.createHash('sha256').update(code).digest('hex');
-  this.security.phoneVerificationExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
-  return code;
-};
-
-userSchema.methods.incrementLoginAttempts = function() {
-  // If we have a previous lock that has expired, restart at 1
-  if (this.security.lockUntil && this.security.lockUntil < Date.now()) {
-    return this.updateOne({
-      $unset: { 'security.lockUntil': 1 },
-      $set: { 'security.loginAttempts': 1 }
-    });
+  static _col() {
+    if (!db) throw new Error('Firestore not initialized');
+    return db.collection(USERS_COLLECTION);
   }
-  
-  const updates = { $inc: { 'security.loginAttempts': 1 } };
-  
-  // Lock account after 5 failed attempts
-  if (this.security.loginAttempts + 1 >= 5 && !this.isLocked) {
-    updates.$set = { 'security.lockUntil': Date.now() + 2 * 60 * 60 * 1000 }; // 2 hours
+
+  static async findOne(query) {
+    // Minimal query support for cases used by routes
+    if (query.$or && Array.isArray(query.$or)) {
+      for (const cond of query.$or) {
+        const user = await this.findOne(cond);
+        if (user) return user;
+      }
+      return null;
+    }
+
+    // Equality filters
+    let q = this._col();
+    const filters = Object.entries(query);
+    // Firestore can handle up to a few equality filters; fall back to scan if more
+    if (filters.length === 1) {
+      const [field, value] = filters[0];
+      const snapshot = await q.where(field, '==', value).limit(1).get();
+      if (snapshot.empty) return null;
+      const doc = snapshot.docs[0];
+      return new User({ userId: doc.id, ...doc.data() });
+    }
+
+    // Fallback: scan with first filter and test others client-side
+    const [firstField, firstValue] = filters[0];
+    const snapshot = await q.where(firstField, '==', firstValue).limit(50).get();
+    for (const doc of snapshot.docs) {
+      const data = { userId: doc.id, ...doc.data() };
+      const ok = filters.every(([f, v]) => (data[f] === v));
+      if (ok) return new User(data);
+    }
+    return null;
   }
-  
-  return this.updateOne(updates);
-};
 
-userSchema.methods.resetLoginAttempts = function() {
-  return this.updateOne({
-    $unset: { 'security.loginAttempts': 1, 'security.lockUntil': 1 }
-  });
-};
-
-userSchema.methods.updateLastLogin = function() {
-  this.lastLogin = new Date();
-  this.lastActive = new Date();
-  return this.save();
-};
-
-userSchema.methods.updateRating = function(newRating) {
-  const totalRatings = this.totalRatings + 1;
-  const currentTotal = this.rating * this.totalRatings;
-  const newTotal = currentTotal + newRating;
-  this.rating = newTotal / totalRatings;
-  this.totalRatings = totalRatings;
-  return this.save();
-};
-
-userSchema.methods.completeKyc = function(kycData) {
-  this.kyc = {
-    ...this.kyc,
-    ...kycData,
-    verifiedAt: new Date(),
-    verifiedBy: 'system'
-  };
-  this.isVerified = true;
-  this.verificationLevel = 'kyc_verified';
-  return this.save();
-};
-
-userSchema.methods.getPublicProfile = function() {
-  const userObject = this.toObject();
-  delete userObject.password;
-  delete userObject.security;
-  delete userObject.__v;
-  return userObject;
-};
-
-userSchema.methods.getSafeProfile = function() {
-  return {
-    userId: this.userId,
-    fullName: this.fullName,
-    skills: this.skills,
-    location: this.location,
-    rating: this.rating,
-    totalRatings: this.totalRatings,
-    isVerified: this.isVerified,
-    verificationLevel: this.verificationLevel,
-    joinDate: this.statistics.joinDate,
-    totalJobsCompleted: this.statistics.totalJobsCompleted
-  };
-};
-
-// Static methods
-userSchema.statics.findByEmail = function(email) {
-  return this.findOne({ email: email.toLowerCase() });
-};
-
-userSchema.statics.findByPhone = function(phoneNumber) {
-  return this.findOne({ phoneNumber });
-};
-
-userSchema.statics.findByUserId = function(userId) {
-  return this.findOne({ userId });
-};
-
-userSchema.statics.findActiveUsers = function() {
-  return this.find({ isActive: true, isBlocked: false });
-};
-
-userSchema.statics.findVerifiedUsers = function() {
-  return this.find({ isVerified: true, isActive: true });
-};
-
-userSchema.statics.searchUsers = function(query, options = {}) {
-  const { location, skills, minRating, limit = 20, skip = 0 } = options;
-  
-  const searchQuery = {
-    isActive: true,
-    isBlocked: false
-  };
-  
-  if (query) {
-    searchQuery.$or = [
-      { fullName: { $regex: query, $options: 'i' } },
-      { skills: { $in: [new RegExp(query, 'i')] } }
-    ];
+  static async findById(userId) {
+    if (!userId) return null;
+    const doc = await this._col().doc(userId).get();
+    if (!doc.exists) return null;
+    return new User({ userId: doc.id, ...doc.data() });
   }
-  
-  if (location) {
-    searchQuery.location = { $regex: location, $options: 'i' };
-  }
-  
-  if (skills && skills.length > 0) {
-    searchQuery.skills = { $in: skills };
-  }
-  
-  if (minRating) {
-    searchQuery.rating = { $gte: minRating };
-  }
-  
-  return this.find(searchQuery)
-    .sort({ rating: -1, totalRatings: -1 })
-    .limit(limit)
-    .skip(skip);
-};
 
-// Middleware for soft delete
-userSchema.methods.softDelete = function(reason = 'User requested account deletion') {
-  this.isActive = false;
-  this.isBlocked = true;
-  this.blockedReason = reason;
-  return this.save();
-};
+  static async findByUserId(userId) {
+    return this.findById(userId);
+  }
 
-// Middleware for account reactivation
-userSchema.methods.reactivate = function() {
-  this.isActive = true;
-  this.isBlocked = false;
-  this.blockedReason = null;
-  return this.save();
-};
+  static async findByEmail(email) {
+    return this.findOne({ email: email?.toLowerCase() });
+  }
 
-module.exports = mongoose.model('User', userSchema);
+  static async findByPhone(phoneNumber) {
+    return this.findOne({ phoneNumber });
+  }
+
+  get isLocked() {
+    return !!(this.security?.lockUntil && new Date(this.security.lockUntil) > new Date());
+  }
+
+  async comparePassword(candidatePassword) {
+    if (!this.password) return false;
+    return bcrypt.compare(candidatePassword, this.password);
+  }
+
+  async save() {
+    const data = { ...this };
+    // Ensure email is lowercased and password hashed if not already hashed
+    if (data.email) data.email = String(data.email).toLowerCase();
+    if (data.password && !/^\$2[aby]\$/.test(data.password)) {
+      const salt = await bcrypt.genSalt(12);
+      data.password = await bcrypt.hash(data.password, salt);
+    }
+    data.updatedAt = new Date();
+    await User._col().doc(this.userId).set(data, { merge: true });
+    return this;
+  }
+
+  async updateLastLogin() {
+    this.lastLogin = new Date();
+    this.lastActive = new Date();
+    await this.save();
+    return this;
+  }
+
+  async incrementLoginAttempts() {
+    const attempts = (this.security?.loginAttempts || 0) + 1;
+    const security = { ...(this.security || {}), loginAttempts: attempts };
+    // Lock after 5 failed attempts for 2 hours
+    if (attempts >= 5 && !this.isLocked) {
+      security.lockUntil = new Date(Date.now() + 2 * 60 * 60 * 1000);
+    }
+    this.security = security;
+    await this.save();
+    return this;
+  }
+
+  async resetLoginAttempts() {
+    const security = { ...(this.security || {}) };
+    delete security.loginAttempts;
+    delete security.lockUntil;
+    this.security = security;
+    await this.save();
+    return this;
+  }
+
+  async completeKyc(kycData) {
+    this.kyc = { ...(this.kyc || {}), ...kycData, verifiedAt: new Date(), verifiedBy: 'system' };
+    this.isVerified = true;
+    this.verificationLevel = 'kyc_verified';
+    await this.save();
+    return this;
+  }
+
+  generatePasswordResetToken() {
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const hashed = crypto.createHash('sha256').update(resetToken).digest('hex');
+    const security = { ...(this.security || {}) };
+    security.passwordResetToken = hashed;
+    security.passwordResetExpires = new Date(Date.now() + 10 * 60 * 1000);
+    this.security = security;
+    return resetToken;
+  }
+
+  generateEmailVerificationToken() {
+    const token = crypto.randomBytes(32).toString('hex');
+    const hashed = crypto.createHash('sha256').update(token).digest('hex');
+    const security = { ...(this.security || {}) };
+    security.emailVerificationToken = hashed;
+    security.emailVerificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    this.security = security;
+    return token;
+  }
+
+  generatePhoneVerificationCode() {
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const hashed = crypto.createHash('sha256').update(code).digest('hex');
+    const security = { ...(this.security || {}) };
+    security.phoneVerificationCode = hashed;
+    security.phoneVerificationExpires = new Date(Date.now() + 10 * 60 * 1000);
+    this.security = security;
+    return code;
+  }
+
+  getPublicProfile() {
+    const obj = { ...this };
+    delete obj.password;
+    delete obj.security;
+    return obj;
+  }
+}
+
+module.exports = User;

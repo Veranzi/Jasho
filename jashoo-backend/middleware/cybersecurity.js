@@ -10,9 +10,8 @@ const hpp = require('hpp');
 const rateLimit = require('express-rate-limit');
 const slowDown = require('express-slow-down');
 const ExpressBrute = require('express-brute');
-const MongoStore = require('express-brute-mongo');
 const session = require('express-session');
-const MongoStoreSession = require('connect-mongo');
+const session = require('express-session');
 const winston = require('winston');
 const geoip = require('geoip-lite');
 const UAParser = require('ua-parser-js');
@@ -271,13 +270,8 @@ const createRateLimit = (windowMs, max, message, options = {}) => {
   });
 };
 
-// Brute force protection
-const bruteForceStore = new MongoStore({
-  host: process.env.MONGODB_URI,
-  collection: 'bruteforce'
-});
-
-const bruteForce = new ExpressBrute(bruteForceStore, {
+// Brute force protection (memory store to avoid MongoDB)
+const bruteForce = new ExpressBrute(new ExpressBrute.MemoryStore(), {
   freeRetries: 5,
   minWait: 5 * 60 * 1000, // 5 minutes
   maxWait: 15 * 60 * 1000, // 15 minutes
@@ -461,19 +455,15 @@ const sanitizeObject = (obj) => {
   return obj;
 };
 
-// Session security
+// Session security (memory store; replace with Firestore/Redis in prod if needed)
 const sessionSecurity = session({
   secret: process.env.SESSION_SECRET || 'jashoo-session-secret',
   resave: false,
   saveUninitialized: false,
-  store: MongoStoreSession.create({
-    mongoUrl: process.env.MONGODB_URI,
-    touchAfter: 24 * 3600 // lazy session update
-  }),
   cookie: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
-    maxAge: parseInt(process.env.SESSION_COOKIE_MAX_AGE) || 86400000, // 24 hours
+    maxAge: parseInt(process.env.SESSION_COOKIE_MAX_AGE) || 86400000,
     sameSite: 'strict'
   },
   name: 'jashoo.sid'

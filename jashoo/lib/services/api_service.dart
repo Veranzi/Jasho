@@ -1,29 +1,18 @@
 import 'dart:convert';
-<<<<<<< HEAD
-import 'package:http/http.dart' as http;
-
-class ApiService {
-  final String baseUrl = 'http://10.0.2.2:4000'; // For Android emulator
-
-  Future<Map<String, dynamic>> checkHealth() async {
-    final response = await http.get(Uri.parse('$baseUrl/health'));
-
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception('Failed to reach backend: ${response.statusCode}');
-    }
-  }
-}
-=======
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://localhost:3000/api';
-  static const String imageBaseUrl = 'http://localhost:3000/uploads/profile-images';
+  static String get baseUrl {
+    if (Platform.isAndroid) return 'http://10.0.2.2:3000/api';
+    return 'http://localhost:3000/api';
+  }
+  static String get imageBaseUrl {
+    if (Platform.isAndroid) return 'http://10.0.2.2:3000/uploads/profile-images';
+    return 'http://localhost:3000/uploads/profile-images';
+  }
   
   // Singleton pattern
   static final ApiService _instance = ApiService._internal();
@@ -75,7 +64,7 @@ class ApiService {
     bool includeAuth = true,
   }) async {
     try {
-      final url = Uri.parse('$baseUrl$endpoint');
+      final url = Uri.parse('${ApiService.baseUrl}$endpoint');
       final requestHeaders = {..._getHeaders(includeAuth: includeAuth), ...?headers};
       
       http.Response response;
@@ -145,7 +134,7 @@ class ApiService {
     bool includeAuth = true,
   }) async {
     try {
-      final url = Uri.parse('$baseUrl$endpoint');
+      final url = Uri.parse('${ApiService.baseUrl}$endpoint');
       final request = http.MultipartRequest(method, url);
       
       // Add headers
@@ -890,4 +879,3 @@ class ApiException implements Exception {
   @override
   String toString() => 'ApiException: $message (Code: $code, Status: $statusCode)';
 }
->>>>>>> 5765b52ffa54efce13fcbc58730152e74d0803c0

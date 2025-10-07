@@ -36,13 +36,12 @@ const authenticateToken = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    // Check if user still exists and is active
+    // Firestore-based lookup
     const user = await User.findOne({ 
       userId: decoded.userId, 
       isActive: true,
       isBlocked: false
-    }).select('-password');
+    });
 
     if (!user) {
       return res.status(401).json({
@@ -122,11 +121,8 @@ const optionalAuth = async (req, res, next) => {
         userId: decoded.userId, 
         isActive: true,
         isBlocked: false
-      }).select('-password');
-      
-      if (user) {
-        req.user = user;
-      }
+      });
+      if (user) req.user = user;
     }
     
     next();

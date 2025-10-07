@@ -1,11 +1,13 @@
 const express = require('express');
-const mongoose = require('mongoose');
+// MongoDB removed — using Firebase Firestore only
 const cors = require('cors');
 const helmet = require('helmet');
 const compression = require('compression');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const slowDown = require('express-slow-down');
+const mongoSanitize = require('express-mongo-sanitize');
+const hpp = require('hpp');
 require('dotenv').config();
 
 // Import security middleware
@@ -25,6 +27,14 @@ const {
 
 // Import blockchain middleware
 const { blockchainMiddleware } = require('./middleware/blockchain');
+
+// Initialize Firebase Admin (if configured)
+try {
+  require('./firebaseAdmin');
+} catch (e) {
+  // eslint-disable-next-line no-console
+  console.warn('Firebase Admin not initialized:', e?.message || e);
+}
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -109,7 +119,7 @@ app.use(express.urlencoded({ extended: true, limit: process.env.MAX_FILE_SIZE ||
 // Input sanitization
 app.use(sanitizeInput);
 
-// MongoDB sanitization
+// (Optional) Mongo-style key sanitization
 app.use(mongoSanitize());
 
 // HTTP Parameter Pollution protection
@@ -156,8 +166,8 @@ app.get('/health', (req, res) => {
     environment: process.env.NODE_ENV,
     version: process.env.npm_package_version || '1.0.0',
     services: {
-      database: 'connected',
-      redis: 'connected',
+      database: 'firestore',
+      redis: process.env.REDIS_URL ? 'configured' : 'disabled',
       blockchain: process.env.BLOCKCHAIN_ENABLED === 'true' ? 'enabled' : 'disabled',
       ai: process.env.AI_ENABLED === 'true' ? 'enabled' : 'disabled'
     }
@@ -307,38 +317,9 @@ process.on('SIGINT', () => {
   });
 });
 
-// Database connection with retry logic
+// No-op connect for Firestore-only mode
 const connectDB = async () => {
-  try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      maxPoolSize: 10,
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000,
-      bufferCommands: false,
-      bufferMaxEntries: 0
-    });
-    
-    logger.info(`MongoDB Connected: ${conn.connection.host}`);
-    
-    // Handle connection events
-    mongoose.connection.on('error', (err) => {
-      logger.error('MongoDB connection error:', err);
-    });
-    
-    mongoose.connection.on('disconnected', () => {
-      logger.warn('MongoDB disconnected');
-    });
-    
-    mongoose.connection.on('reconnected', () => {
-      logger.info('MongoDB reconnected');
-    });
-    
-  } catch (error) {
-    logger.error('MongoDB connection error:', error);
-    process.exit(1);
-  }
+  logger.info('Using Firebase Firestore (no MongoDB connection)');
 };
 
 // Start server
@@ -390,7 +371,9 @@ const startServer = async () => {
   }
 };
 
-// Start the server
-startServer();
+// Start the server unless disabled for tests/tools
+if (process.env.JASHOO_NO_LISTEN !== 'true') {
+  startServer();
+}
 
 module.exports = app;

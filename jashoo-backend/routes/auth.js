@@ -11,6 +11,7 @@ const { validateUserRegistration, validateUserLogin, validateEmailVerification, 
 const { logger } = require('../middleware/cybersecurity');
 const { sendEmail } = require('../utils/email');
 const { sendSMS } = require('../utils/sms');
+const { auth: firebaseAuth } = require('../firebaseAdmin');
 
 const router = express.Router();
 
@@ -30,9 +31,9 @@ router.post('/register', validateUserRegistration, async (req, res) => {
     } = req.body;
 
     // Check if user already exists
-    const existingUser = await User.findOne({
-      $or: [{ email: email.toLowerCase() }, { phoneNumber }]
-    });
+    const existingByEmail = await User.findByEmail(email);
+    const existingByPhone = await User.findByPhone(phoneNumber);
+    const existingUser = existingByEmail || existingByPhone;
 
     if (existingUser) {
       return res.status(400).json({
@@ -185,7 +186,7 @@ router.post('/login', validateUserLogin, async (req, res) => {
     const user = await User.findOne({ 
       email: email.toLowerCase(), 
       isActive: true 
-    }).select('+password');
+    });
 
     if (!user) {
       return res.status(401).json({
@@ -282,12 +283,9 @@ router.post('/verify-email', validateEmailVerification, async (req, res) => {
     // Hash the token to compare with stored hash
     const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
-    const user = await User.findOne({
-      'security.emailVerificationToken': hashedToken,
-      'security.emailVerificationExpires': { $gt: Date.now() }
-    });
+    const user = await User.findOne({ 'security.emailVerificationToken': hashedToken });
 
-    if (!user) {
+    if (!user || !user.security?.emailVerificationExpires || new Date(user.security.emailVerificationExpires) <= new Date()) {
       return res.status(400).json({
         success: false,
         message: 'Invalid or expired verification token',
@@ -344,13 +342,9 @@ router.post('/verify-phone', validatePhoneVerification, async (req, res) => {
     // Hash the code to compare with stored hash
     const hashedCode = crypto.createHash('sha256').update(code).digest('hex');
 
-    const user = await User.findOne({
-      phoneNumber,
-      'security.phoneVerificationCode': hashedCode,
-      'security.phoneVerificationExpires': { $gt: Date.now() }
-    });
+    const user = await User.findOne({ phoneNumber, 'security.phoneVerificationCode': hashedCode });
 
-    if (!user) {
+    if (!user || !user.security?.phoneVerificationExpires || new Date(user.security.phoneVerificationExpires) <= new Date()) {
       return res.status(400).json({
         success: false,
         message: 'Invalid or expired verification code',
@@ -596,6 +590,93 @@ router.post('/logout', authenticateToken, async (req, res) => {
   }
 });
 
+// Login/Register via Firebase Phone Authentication
+router.post('/firebase-phone', async (req, res) => {
+  try {
+    const { idToken, fullName, location } = req.body;
+
+    if (!idToken) {
+      return res.status(400).json({
+        success: false,
+        message: 'idToken is required',
+        code: 'ID_TOKEN_REQUIRED'
+      });
+    }
+
+    // Verify Firebase ID token
+    const decoded = await firebaseAuth.verifyIdToken(idToken);
+    const phoneNumber = decoded.phone_number;
+    const firebaseUid = decoded.uid;
+
+    if (!phoneNumber) {
+      return res.status(400).json({
+        success: false,
+        message: 'No phone number on Firebase token',
+        code: 'PHONE_REQUIRED'
+      });
+    }
+
+    // Find or create user by phone number
+    let user = await User.findByPhone(phoneNumber);
+
+    if (!user) {
+      const userId = `user_${Date.now()}_${(firebaseUid || Math.random().toString(36)).toString().slice(-6)}`;
+      user = new User({
+        userId,
+        email: null,
+        phoneNumber,
+        password: null,
+        fullName: fullName || 'New User',
+        location: location || 'Unknown',
+        skills: [],
+        verificationLevel: 'phone_verified',
+        isVerified: true,
+      });
+      await user.save();
+
+      // Initialize wallet
+      const { Wallet } = require('../models/Wallet');
+      let wallet = await Wallet.findByUserId(user.userId);
+      if (!wallet) {
+        wallet = await Wallet.createWallet(user.userId);
+      }
+
+      // Initialize gamification
+      const { Gamification } = require('../models/Gamification');
+      let gamification = await Gamification.findOne({ userId: user.userId });
+      if (!gamification) {
+        gamification = await Gamification.createProfile(user.userId);
+      }
+
+      // Initialize credit score
+      const { CreditScore } = require('../models/CreditScore');
+      let creditScore = await CreditScore.findByUser(user.userId);
+      if (!creditScore) {
+        creditScore = await CreditScore.createProfile(user.userId);
+      }
+    }
+
+    // Issue backend JWT for subsequent API calls
+    const token = generateToken(user.userId);
+
+    return res.json({
+      success: true,
+      message: 'Authenticated via Firebase phone',
+      data: {
+        token,
+        user: user.getPublicProfile()
+      }
+    });
+  } catch (error) {
+    logger.error('Firebase phone auth error', { error: error.message });
+    return res.status(401).json({
+      success: false,
+      message: 'Invalid Firebase token',
+      code: 'INVALID_ID_TOKEN'
+    });
+  }
+});
+
 // Check if email is available
 router.post('/check-email', async (req, res) => {
   try {
@@ -683,7 +764,7 @@ router.post('/forgot-password', async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const user = await User.findByEmail(email);
 
     if (!user) {
       // Don't reveal if email exists or not
@@ -750,12 +831,9 @@ router.post('/reset-password', async (req, res) => {
     // Hash the token to compare with stored hash
     const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
-    const user = await User.findOne({
-      'security.passwordResetToken': hashedToken,
-      'security.passwordResetExpires': { $gt: Date.now() }
-    }).select('+password');
+    const user = await User.findOne({ 'security.passwordResetToken': hashedToken });
 
-    if (!user) {
+    if (!user || !user.security?.passwordResetExpires || new Date(user.security.passwordResetExpires) <= new Date()) {
       return res.status(400).json({
         success: false,
         message: 'Invalid or expired reset token',
@@ -807,7 +885,7 @@ router.post('/change-password', authenticateToken, async (req, res) => {
       });
     }
 
-    const user = await User.findById(req.user.userId).select('+password');
+    const user = await User.findById(req.user.userId);
 
     if (!user) {
       return res.status(404).json({
