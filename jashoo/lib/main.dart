@@ -5,6 +5,8 @@ import 'l10n/app_localizations.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'routes.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'providers/auth_provider.dart';
 import 'providers/user_provider.dart';
 import 'providers/wallet_provider.dart';
@@ -15,7 +17,9 @@ import 'providers/savings_provider.dart';
 import 'providers/locale_provider.dart';
 import 'providers/pin_provider.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const JashoApp());
 }
 

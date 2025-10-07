@@ -36,6 +36,8 @@ dependencies:
   shared_preferences: ^2.3.2
   local_auth: ^2.3.0
   google_sign_in: ^6.2.1
+  firebase_core: ^3.6.0
+  firebase_auth: ^5.3.1
 
   # Visualization and documents
   fl_chart: ^0.69.0
