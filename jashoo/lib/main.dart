@@ -6,6 +6,7 @@ import 'package:responsive_framework/responsive_framework.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'routes.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'providers/auth_provider.dart' as app_auth;
 import 'providers/user_provider.dart';
 import 'providers/wallet_provider.dart';
@@ -19,11 +20,15 @@ import 'screens/auth/splash_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  try {
-    await Firebase.initializeApp();
-  } catch (e) {
-    // Continue without Firebase (e.g., web without configured options)
-    debugPrint('Firebase initialization skipped: $e');
+  if (kIsWeb) {
+    // Skip Firebase on web if options are not provided to avoid crash
+    debugPrint('Firebase init skipped on web.');
+  } else {
+    try {
+      await Firebase.initializeApp();
+    } catch (e) {
+      debugPrint('Firebase initialization skipped: $e');
+    }
   }
   runApp(const JashoApp());
 }
