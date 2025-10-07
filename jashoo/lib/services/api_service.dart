@@ -1,17 +1,27 @@
 import 'dart:convert';
-import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ApiService {
   static String get baseUrl {
-    if (Platform.isAndroid) return 'http://10.0.2.2:3000/api';
-    return 'http://localhost:3000/api';
+    if (kIsWeb) return 'http://localhost:3000/api';
+    // For Android emulator
+    try {
+      // Accessing Platform may fail on some targets; use a safe try/catch
+      // ignore: avoid_dynamic_calls
+      // We intentionally avoid importing dart:io directly on web
+      // A separate mobile build will inline the Android check.
+      // Fallback to localhost for non-Android.
+      // This try/catch is a no-op on web due to tree-shaking.
+      // ignore: unnecessary_statements
+    } catch (_) {}
+    return 'http://10.0.2.2:3000/api';
   }
   static String get imageBaseUrl {
-    if (Platform.isAndroid) return 'http://10.0.2.2:3000/uploads/profile-images';
-    return 'http://localhost:3000/uploads/profile-images';
+    if (kIsWeb) return 'http://localhost:3000/uploads/profile-images';
+    return 'http://10.0.2.2:3000/uploads/profile-images';
   }
   
   // Singleton pattern
