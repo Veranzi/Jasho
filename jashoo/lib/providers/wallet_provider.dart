@@ -489,21 +489,21 @@ class WalletProvider extends ChangeNotifier {
   // Get total earnings
   double getTotalEarnings() {
     return _transactions
-        .where((txn) => txn.type == 'earning' && txn.status == 'Success')
+        .where((txn) => txn.type == 'earning' && (txn.status == 'Success' || txn.status == 'completed'))
         .fold(0.0, (sum, txn) => sum + txn.amount);
   }
 
   // Get total withdrawals
   double getTotalWithdrawals() {
     return _transactions
-        .where((txn) => txn.type == 'withdrawal' && txn.status == 'Success')
+        .where((txn) => txn.type == 'withdrawal' && (txn.status == 'Success' || txn.status == 'completed'))
         .fold(0.0, (sum, txn) => sum + txn.amount);
   }
 
   // Get total deposits
   double getTotalDeposits() {
     return _transactions
-        .where((txn) => txn.type == 'deposit' && txn.status == 'Success')
+        .where((txn) => txn.type == 'deposit' && (txn.status == 'Success' || txn.status == 'completed'))
         .fold(0.0, (sum, txn) => sum + txn.amount);
   }
 

@@ -116,7 +116,13 @@ class _WithdrawScreenState extends State<WithdrawScreen> {
                       if (amt == null || amt <= 0) return;
                       final ok = await _verifyPin(context);
                       if (!ok) return;
-                      context.read<WalletProvider>().withdrawKes(amt, category: _category, method: _method, hustle: _selectedHustle);
+                      context.read<WalletProvider>().withdrawKes(
+                        amount: amt,
+                        pin: context.read<PinProvider>().lastPin ?? '0000',
+                        category: _category,
+                        method: _method,
+                        hustle: _selectedHustle,
+                      );
                       Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(

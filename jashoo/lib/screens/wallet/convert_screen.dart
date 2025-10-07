@@ -14,6 +14,26 @@ class _ConvertScreenState extends State<ConvertScreen> {
   final _rateController = TextEditingController(text: '150.0'); // demo rate
   String _direction = 'KES → USDT';
 
+  Future<String?> _promptPin() async {
+    final controller = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Enter PIN'),
+        content: TextField(
+          controller: controller,
+          obscureText: true,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(labelText: 'PIN'),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, null), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context, controller.text.trim()), child: const Text('Confirm')),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -51,17 +71,23 @@ class _ConvertScreenState extends State<ConvertScreen> {
             ),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 final kes = double.tryParse(_amountController.text.trim());
                 final rate = double.tryParse(_rateController.text.trim());
                 if (kes == null || kes <= 0 || rate == null || rate <= 0) return;
                 if (_direction == 'KES → USDT') {
-                  context.read<WalletProvider>().convertKesToUsdt(kes, rate);
+                  final pin = await _promptPin();
+                  if (pin == null || pin.isEmpty) return;
+                  await context.read<WalletProvider>().convertKesToUsdt(
+                    kesAmount: kes,
+                    rate: rate,
+                    pin: pin,
+                  );
                 } else {
                   // reverse conversion: simple demo
                   final wallet = context.read<WalletProvider>();
                   final requiredKes = kes * rate;
-                  wallet.depositKes(requiredKes, description: 'Convert USDT to KES');
+                  wallet.depositKes(amount: requiredKes, description: 'Convert USDT to KES');
                 }
                 Navigator.pop(context);
               },

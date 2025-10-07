@@ -226,6 +226,30 @@ class ApiService {
     return response;
   }
 
+  // Firebase phone login/register
+  Future<Map<String, dynamic>> loginWithFirebasePhone({
+    required String idToken,
+    String? fullName,
+    String? location,
+  }) async {
+    final response = await _makeRequest(
+      'POST',
+      '/auth/firebase-phone',
+      body: {
+        'idToken': idToken,
+        if (fullName != null) 'fullName': fullName,
+        if (location != null) 'location': location,
+      },
+      includeAuth: false,
+    );
+
+    if (response['success'] == true && response['data']?['token'] != null) {
+      await setToken(response['data']['token']);
+    }
+
+    return response;
+  }
+
   Future<Map<String, dynamic>> verifyEmail({required String token}) async {
     return await _makeRequest('POST', '/auth/verify-email', body: {
       'token': token,
@@ -388,6 +412,7 @@ class ApiService {
     String? method,
     String? hustle,
     String category = 'Deposit',
+    String? network,
   }) async {
     return await _makeRequest('POST', '/wallet/deposit', body: {
       'amount': amount,
@@ -396,6 +421,7 @@ class ApiService {
       if (method != null) 'method': method,
       if (hustle != null) 'hustle': hustle,
       'category': category,
+      if (network != null) 'network': network,
     });
   }
 
@@ -406,6 +432,7 @@ class ApiService {
     String category = 'Expense',
     String? method,
     String? hustle,
+    String? network,
   }) async {
     return await _makeRequest('POST', '/wallet/withdraw', body: {
       'amount': amount,
@@ -414,6 +441,7 @@ class ApiService {
       'category': category,
       if (method != null) 'method': method,
       if (hustle != null) 'hustle': hustle,
+      if (network != null) 'network': network,
     });
   }
 
@@ -423,6 +451,7 @@ class ApiService {
     required double rate,
     String fromCurrency = 'KES',
     String toCurrency = 'USDT',
+    String? network,
   }) async {
     return await _makeRequest('POST', '/wallet/convert', body: {
       'amount': amount,
@@ -430,6 +459,7 @@ class ApiService {
       'rate': rate,
       'fromCurrency': fromCurrency,
       'toCurrency': toCurrency,
+      if (network != null) 'network': network,
     });
   }
 
@@ -439,6 +469,7 @@ class ApiService {
     required String pin,
     String currencyCode = 'KES',
     String? description,
+    String? network,
   }) async {
     return await _makeRequest('POST', '/wallet/transfer', body: {
       'recipientUserId': recipientUserId,
@@ -446,6 +477,7 @@ class ApiService {
       'pin': pin,
       'currencyCode': currencyCode,
       if (description != null) 'description': description,
+      if (network != null) 'network': network,
     });
   }
 

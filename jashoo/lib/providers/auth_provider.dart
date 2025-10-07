@@ -133,6 +133,40 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  // Login/Register with Firebase Phone
+  Future<bool> loginWithFirebasePhone({
+    required String idToken,
+    String? fullName,
+    String? location,
+  }) async {
+    _setLoading(true);
+    _clearError();
+    try {
+      final response = await ApiService().loginWithFirebasePhone(
+        idToken: idToken,
+        fullName: fullName,
+        location: location,
+      );
+      if (response['success'] == true) {
+        final data = response['data'];
+        _userId = data['user']['userId'];
+        _token = data['token'];
+        _email = data['user']['email'];
+        _fullName = data['user']['fullName'];
+        notifyListeners();
+        return true;
+      } else {
+        _setError(response['message'] ?? 'Phone auth failed');
+        return false;
+      }
+    } catch (e) {
+      _setError(e.toString());
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
   // Logout user
   Future<void> logout() async {
     _setLoading(true);

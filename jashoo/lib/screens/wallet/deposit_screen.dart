@@ -95,11 +95,11 @@ class _DepositScreenState extends State<DepositScreen> {
                       final amt = double.tryParse(_amountController.text.trim());
                       if (amt == null || amt <= 0) return;
                       context.read<WalletProvider>().depositKes(
-                            amt,
-                            description: '$_method Deposit',
-                            method: _method,
-                            hustle: _selectedHustle,
-                          );
+                        amount: amt,
+                        description: '$_method Deposit',
+                        method: _method,
+                        hustle: _selectedHustle,
+                      );
                       Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(
