@@ -13,17 +13,12 @@ router.get('/goals', authenticateToken, validatePagination, async (req, res) => 
   try {
     const { page = 1, limit = 20 } = req.query;
 
-    const goals = await SavingsGoal.find({ 
-      userId: req.user.userId,
-      isActive: true 
-    })
-    .sort({ createdAt: -1 })
-    .limit(parseInt(limit))
-    .skip((parseInt(page) - 1) * parseInt(limit));
+    const allGoals = await SavingsGoal.findByUser(req.user.userId);
+    const goals = allGoals.slice((parseInt(page)-1)*parseInt(limit), parseInt(page)*parseInt(limit));
 
     // Convert to Flutter SavingsGoal format
     const formattedGoals = goals.map(goal => ({
-      id: goal._id.toString(),
+      id: goal.id,
       name: goal.name,
       target: goal.target,
       saved: goal.saved,
@@ -71,10 +66,8 @@ router.get('/goals/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
 
-    const goal = await SavingsGoal.findOne({ 
-      _id: id, 
-      userId: req.user.userId 
-    });
+    const goal = await SavingsGoal.findOneById(id);
+    if (goal && goal.userId !== req.user.userId) return res.status(404).json({ success:false,message:'Savings goal not found', code:'GOAL_NOT_FOUND' });
 
     if (!goal) {
       return res.status(404).json({
@@ -86,7 +79,7 @@ router.get('/goals/:id', authenticateToken, async (req, res) => {
 
     // Convert to Flutter SavingsGoal format
     const formattedGoal = {
-      id: goal._id.toString(),
+      id: goal.id,
       name: goal.name,
       target: goal.target,
       saved: goal.saved,
@@ -129,22 +122,12 @@ router.post('/goals', authenticateToken, validateSavingsGoal, async (req, res) =
   try {
     const { name, target, dueDate, category, hustle } = req.body;
 
-    const goal = new SavingsGoal({
-      userId: req.user.userId,
-      name,
-      target,
-      saved: 0,
-      dueDate: dueDate ? new Date(dueDate) : null,
-      category,
-      hustle,
-      isActive: true
-    });
-
+    const goal = new SavingsGoal({ userId: req.user.userId, name, target, saved: 0, dueDate: dueDate ? new Date(dueDate) : null, category, hustle, isActive: true });
     await goal.save();
 
     // Convert to Flutter SavingsGoal format
     const formattedGoal = {
-      id: goal._id.toString(),
+      id: goal.id,
       name: goal.name,
       target: goal.target,
       saved: goal.saved,
@@ -188,10 +171,10 @@ router.put('/goals/:id', authenticateToken, validateSavingsGoal, async (req, res
     const { id } = req.params;
     const { name, target, dueDate, category, hustle } = req.body;
 
-    const goal = await SavingsGoal.findOne({ 
-      _id: id, 
-      userId: req.user.userId 
-    });
+    const goal = await SavingsGoal.findOneById(id);
+    if (!goal || goal.userId !== req.user.userId) {
+      return res.status(404).json({ success:false, message:'Savings goal not found', code:'GOAL_NOT_FOUND' });
+    }
 
     if (!goal) {
       return res.status(404).json({
@@ -212,7 +195,7 @@ router.put('/goals/:id', authenticateToken, validateSavingsGoal, async (req, res
 
     // Convert to Flutter SavingsGoal format
     const formattedGoal = {
-      id: goal._id.toString(),
+      id: goal.id,
       name: goal.name,
       target: goal.target,
       saved: goal.saved,
@@ -265,10 +248,10 @@ router.post('/goals/:id/contribute', authenticateToken, validateContribution, as
       });
     }
 
-    const goal = await SavingsGoal.findOne({ 
-      _id: id, 
-      userId: req.user.userId 
-    });
+    const goal = await SavingsGoal.findOneById(id);
+    if (!goal || goal.userId !== req.user.userId) {
+      return res.status(404).json({ success:false, message:'Savings goal not found', code:'GOAL_NOT_FOUND' });
+    }
 
     if (!goal) {
       return res.status(404).json({
@@ -310,19 +293,7 @@ router.post('/goals/:id/contribute', authenticateToken, validateContribution, as
     await goal.addContribution(amount);
 
     // Create contribution record
-    const contribution = new Contribution({
-      userId: req.user.userId,
-      goalId: goal._id,
-      amount,
-      source,
-      hustle,
-      pointsEarned: Math.floor(amount), // 1 KES = 1 point
-      metadata: {
-        ip: req.ip,
-        userAgent: req.get('User-Agent')
-      }
-    });
-
+    const contribution = new Contribution({ userId: req.user.userId, goalId: goal.id, amount, source, hustle, pointsEarned: Math.floor(amount), metadata: { ip: req.ip, userAgent: req.get('User-Agent') } });
     await contribution.save();
 
     // Create transaction
@@ -370,7 +341,7 @@ router.post('/goals/:id/contribute', authenticateToken, validateContribution, as
 
     // Convert to Flutter SavingsGoal format
     const formattedGoal = {
-      id: goal._id.toString(),
+      id: goal.id,
       name: goal.name,
       target: goal.target,
       saved: goal.saved,
@@ -392,7 +363,7 @@ router.post('/goals/:id/contribute', authenticateToken, validateContribution, as
       data: {
         goal: formattedGoal,
         contribution: {
-          id: contribution._id.toString(),
+          id: contribution.id,
           amount: contribution.amount,
           source: contribution.source,
           hustle: contribution.hustle,
@@ -428,10 +399,10 @@ router.get('/goals/:id/contributions', authenticateToken, validatePagination, as
     const { id } = req.params;
     const { page = 1, limit = 20 } = req.query;
 
-    const goal = await SavingsGoal.findOne({ 
-      _id: id, 
-      userId: req.user.userId 
-    });
+    const goal = await SavingsGoal.findOneById(id);
+    if (!goal || goal.userId !== req.user.userId) {
+      return res.status(404).json({ success:false, message:'Savings goal not found', code:'GOAL_NOT_FOUND' });
+    }
 
     if (!goal) {
       return res.status(404).json({
@@ -441,12 +412,8 @@ router.get('/goals/:id/contributions', authenticateToken, validatePagination, as
       });
     }
 
-    const contributions = await Contribution.find({ 
-      goalId: goal._id 
-    })
-    .sort({ createdAt: -1 })
-    .limit(parseInt(limit))
-    .skip((parseInt(page) - 1) * parseInt(limit));
+    const all = await Contribution.findByGoal(goal.id);
+    const contributions = all.slice((parseInt(page)-1)*parseInt(limit), parseInt(page)*parseInt(limit));
 
     res.json({
       success: true,
@@ -480,10 +447,10 @@ router.delete('/goals/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
 
-    const goal = await SavingsGoal.findOne({ 
-      _id: id, 
-      userId: req.user.userId 
-    });
+    const goal = await SavingsGoal.findOneById(id);
+    if (!goal || goal.userId !== req.user.userId) {
+      return res.status(404).json({ success:false, message:'Savings goal not found', code:'GOAL_NOT_FOUND' });
+    }
 
     if (!goal) {
       return res.status(404).json({
@@ -525,14 +492,12 @@ router.get('/loans', authenticateToken, validatePagination, async (req, res) => 
     const query = { userId: req.user.userId };
     if (status) query.status = status;
 
-    const loans = await LoanRequest.find(query)
-      .sort({ createdAt: -1 })
-      .limit(parseInt(limit))
-      .skip((parseInt(page) - 1) * parseInt(limit));
+    const allLoans = await LoanRequest.find(query);
+    const loans = allLoans.slice((parseInt(page)-1)*parseInt(limit), parseInt(page)*parseInt(limit));
 
     // Convert to Flutter LoanRequest format
     const formattedLoans = loans.map(loan => ({
-      id: loan._id.toString(),
+      id: loan.id,
       amount: loan.amount,
       status: loan.status,
       // Additional fields for Flutter
@@ -582,10 +547,10 @@ router.get('/loans/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
 
-    const loan = await LoanRequest.findOne({ 
-      _id: id, 
-      userId: req.user.userId 
-    });
+    const loan = await LoanRequest.findOneById(id);
+    if (!loan || loan.userId !== req.user.userId) {
+      return res.status(404).json({ success:false, message:'Loan request not found', code:'LOAN_NOT_FOUND' });
+    }
 
     if (!loan) {
       return res.status(404).json({
@@ -597,7 +562,7 @@ router.get('/loans/:id', authenticateToken, async (req, res) => {
 
     // Convert to Flutter LoanRequest format
     const formattedLoan = {
-      id: loan._id.toString(),
+      id: loan.id,
       amount: loan.amount,
       status: loan.status,
       purpose: loan.purpose,
@@ -644,7 +609,8 @@ router.post('/loans', authenticateToken, requireVerification, validateLoanReques
 
     // Get user's credit score
     const { CreditScore } = require('../models/CreditScore');
-    const creditScore = await CreditScore.findOne({ userId: req.user.userId });
+    const { CreditScore } = require('../models/CreditScore');
+    const creditScore = await CreditScore.findByUser(req.user.userId);
 
     if (!creditScore) {
       return res.status(400).json({
@@ -668,29 +634,12 @@ router.post('/loans', authenticateToken, requireVerification, validateLoanReques
     const interestRate = eligibility.interestRate || 15; // Default 15% APR
     const monthlyPayment = amount * (interestRate / 100 / 12) * Math.pow(1 + (interestRate / 100 / 12), termMonths) / (Math.pow(1 + (interestRate / 100 / 12), termMonths) - 1);
 
-    const loan = new LoanRequest({
-      userId: req.user.userId,
-      amount,
-      purpose,
-      status: 'pending',
-      interestRate,
-      termMonths,
-      monthlyPayment,
-      creditScore: creditScore.currentScore,
-      collateral,
-      guarantor,
-      documents: [],
-      metadata: {
-        ip: req.ip,
-        userAgent: req.get('User-Agent')
-      }
-    });
-
+    const loan = new LoanRequest({ userId: req.user.userId, amount, purpose, status: 'pending', interestRate, termMonths, monthlyPayment, creditScore: creditScore.currentScore, collateral, guarantor, documents: [], metadata: { ip: req.ip, userAgent: req.get('User-Agent') } });
     await loan.save();
 
     // Convert to Flutter LoanRequest format
     const formattedLoan = {
-      id: loan._id.toString(),
+      id: loan.id,
       amount: loan.amount,
       status: loan.status,
       purpose: loan.purpose,
@@ -736,12 +685,12 @@ router.get('/statistics', authenticateToken, async (req, res) => {
     const userId = req.user.userId;
 
     // Get savings goals
-    const goals = await SavingsGoal.find({ userId, isActive: true });
+    const goals = await SavingsGoal.findByUser(userId);
     const totalSaved = goals.reduce((sum, goal) => sum + goal.saved, 0);
     const totalTarget = goals.reduce((sum, goal) => sum + goal.target, 0);
 
     // Get contributions
-    const contributions = await Contribution.find({ userId });
+    const contributions = await Contribution.findByUser(userId);
     const totalContributions = contributions.reduce((sum, contrib) => sum + contrib.amount, 0);
     const pointsEarnedFromSavings = contributions.reduce((sum, contrib) => sum + contrib.pointsEarned, 0);
 
