@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
+import '../../providers/auth_provider.dart' as app_auth;
+import '../../services/api_service.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -215,15 +218,36 @@ class _SignupScreenState extends State<SignupScreen> {
                           return;
                         }
 
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                                "Signup Successful! Hustles: ${selectedHustles.join(", ")}"),
-                          ),
-                        );
-
-                        // TODO: Add Firebase or API signup here
-                        Navigator.of(context).pop();
+                        () async {
+                          final fullLocation = '${selectedCountry!}, ${selectedCounty!}, ${selectedWard!}';
+                          try {
+                            final resp = await ApiService().register(
+                              email: emailController.text.trim(),
+                              password: passwordController.text,
+                              fullName: usernameController.text.trim(),
+                              phoneNumber: _fullPhoneE164!,
+                              location: fullLocation,
+                              skills: selectedHustles,
+                            );
+                            if (resp['success'] == true) {
+                              if (!mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Account created')),
+                              );
+                              Navigator.of(context).pop();
+                            } else {
+                              if (!mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(resp['message'] ?? 'Registration failed')),
+                              );
+                            }
+                          } catch (e) {
+                            if (!mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Error: $e')),
+                            );
+                          }
+                        }();
                       }
                     },
                     style: ElevatedButton.styleFrom(
