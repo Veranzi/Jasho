@@ -1,7 +1,8 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart' hide Badge;
 import 'package:provider/provider.dart';
 import '../../providers/gamification_provider.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class GamificationScreen extends StatelessWidget {
   const GamificationScreen({super.key});
@@ -15,9 +16,8 @@ class GamificationScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Image.asset('assets/logo1.png', height: 28),
-        centerTitle: true,
-        backgroundColor: const Color(0xFF10B981),
+        title: const Text('Jasho Points'),
+        backgroundColor: const Color(0xFF0D47A1),
         actions: [
           IconButton(
             icon: const Icon(Icons.leaderboard),
@@ -31,7 +31,6 @@ class GamificationScreen extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(context),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -43,11 +42,14 @@ class GamificationScreen extends StatelessWidget {
             const SizedBox(height: 8),
             _EarnGrid(onSimulate: (value) => g.earnPoints(value)),
             const SizedBox(height: 16),
+            _SectionTitle(title: 'Badges'),
+            const SizedBox(height: 8),
+            _BadgesStrip(badges: g.badges),
+            const SizedBox(height: 16),
             _SectionTitle(title: 'Redeem quickly'),
             const SizedBox(height: 8),
             _RedeemQuick(onRedeem: (cost) => g.redeemPoints(cost), currentPoints: points),
             const SizedBox(height: 16),
-            // Open Rewards Store and Simulate buttons in same row
             Row(
               children: [
                 Expanded(
@@ -66,77 +68,6 @@ class GamificationScreen extends StatelessWidget {
                   ),
                 ),
               ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomNavigationBar(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      decoration: BoxDecoration(color: Colors.white, boxShadow: [
-        BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 10),
-      ]),
-      child: SafeArea(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildNavItem(context, Icons.home, "Home", 0),
-            _buildNavItem(context, Icons.history, "History", 1),
-            _buildNavItem(context, Icons.insights, "AI Insight", 2),
-            _buildNavItem(context, Icons.person, "Profile", 3),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(BuildContext context, IconData icon, String label, int index) {
-    const Color primaryColor = Color(0xFF10B981);
-    const Color lightBlueBackground = Color(0xFFE6FFF5);
-    
-    return GestureDetector(
-      onTap: () {
-        switch (index) {
-          case 0:
-            Navigator.pushReplacementNamed(context, '/dashboard');
-            break;
-          case 1:
-            Navigator.pushNamed(context, '/transactionHistory');
-            break;
-          case 2:
-            Navigator.pushNamed(context, '/aiAssistant');
-            break;
-          case 3:
-            Navigator.pushNamed(context, '/profileUpdate');
-            break;
-        }
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-        decoration: BoxDecoration(
-            color: index == 2 ? lightBlueBackground : Colors.transparent, // Highlight AI Insight
-            borderRadius: BorderRadius.circular(20)),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon,
-                color: index == 2 ? primaryColor : Colors.grey[600], size: 24),
-            const SizedBox(height: 2),
-            Flexible(
-              child: Text(label,
-                  style: TextStyle(
-                      color: index == 2 ? primaryColor : Colors.grey[600],
-                      fontSize: 10,
-                      fontWeight:
-                          index == 2 ? FontWeight.bold : FontWeight.normal),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1),
             ),
           ],
         ),
@@ -166,7 +97,7 @@ class _HeaderCard extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF10B981), Color(0xFF34D399)],
+          colors: [Color(0xFF0D47A1), Color(0xFF1976D2)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -180,7 +111,7 @@ class _HeaderCard extends StatelessWidget {
             children: [
               const Icon(Icons.stars, color: Colors.white, size: 28),
               const SizedBox(width: 8),
-              Text('Level $level', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14.sp)),
+              Text('Level $level', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               const Spacer(),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -189,14 +120,14 @@ class _HeaderCard extends StatelessWidget {
                   children: [
                     const Icon(Icons.local_fire_department, color: Colors.orangeAccent, size: 18),
                     const SizedBox(width: 6),
-                    Text('${streakDays}d streak', style: TextStyle(color: Colors.white, fontSize: 12.sp)),
+                    Text('${streakDays}d streak', style: const TextStyle(color: Colors.white)),
                   ],
                 ),
               ),
             ],
           ),
           const SizedBox(height: 10),
-          Text('$points pts', style: TextStyle(color: Colors.white, fontSize: 32.sp, fontWeight: FontWeight.bold)),
+          Text('$points pts', style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
           const SizedBox(height: 6),
           ClipRRect(
             borderRadius: BorderRadius.circular(999),
@@ -208,7 +139,7 @@ class _HeaderCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 6),
-          Text('Next level: ${(progressToNext * 100).toStringAsFixed(0)}%', style: TextStyle(color: Colors.white70, fontSize: 12.sp)),
+          Text('Next level: ${(progressToNext * 100).toStringAsFixed(0)}%', style: const TextStyle(color: Colors.white70)),
         ],
       ),
     );
@@ -235,8 +166,7 @@ class _EarnGrid extends StatelessWidget {
       _EarnItem(Icons.person_add_alt, 'Complete profile', 20),
       _EarnItem(Icons.send, 'Send money / pay bill', 10),
       _EarnItem(Icons.group_add, 'Refer a friend (verified)', 50),
-      _EarnItem(Icons.handshake, 'Use partner services (ABSA)', 20),
-      _EarnItem(Icons.work, 'Refer for jobs', 25),
+      _EarnItem(Icons.handshake, 'Use partner services (SACCO, Absa)', 20),
       _EarnItem(Icons.savings, 'Save consistently (weekly bonus)', 5),
       _EarnItem(Icons.emoji_events, 'Hit milestones', 100),
       _EarnItem(Icons.security, 'Cybersecurity module', 30),
@@ -245,76 +175,45 @@ class _EarnGrid extends StatelessWidget {
       _EarnItem(Icons.feedback, 'Give feedback', 5),
     ];
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        // Calculate responsive aspect ratio based on screen width
-        double aspectRatio;
-        int crossAxisCount;
-        
-        if (constraints.maxWidth < 400) {
-          aspectRatio = 3.5; // Taller cards for narrow screens
-          crossAxisCount = 2;
-        } else if (constraints.maxWidth < 600) {
-          aspectRatio = 3.2;
-          crossAxisCount = 2;
-        } else {
-          aspectRatio = 2.8; // Shorter cards for wider screens
-          crossAxisCount = 3; // More columns on wider screens
-        }
-
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
-            mainAxisSpacing: 8,
-            crossAxisSpacing: 8,
-            childAspectRatio: aspectRatio,
-          ),
-          itemCount: items.length,
-          itemBuilder: (_, i) {
-            final it = items[i];
-            return InkWell(
-              onTap: () => onSimulate(it.points),
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 12,
+        crossAxisSpacing: 12,
+        childAspectRatio: 2.9,
+      ),
+      itemCount: items.length,
+      itemBuilder: (_, i) {
+        final it = items[i];
+        return InkWell(
+          onTap: () => onSimulate(it.points),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(12),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.2)),
-                ),
-                padding: const EdgeInsets.all(8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(it.icon, color: Theme.of(context).colorScheme.primary, size: 18),
-                        const SizedBox(width: 6),
-                        Expanded(
-                          child: Text(
-                            it.title, 
-                            maxLines: 2, 
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 10.sp),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Text(
-                      '+${it.points} pts', 
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 10.sp,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          },
+              border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.2)),
+            ),
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              children: [
+                Icon(it.icon, color: Theme.of(context).colorScheme.primary),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(it.title, maxLines: 2, overflow: TextOverflow.ellipsis),
+                      const SizedBox(height: 4),
+                      Text('+${it.points} pts', style: const TextStyle(fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
         );
       },
     );
@@ -400,75 +299,49 @@ class _RedeemQuick extends StatelessWidget {
       {'name': 'Partner reward', 'cost': 900, 'icon': Icons.directions_bus},
     ];
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        double cardWidth;
-        if (constraints.maxWidth < 400) {
-          cardWidth = 180;
-        } else if (constraints.maxWidth < 600) {
-          cardWidth = 200;
-        } else {
-          cardWidth = 220;
-        }
-
-        return SizedBox(
-          height: 120,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            itemCount: items.length,
-            separatorBuilder: (_, __) => const SizedBox(width: 12),
-            itemBuilder: (_, i) {
-              final r = items[i];
-              final bool canRedeem = currentPoints >= (r['cost'] as int);
-              return Container(
-                width: cardWidth,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.2)),
-                ),
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+    return SizedBox(
+      height: 120,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: items.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 12),
+        itemBuilder: (_, i) {
+          final r = items[i];
+          final bool canRedeem = currentPoints >= (r['cost'] as int);
+          return Container(
+            width: 220,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.2)),
+            ),
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
                   children: [
-                    Row(
-                      children: [
-                        Icon(r['icon'] as IconData, color: Theme.of(context).colorScheme.primary, size: 20),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            r['name'].toString(), 
-                            maxLines: 1, 
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 12),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const Spacer(),
-                    Row(
-                      children: [
-                        Text('${r['cost']} pts', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                        const Spacer(),
-                        SizedBox(
-                          height: 32,
-                          child: ElevatedButton(
-                            onPressed: canRedeem ? () => onRedeem(r['cost'] as int) : null,
-                            style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                            ),
-                            child: const Text('Redeem', style: TextStyle(fontSize: 11)),
-                          ),
-                        ),
-                      ],
-                    )
+                    Icon(r['icon'] as IconData, color: Theme.of(context).colorScheme.primary),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text(r['name'].toString(), maxLines: 1, overflow: TextOverflow.ellipsis)),
                   ],
                 ),
-              );
-            },
-          ),
-        );
-      },
+                const Spacer(),
+                Row(
+                  children: [
+                    Text('${r['cost']} pts', style: const TextStyle(fontWeight: FontWeight.bold)),
+                    const Spacer(),
+                    ElevatedButton(
+                      onPressed: canRedeem ? () => onRedeem(r['cost'] as int) : null,
+                      child: const Text('Redeem'),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }

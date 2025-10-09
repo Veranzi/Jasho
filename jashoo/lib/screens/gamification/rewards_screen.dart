@@ -147,7 +147,7 @@ class _RewardCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.2)),
+        border: Border.all(color: Theme.of(context).dividerColor.withAlpha(51)),
       ),
       padding: const EdgeInsets.all(12),
       child: Column(
@@ -188,4 +188,3 @@ IconData _iconForType(String type) {
       return Icons.card_giftcard;
   }
 }
-

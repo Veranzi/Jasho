@@ -1,28 +1,11 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:image_picker/image_picker.dart';
 
 class ApiService {
-  static String get baseUrl {
-    if (kIsWeb) return 'http://localhost:3000/api';
-    // For Android emulator
-    try {
-      // Accessing Platform may fail on some targets; use a safe try/catch
-      // ignore: avoid_dynamic_calls
-      // We intentionally avoid importing dart:io directly on web
-      // A separate mobile build will inline the Android check.
-      // Fallback to localhost for non-Android.
-      // This try/catch is a no-op on web due to tree-shaking.
-      // ignore: unnecessary_statements
-    } catch (_) {}
-    return 'http://10.0.2.2:3000/api';
-  }
-  static String get imageBaseUrl {
-    if (kIsWeb) return 'http://localhost:3000/uploads/profile-images';
-    return 'http://10.0.2.2:3000/uploads/profile-images';
-  }
+  static const String baseUrl = 'http://localhost:3000/api';
+  static const String imageBaseUrl = 'http://localhost:3000/uploads/profile-images';
   
   // Singleton pattern
   static final ApiService _instance = ApiService._internal();
@@ -74,7 +57,7 @@ class ApiService {
     bool includeAuth = true,
   }) async {
     try {
-      final url = Uri.parse('${ApiService.baseUrl}$endpoint');
+      final url = Uri.parse('$baseUrl/$endpoint'.replaceAll('//', '/').replaceFirst(':/', '://'));
       final requestHeaders = {..._getHeaders(includeAuth: includeAuth), ...?headers};
       
       http.Response response;
@@ -144,7 +127,7 @@ class ApiService {
     bool includeAuth = true,
   }) async {
     try {
-      final url = Uri.parse('${ApiService.baseUrl}$endpoint');
+      final url = Uri.parse('$baseUrl$endpoint');
       final request = http.MultipartRequest(method, url);
       
       // Add headers
@@ -240,41 +223,29 @@ class ApiService {
       'password': password,
       'rememberMe': rememberMe,
     }, includeAuth: false);
-
+    
     if (response['success'] == true && response['data']?['token'] != null) {
       await setToken(response['data']['token']);
     }
-
+    
     return response;
   }
 
-  Future<Map<String, dynamic>> logout() async {
-    final response = await _makeRequest('POST', '/auth/logout');
-    await clearToken();
-    return response;
-  }
-
-  // Firebase phone login/register
   Future<Map<String, dynamic>> loginWithFirebasePhone({
     required String idToken,
     String? fullName,
     String? location,
   }) async {
-    final response = await _makeRequest(
-      'POST',
-      '/auth/firebase-phone',
-      body: {
-        'idToken': idToken,
-        if (fullName != null) 'fullName': fullName,
-        if (location != null) 'location': location,
-      },
-      includeAuth: false,
-    );
+    return await _makeRequest('POST', '/auth/firebase-phone-auth', body: {
+      'idToken': idToken,
+      if (fullName != null) 'fullName': fullName,
+      if (location != null) 'location': location,
+    }, includeAuth: false);
+  }
 
-    if (response['success'] == true && response['data']?['token'] != null) {
-      await setToken(response['data']['token']);
-    }
-
+  Future<Map<String, dynamic>> logout() async {
+    final response = await _makeRequest('POST', '/auth/logout');
+    await clearToken();
     return response;
   }
 
@@ -440,7 +411,6 @@ class ApiService {
     String? method,
     String? hustle,
     String category = 'Deposit',
-    String? network,
   }) async {
     return await _makeRequest('POST', '/wallet/deposit', body: {
       'amount': amount,
@@ -449,7 +419,6 @@ class ApiService {
       if (method != null) 'method': method,
       if (hustle != null) 'hustle': hustle,
       'category': category,
-      if (network != null) 'network': network,
     });
   }
 
@@ -460,7 +429,6 @@ class ApiService {
     String category = 'Expense',
     String? method,
     String? hustle,
-    String? network,
   }) async {
     return await _makeRequest('POST', '/wallet/withdraw', body: {
       'amount': amount,
@@ -469,7 +437,6 @@ class ApiService {
       'category': category,
       if (method != null) 'method': method,
       if (hustle != null) 'hustle': hustle,
-      if (network != null) 'network': network,
     });
   }
 
@@ -479,7 +446,6 @@ class ApiService {
     required double rate,
     String fromCurrency = 'KES',
     String toCurrency = 'USDT',
-    String? network,
   }) async {
     return await _makeRequest('POST', '/wallet/convert', body: {
       'amount': amount,
@@ -487,7 +453,6 @@ class ApiService {
       'rate': rate,
       'fromCurrency': fromCurrency,
       'toCurrency': toCurrency,
-      if (network != null) 'network': network,
     });
   }
 
@@ -497,7 +462,6 @@ class ApiService {
     required String pin,
     String currencyCode = 'KES',
     String? description,
-    String? network,
   }) async {
     return await _makeRequest('POST', '/wallet/transfer', body: {
       'recipientUserId': recipientUserId,
@@ -505,7 +469,6 @@ class ApiService {
       'pin': pin,
       'currencyCode': currencyCode,
       if (description != null) 'description': description,
-      if (network != null) 'network': network,
     });
   }
 
@@ -520,23 +483,22 @@ class ApiService {
     String? urgency,
     String? searchQuery,
   }) async {
-    final queryParams = <String, String>{
+    final queryParams = <String, dynamic>{
       'page': page.toString(),
       'limit': limit.toString(),
+      'category': category,
+      'location': location,
+      'minPrice': minPrice,
+      'maxPrice': maxPrice,
+      'urgency': urgency,
+      'q': searchQuery,
     };
-    
-    if (category != null) queryParams['category'] = category;
-    if (location != null) queryParams['location'] = location;
-    if (minPrice != null) queryParams['minPrice'] = minPrice.toString();
-    if (maxPrice != null) queryParams['maxPrice'] = maxPrice.toString();
-    if (urgency != null) queryParams['urgency'] = urgency;
-    if (searchQuery != null) queryParams['q'] = searchQuery;
-    
-    final queryString = queryParams.entries
-        .map((e) => '${e.key}=${Uri.encodeComponent(e.value)}')
-        .join('&');
-    
-    return await _makeRequest('GET', '/jobs?$queryString');
+
+    queryParams.removeWhere((key, value) => value == null);
+
+    final uri = Uri(path: '/jobs', queryParameters: queryParams.map((key, value) => MapEntry(key, value.toString())));
+
+    return await _makeRequest('GET', uri.toString());
   }
 
   Future<Map<String, dynamic>> getJob({required String jobId}) async {

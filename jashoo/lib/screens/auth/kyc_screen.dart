@@ -27,7 +27,7 @@ class _KycScreenState extends State<KycScreen> {
               child: Column(
                 children: [
                   DropdownButtonFormField<String>(
-                    value: _idType,
+                    initialValue: _idType,
                     items: const [
                       DropdownMenuItem(value: 'ID', child: Text('National ID')),
                       DropdownMenuItem(value: 'PASSPORT', child: Text('Passport')),

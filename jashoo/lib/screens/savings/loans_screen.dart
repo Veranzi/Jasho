@@ -1,10 +1,11 @@
+// ignore_for_file: unused_shown_name, deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/savings_provider.dart';
 import '../../widgets/skeleton.dart';
 import 'package:provider/provider.dart' show ReadContext, WatchContext;
 import '../../providers/user_provider.dart';
-import '../loans/loan_eligibility_screen.dart';
 
 class LoansScreen extends StatefulWidget {
   const LoansScreen({super.key});
@@ -22,19 +23,13 @@ class _LoansScreenState extends State<LoansScreen> {
     final totalSaved = savings.goals.fold<double>(0, (sum, g) => sum + g.saved);
     final eligibility = (totalSaved * 0.5).toStringAsFixed(0); // 50% of savings
     return Scaffold(
-      appBar: AppBar(
-        title: Image.asset('assets/logo1.png', height: 28),
-        centerTitle: true,
-        backgroundColor: const Color(0xFF10B981),
-      ),
+      appBar: AppBar(title: const Text('Loans by Absa'), backgroundColor: const Color(0xFF0D47A1)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _EligibilityCard(eligibility: eligibility),
-            const SizedBox(height: 16),
-            _IncreaseEligibilityCard(),
             const SizedBox(height: 16),
             _AbsaHighlightCard(),
             const SizedBox(height: 16),
@@ -55,77 +50,6 @@ class _LoansScreenState extends State<LoansScreen> {
             _LoanList(loans: savings.loans),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _IncreaseEligibilityCard extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF059669), Color(0xFF10B981)],
-        ),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Icons.trending_up, color: Colors.white),
-              const SizedBox(width: 12),
-              const Expanded(
-                child: Text(
-                  'Increase Your Loan Eligibility',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Provide SACCO details and evidence to qualify for higher loan amounts',
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 12),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const LoanEligibilityScreen(),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: const Color(0xFF10B981),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: const Text(
-                'Submit SACCO Details',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -274,7 +198,7 @@ class _LoanApplicationCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.2)),
+        border: Border.all(color: Theme.of(context).dividerColor.withAlpha(51)),
       ),
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -352,7 +276,7 @@ class _LoanList extends StatelessWidget {
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.2)),
+            border: Border.all(color: Theme.of(context).dividerColor.withAlpha(51)),
           ),
           padding: const EdgeInsets.all(12),
           child: Row(
@@ -376,4 +300,3 @@ class _LoanList extends StatelessWidget {
     );
   }
 }
-

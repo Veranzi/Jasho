@@ -240,7 +240,7 @@ class ImageService {
   }) async {
     try {
       final response = await _apiService.getProfileImage(
-        userId: userId,
+        userId: 'user123', // Placeholder, replace with actual user ID from auth provider
         size: size,
       );
       

@@ -6,11 +6,9 @@ import 'package:provider/provider.dart';
 import '../../providers/wallet_provider.dart';
 import 'profile_drawer.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:provider/provider.dart';
 import '../../providers/jobs_provider.dart';
 import 'ai_assistant_screen.dart';
 import 'transactions.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class DashBoardScreen extends StatefulWidget {
   const DashBoardScreen({super.key});
@@ -22,8 +20,8 @@ class DashBoardScreen extends StatefulWidget {
 class _DashBoardScreenState extends State<DashBoardScreen> {
   int _selectedIndex = 0;
 
-  static const Color primaryColor = Color(0xFF10B981);
-  static const Color lightBlueBackground = Color(0xFFE6FFF5);
+  static const Color primaryColor = Color(0xFF0D47A1);
+  static const Color lightBlueBackground = Color(0xFFE3F2FD);
 
   @override
   Widget build(BuildContext context) {
@@ -45,8 +43,17 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
     return AppBar(
       backgroundColor: primaryColor,
       elevation: 0,
-      title: Image.asset('assets/logo1.png', height: 32),
-      centerTitle: true,
+      title: Row(
+        children: [
+          Image.asset('assets/logo.png', height: 28, color: Colors.white),
+          const SizedBox(width: 12),
+          const Text(
+            "JASHO",
+            style: TextStyle(
+                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),
+          ),
+        ],
+      ),
       actions: [
         IconButton(
           icon: const Icon(Icons.notifications, color: Colors.white),
@@ -82,71 +89,20 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
           const SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                if (constraints.maxWidth > 600) {
-                  // Desktop/Tablet layout - rows
-                  return Column(
-                    children: [
-                      _buildStatusCards(),
-                      const SizedBox(height: 16),
-                      // First row: Chart and Quick Actions
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            flex: 2,
-                            child: _buildEarningsSavingsChart(),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            flex: 1,
-                            child: _buildServicesSection("Quick Actions", _quickActions),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      // Second row: Jobs shortcut and Insights
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            flex: 2,
-                            child: _buildJobsShortcut(),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            flex: 1,
-                            child: _buildInsightsCard(),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-                      // Third row: Task summary (full width)
-                      _buildTaskSummary(),
-                      const SizedBox(height: 24),
-                    ],
-                  );
-                } else {
-                  // Mobile layout - columns
-                  return Column(
-                    children: [
-                      _buildStatusCards(),
-                      const SizedBox(height: 16),
-                      _buildEarningsSavingsChart(),
-                      const SizedBox(height: 16),
-                      _buildServicesSection("Quick Actions", _quickActions),
-                      const SizedBox(height: 16),
-                      _buildJobsShortcut(),
-                      const SizedBox(height: 16),
-                      _buildInsightsCard(),
-                      const SizedBox(height: 16),
-                      _buildTaskSummary(),
-                      const SizedBox(height: 24),
-                    ],
-                  );
-                }
-              },
+            child: Column(
+              children: [
+          _buildStatusCards(),
+                const SizedBox(height: 24),
+                _buildEarningsSavingsChart(),
+                const SizedBox(height: 24),
+          _buildServicesSection("Quick Actions", _quickActions),
+                const SizedBox(height: 24),
+                _buildJobsShortcut(),
+                const SizedBox(height: 24),
+          _buildInsightsCard(),
+                const SizedBox(height: 24),
+                _buildTaskSummary(),
+              ],
             ),
           ),
         ],
@@ -158,7 +114,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
     final wallet = context.watch<WalletProvider>();
     final isKes = wallet.displayCurrency == Currency.kes;
     final balance = wallet.currentBalance;
-    final label = isKes ? 'KES' : 'USDT';
+    final label = wallet.getCurrencySymbol();
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
       decoration: const BoxDecoration(
@@ -172,84 +128,53 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text("Wallet Balance",
-              style:
-                  TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14.sp)),
+              style: TextStyle(color: Colors.white.withAlpha(204), fontSize: 14)),
           const SizedBox(height: 10),
-          // Wallet balance and action buttons in same row
           Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Balance amount on the left
-              Expanded(
-                flex: 2,
-                child: Text(
-                  "$label ${balance.toStringAsFixed(isKes ? 0 : 2)}",
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 28.sp,
-                      fontWeight: FontWeight.bold),
-                  overflow: TextOverflow.ellipsis,
-                ),
+              Text(
+                "$label ${balance.toStringAsFixed(isKes ? 0 : 2)}",
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold),
               ),
-              const SizedBox(width: 12),
-              // Action buttons on the right
-              Expanded(
-                flex: 3,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: wallet.toggleCurrency,
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          side: BorderSide(color: Colors.white.withOpacity(0.5)),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20)),
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                        ),
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(isKes ? 'USDT' : 'KES', 
-                            style: const TextStyle(fontSize: 10)),
-                        ),
-                      ),
+              Row(
+                children: [
+                  OutlinedButton(
+                    onPressed: wallet.toggleCurrency,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      side: BorderSide(color: Colors.white.withAlpha(128)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)),
                     ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pushNamed(context, '/deposit'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          side: BorderSide(color: Colors.white.withOpacity(0.5)),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20)),
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                        ),
-                        child: const FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text("DEPOSIT", style: TextStyle(fontSize: 10)),
-                        ),
-                      ),
+                    child: Text(isKes ? 'SHOW USDT' : 'SHOW KES'),
+                  ),
+                  const SizedBox(width: 8),
+                  OutlinedButton(
+                    onPressed: () => Navigator.pushNamed(context, '/deposit'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      side: BorderSide(color: Colors.white.withAlpha(128)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)),
                     ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pushNamed(context, '/withdraw'),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          side: BorderSide(color: Colors.white.withOpacity(0.5)),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20)),
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                        ),
-                        child: const FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text("WITHDRAW", style: TextStyle(fontSize: 10)),
-                        ),
-                      ),
+                    child: const Text("DEPOSIT"),
+                  ),
+                  const SizedBox(width: 8),
+                  OutlinedButton(
+                    onPressed: () => Navigator.pushNamed(context, '/withdraw'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      side: BorderSide(color: Colors.white.withAlpha(128)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)),
                     ),
-                  ],
-                ),
+                    child: const Text("WITHDRAW"),
+                  ),
+                ],
               ),
             ],
           ),
@@ -257,7 +182,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
+              color: Colors.white.withAlpha(51),
               borderRadius: BorderRadius.circular(8),
             ),
             child: const Text("Flat commission discounts available",
@@ -269,47 +194,42 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   }
 
   Widget _buildStatusCards() {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Row(
-          children: [
-            Expanded(child: _buildStatusCard("Success", "12")),
-            const SizedBox(width: 8),
-            Expanded(child: _buildStatusCard("Top Up", "5")),
-            const SizedBox(width: 8),
-            Expanded(child: _buildStatusCard("Pending", "2")),
-          ],
-        );
-      },
+    return Row(
+      children: [
+        _buildStatusCard("Success", "12"),
+        const SizedBox(width: 12),
+        _buildStatusCard("Top Up", "5"),
+        const SizedBox(width: 12),
+        _buildStatusCard("Pending", "2"),
+      ],
     );
   }
 
   Widget _buildStatusCard(String title, String value) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              spreadRadius: 1,
-              blurRadius: 10),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(title,
-              style: TextStyle(color: Colors.grey[600], fontSize: 14.sp),
-              overflow: TextOverflow.ellipsis),
-          const SizedBox(height: 4),
-          Text(value,
-              style: TextStyle(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87)),
-        ],
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(color: Colors.black.withAlpha(13),
+                spreadRadius: 1,
+                blurRadius: 10),
+          ],
+        ),
+        child: Column(
+          children: [
+            Text(title,
+                style: TextStyle(color: Colors.grey[600], fontSize: 14)),
+            const SizedBox(height: 4),
+            Text(value,
+                style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87)),
+          ],
+        ),
       ),
     );
   }
@@ -321,8 +241,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
-            BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+            BoxShadow(color: Colors.black.withAlpha(13),
                 spreadRadius: 1,
                 blurRadius: 10),
           ]),
@@ -330,8 +249,8 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title,
-              style: TextStyle(
-                  fontSize: 18.sp,
+              style: const TextStyle(
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87)),
           const SizedBox(height: 16),
@@ -422,208 +341,119 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
 
   /// ----------------- PROFILE -----------------
   Widget _buildProfile() {
-    return SafeArea(
-      child: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: Column(
-                children: [
-                  const SizedBox(height: 16),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Row(
-                      children: const [
-                        CircleAvatar(
-                          radius: 36,
-                          backgroundColor: primaryColor,
-                          child: Icon(Icons.person, color: Colors.white, size: 40),
-                        ),
-                        SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Your Profile',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  // Profile cards layout - two per row
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Column(
-                      children: [
-                        // Row 1: Edit Profile and Points & Rewards
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildProfileCard(
-                                icon: Icons.edit,
-                                title: 'Edit Profile',
-                                subtitle: '',
-                                onTap: () => Navigator.pushNamed(context, '/profileUpdate'),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _buildProfileCard(
-                                icon: Icons.emoji_events,
-                                title: 'Jasho Points',
-                                subtitle: '',
-                                onTap: () => Navigator.pushNamed(context, '/gamification'),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        // Row 2: Savings and Loans
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildProfileCard(
-                                icon: Icons.savings,
-                                title: 'Savings',
-                                subtitle: '',
-                                onTap: () => Navigator.pushNamed(context, '/savings'),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _buildProfileCard(
-                                icon: Icons.account_balance,
-                                title: 'Loans',
-                                subtitle: '',
-                                onTap: () => Navigator.pushNamed(context, '/loans'),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        // Row 3: Insurance and Help & Support
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildProfileCard(
-                                icon: Icons.health_and_safety,
-                                title: 'Insurance',
-                                subtitle: '',
-                                onTap: () => Navigator.pushNamed(context, '/insurance'),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: _buildProfileCard(
-                                icon: Icons.help,
-                                title: 'Help',
-                                subtitle: '',
-                                onTap: () => Navigator.pushNamed(context, '/help'),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+    return Column(
+      children: [
+        const SizedBox(height: 16),
+        Row(
+          children: const [
+            SizedBox(width: 16),
+            CircleAvatar(
+              radius: 36,
+              backgroundColor: primaryColor,
+              child: Icon(Icons.person, color: Colors.white, size: 40),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => Navigator.pushNamed(context, '/changePassword'),
-                    icon: const Icon(Icons.lock),
-                    label: const Text('Password'),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => Navigator.pushNamed(context, '/logout'),
-                    icon: const Icon(Icons.logout, color: Colors.red),
-                    label: const Text('Logout'),
-                  ),
-                ),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProfileCard({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              spreadRadius: 1,
-              blurRadius: 10,
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                icon,
-                color: primaryColor,
-                size: 24,
-              ),
-            ),
-            const SizedBox(width: 16),
+            SizedBox(width: 12),
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
+              child: Text(
+                'Your Profile',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios,
-              size: 16,
-              color: Colors.grey[400],
             ),
           ],
         ),
-      ),
+        const SizedBox(height: 16),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.pushNamed(context, '/profileUpdate'),
+                  icon: const Icon(Icons.edit),
+                  label: const Text('Edit'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.pushNamed(context, '/gamification'),
+                  icon: const Icon(Icons.emoji_events),
+                  label: const Text('Points'),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.pushNamed(context, '/savings'),
+                  icon: const Icon(Icons.savings),
+                  label: const Text('Savings'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.pushNamed(context, '/loans'),
+                  icon: const Icon(Icons.account_balance),
+                  label: const Text('Loans'),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.pushNamed(context, '/insurance'),
+                  icon: const Icon(Icons.health_and_safety),
+                  label: const Text('Insurance'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.pushNamed(context, '/help'),
+                  icon: const Icon(Icons.help),
+                  label: const Text('Help'),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const Spacer(),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16),
+          child: Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.pushNamed(context, '/changePassword'),
+                  icon: const Icon(Icons.lock),
+                  label: const Text('Password'),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.pushNamed(context, '/logout'),
+                  icon: const Icon(Icons.logout, color: Colors.red),
+                  label: const Text('Logout'),
+                ),
+              ),
+            ],
+          ),
+        )
+      ],
     );
   }
 
@@ -633,7 +463,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
       padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(color: Colors.white, boxShadow: [
         BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withAlpha(26),
             spreadRadius: 1,
             blurRadius: 10),
       ]),
@@ -656,7 +486,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
     return GestureDetector(
       onTap: () => setState(() => _selectedIndex = index),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
             color: isSelected ? lightBlueBackground : Colors.transparent,
             borderRadius: BorderRadius.circular(20)),
@@ -664,18 +494,14 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon,
-                color: isSelected ? primaryColor : Colors.grey[600], size: 24),
-            const SizedBox(height: 2),
-            Flexible(
-              child: Text(label,
-                  style: TextStyle(
-                      color: isSelected ? primaryColor : Colors.grey[600],
-                      fontSize: 10,
-                      fontWeight:
-                          isSelected ? FontWeight.bold : FontWeight.normal),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1),
-            ),
+                color: isSelected ? primaryColor : Colors.grey[600], size: 26),
+            const SizedBox(height: 4),
+            Text(label,
+                style: TextStyle(
+                    color: isSelected ? primaryColor : Colors.grey[600],
+                    fontSize: 12,
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal)),
           ],
         ),
       ),
@@ -692,27 +518,26 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
 
   Widget _buildInsightsCard() {
     return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+          BoxShadow(color: Colors.black.withAlpha(13),
             spreadRadius: 1,
             blurRadius: 10,
           ),
         ],
       ),
       child: Row(
-        children: [
-          const Icon(Icons.insights, color: primaryColor),
-          const SizedBox(width: 12),
+        children: const [
+          Icon(Icons.insights, color: primaryColor),
+          SizedBox(width: 12),
           Expanded(
             child: Text(
               'You earned 20% more than last week, save KES 500 to reach goal.',
-              style: TextStyle(fontSize: 14.sp),
-              overflow: TextOverflow.visible,
+              style: TextStyle(fontSize: 14),
             ),
           ),
         ],
@@ -745,8 +570,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+          BoxShadow(color: Colors.black.withAlpha(13),
             spreadRadius: 1,
             blurRadius: 10,
           ),
@@ -799,71 +623,32 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+          BoxShadow(color: Colors.black.withAlpha(13),
             spreadRadius: 1,
             blurRadius: 10,
           ),
         ],
       ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          if (constraints.maxWidth > 300) {
-            // Horizontal layout for larger screens
-            return Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Column(
-                  children: [
-                    Text('Today\'s gigs', style: TextStyle(fontSize: 12.sp)),
-                    Text('$todayJobs', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                Column(
-                  children: [
-                    Text('Active', style: TextStyle(fontSize: 12.sp)),
-                    Text('$inProgress', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                TextButton(
-                  onPressed: () => Navigator.pushNamed(context, '/jobs'),
-                  child: Text('View jobs', style: TextStyle(fontSize: 12.sp)),
-                ),
-              ],
-            );
-          } else {
-            // Vertical layout for smaller screens
-            return Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Column(
-                      children: [
-                        Text('Today\'s gigs', style: TextStyle(fontSize: 12.sp)),
-                        Text('$todayJobs', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Text('Active', style: TextStyle(fontSize: 12.sp)),
-                        Text('$inProgress', style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: TextButton(
-                    onPressed: () => Navigator.pushNamed(context, '/jobs'),
-                    child: Text('View jobs', style: TextStyle(fontSize: 14.sp)),
-                  ),
-                ),
-              ],
-            );
-          }
-        },
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          Column(
+            children: [
+              const Text('Today\'s gigs'),
+              Text('$todayJobs', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          Column(
+            children: [
+              const Text('Active'),
+              Text('$inProgress', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          TextButton(
+            onPressed: () => Navigator.pushNamed(context, '/jobs'),
+            child: const Text('View jobs'),
+          ),
+        ],
       ),
     );
   }

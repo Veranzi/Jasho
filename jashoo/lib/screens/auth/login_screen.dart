@@ -145,7 +145,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     final password = passwordController.text;
                     try {
                       final resp = phone.contains('@')
-                          ? await ApiService().login(email: phone, password: password)
+                          ? await ApiService().login(email: phone, password: password) // This is correct for email
                           : await ApiService().loginWithPhone(phoneNumber: phone, password: password, rememberMe: _rememberMe);
                       if (resp['success'] == true) {
                         if (!mounted) return;

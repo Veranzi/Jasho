@@ -1,9 +1,10 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/savings_provider.dart';
 import '../../providers/gamification_provider.dart';
 import '../../widgets/skeleton.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SavingsScreen extends StatefulWidget {
   const SavingsScreen({super.key});
@@ -28,9 +29,8 @@ class _SavingsScreenState extends State<SavingsScreen> {
     final savings = context.watch<SavingsProvider>();
     return Scaffold(
       appBar: AppBar(
-        title: Image.asset('assets/logo1.png', height: 28),
-        centerTitle: true,
-        backgroundColor: const Color(0xFF10B981),
+        title: const Text('Savings'),
+        backgroundColor: const Color(0xFF0D47A1),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _openCreateGoalSheet(context, savings),
@@ -44,14 +44,14 @@ class _SavingsScreenState extends State<SavingsScreen> {
           children: [
             _PointsFromSavings(points: savings.pointsEarnedFromSavings),
             const SizedBox(height: 16),
-          const _SectionTitle('Your goals'),
+            const _SectionTitle('Your goals'),
             const SizedBox(height: 8),
             _GoalsList(
               goals: savings.goals,
               onContribute: (id) => _contributeDialog(context, id),
             ),
             const SizedBox(height: 16),
-          const _SectionTitle('Hustle breakdown'),
+            const _SectionTitle('Hustle breakdown'),
             const SizedBox(height: 8),
             _HustleBreakdown(data: savings.hustleSavings),
             const SizedBox(height: 80),
@@ -180,9 +180,9 @@ class _PointsFromSavings extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: const Color(0xFFE6FFF5),
+        color: Colors.blue.shade50,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFBBF7D0)),
+        border: Border.all(color: Colors.blue.shade100),
       ),
       padding: const EdgeInsets.all(16),
       child: Row(
@@ -193,11 +193,11 @@ class _PointsFromSavings extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                const Text(
                   'Points earned from savings',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.sp),
+                  style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                Text('$points pts', style: TextStyle(fontSize: 12.sp)),
+                Text('$points pts'),
               ],
             ),
           )
@@ -253,9 +253,7 @@ class _GoalsList extends StatelessWidget {
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Theme.of(context).dividerColor.withOpacity(0.2),
-            ),
+            border: Border.all(color: Theme.of(context).dividerColor.withAlpha(51)),
           ),
           padding: const EdgeInsets.all(12),
           child: Column(
@@ -314,9 +312,7 @@ class _HustleBreakdown extends StatelessWidget {
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: Theme.of(context).dividerColor.withOpacity(0.2),
-          ),
+          border: Border.all(color: Theme.of(context).dividerColor.withAlpha(51)),
         ),
         child: const Text('No hustle breakdown yet.'),
       );
@@ -329,9 +325,7 @@ class _HustleBreakdown extends StatelessWidget {
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: Theme.of(context).dividerColor.withOpacity(0.2),
-            ),
+            border: Border.all(color: Theme.of(context).dividerColor.withAlpha(51)),
           ),
           child: Row(
             children: [

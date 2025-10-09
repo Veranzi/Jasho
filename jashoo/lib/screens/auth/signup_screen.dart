@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
-import '../../providers/auth_provider.dart' as app_auth;
 import '../../services/api_service.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -195,61 +193,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   const SizedBox(height: 30),
 
                   ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        if (selectedHustles.isEmpty) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("Please select at least one hustle")),
-                          );
-                          return;
-                        }
-                        if (_fullPhoneE164 == null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("Please enter a valid phone number")),
-                          );
-                          return;
-                        }
-                        if (selectedCountry == null ||
-                            selectedCounty == null ||
-                            selectedWard == null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("Please complete location details")),
-                          );
-                          return;
-                        }
-
-                        () async {
-                          final fullLocation = '${selectedCountry!}, ${selectedCounty!}, ${selectedWard!}';
-                          try {
-                            final resp = await ApiService().register(
-                              email: emailController.text.trim(),
-                              password: passwordController.text,
-                              fullName: usernameController.text.trim(),
-                              phoneNumber: _fullPhoneE164!,
-                              location: fullLocation,
-                              skills: selectedHustles,
-                            );
-                            if (resp['success'] == true) {
-                              if (!mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Account created')),
-                              );
-                              Navigator.of(context).pop();
-                            } else {
-                              if (!mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(resp['message'] ?? 'Registration failed')),
-                              );
-                            }
-                          } catch (e) {
-                            if (!mounted) return;
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Error: $e')),
-                            );
-                          }
-                        }();
-                      }
-                    },
+                    onPressed: _handleSignup,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF10B981),
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -284,6 +228,60 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _handleSignup() async {
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
+    if (selectedHustles.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select at least one hustle")),
+      );
+      return;
+    }
+    if (_fullPhoneE164 == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter a valid phone number")),
+      );
+      return;
+    }
+    if (selectedCountry == null || selectedCounty == null || selectedWard == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please complete location details")),
+      );
+      return;
+    }
+
+    final fullLocation = '${selectedCountry!}, ${selectedCounty!}, ${selectedWard!}';
+    try {
+      final resp = await ApiService().register(
+        email: emailController.text.trim(),
+        password: passwordController.text,
+        fullName: usernameController.text.trim(),
+        phoneNumber: _fullPhoneE164!,
+        location: fullLocation,
+        skills: selectedHustles,
+      );
+
+      if (!mounted) return;
+
+      if (resp['success'] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Account created')),
+        );
+        Navigator.of(context).pop();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(resp['message'] ?? 'Registration failed')),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
   }
 
   // Helpers ----------------

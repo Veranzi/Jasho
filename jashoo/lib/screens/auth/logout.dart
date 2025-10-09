@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../providers/auth_provider.dart';
 
 class LogoutScreen extends StatelessWidget {
   const LogoutScreen({super.key});
 
-  void _handleLogout(BuildContext context) {
-    // TODO: clear user session or tokens if you’re storing them
-    // For now, just redirect to login
+  Future<void> _handleLogout(BuildContext context) async {
+    // Clear user session and tokens
+    final authProvider = context.read<AuthProvider>();
+    await authProvider.logout();
 
     Navigator.pushNamedAndRemoveUntil(
       context,

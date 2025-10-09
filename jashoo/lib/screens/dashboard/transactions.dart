@@ -97,7 +97,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
             onPressed: _exportAsPdf,
             style: OutlinedButton.styleFrom(
               foregroundColor: Colors.white,
-              side: BorderSide(color: Colors.white.withOpacity(0.5)),
+              side: BorderSide(color: Colors.white.withAlpha(128)),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),
             ),
@@ -110,7 +110,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
             onPressed: () => Navigator.pushNamed(context, '/supportChat'),
             style: OutlinedButton.styleFrom(
               foregroundColor: Colors.white,
-              side: BorderSide(color: Colors.white.withOpacity(0.5)),
+              side: BorderSide(color: Colors.white.withAlpha(128)),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),
             ),
@@ -210,8 +210,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
         children: [
           Text(
             "WALLET BALANCE (as of Now)",
-            style:
-                TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
+            style: TextStyle(color: Colors.white.withAlpha(204), fontSize: 14),
           ),
           const SizedBox(height: 10),
           Row(
@@ -233,7 +232,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
                     onPressed: () {},
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      side: BorderSide(color: Colors.white.withOpacity(0.5)),
+                      side: BorderSide(color: Colors.white.withAlpha(128)),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20)),
                     ),
@@ -403,8 +402,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+          BoxShadow(color: Colors.black.withAlpha(26),
               spreadRadius: 1,
               blurRadius: 10)
         ],

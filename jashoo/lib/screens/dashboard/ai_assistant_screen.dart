@@ -52,8 +52,7 @@ class AiAssistantScreen extends StatelessWidget {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
-                      BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                      BoxShadow(color: Colors.black.withAlpha(13),
                           spreadRadius: 1,
                           blurRadius: 10),
                     ],
@@ -125,8 +124,7 @@ class AiAssistantScreen extends StatelessWidget {
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
-                      BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                      BoxShadow(color: Colors.black.withAlpha(13),
                           spreadRadius: 1,
                           blurRadius: 10)
                     ],
@@ -208,8 +206,7 @@ class AiAssistantScreen extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+          BoxShadow(color: Colors.black.withAlpha(13),
               spreadRadius: 1,
               blurRadius: 10)
         ],

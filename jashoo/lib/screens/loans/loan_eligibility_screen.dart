@@ -4,7 +4,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 
 class LoanEligibilityScreen extends StatefulWidget {
   const LoanEligibilityScreen({super.key});
@@ -157,8 +156,7 @@ class _LoanEligibilityScreenState extends State<LoanEligibilityScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.grey[300]!),
         boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+          BoxShadow(color: Colors.grey.withAlpha(26),
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 2),
@@ -264,8 +262,7 @@ class _LoanEligibilityScreenState extends State<LoanEligibilityScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.grey[300]!),
         boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+          BoxShadow(color: Colors.grey.withAlpha(26),
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 2),
@@ -285,7 +282,7 @@ class _LoanEligibilityScreenState extends State<LoanEligibilityScreen> {
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<String>(
-            value: _selectedEvidenceType,
+            initialValue: _selectedEvidenceType,
             decoration: const InputDecoration(
               labelText: 'Select evidence type',
               border: OutlineInputBorder(),
@@ -350,9 +347,9 @@ class _LoanEligibilityScreenState extends State<LoanEligibilityScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF10B981).withOpacity(0.1),
+        color: const Color(0xFF10B981).withAlpha(26),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFF10B981).withOpacity(0.3)),
+        border: Border.all(color: const Color(0xFF10B981).withAlpha(77)),
       ),
       child: Row(
         children: [
@@ -381,8 +378,7 @@ class _LoanEligibilityScreenState extends State<LoanEligibilityScreen> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.grey[300]!),
         boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+          BoxShadow(color: Colors.grey.withAlpha(26),
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, 2),

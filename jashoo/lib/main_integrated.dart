@@ -29,6 +29,8 @@ Future<void> _initializeServices() async {
 }
 
 class IntegratedJashooApp extends StatelessWidget {
+  const IntegratedJashooApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -55,6 +57,8 @@ class IntegratedJashooApp extends StatelessWidget {
 }
 
 class AppInitializer extends StatefulWidget {
+  const AppInitializer({super.key});
+
   @override
   _AppInitializerState createState() => _AppInitializerState();
 }
@@ -91,63 +95,28 @@ class _AppInitializerState extends State<AppInitializer> {
   }
 
   Future<void> _loadUserData() async {
-    try {
-      // Load user profile
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-      await userProvider.loadProfile();
-
-      // Load wallet data
-      final walletProvider = Provider.of<WalletProvider>(context, listen: false);
-      await walletProvider.loadBalance();
-      await walletProvider.loadTransactions();
-
-      // Load other data in parallel
-      await Future.wait([
-        _loadJobsData(),
-        _loadSavingsData(),
-        _loadGamificationData(),
-        _loadAiData(),
-      ]);
-    } catch (e) {
-      print('Error loading user data: $e');
+    // A helper to safely execute data loading functions.
+    Future<void> _safeLoad(String name, Future<void> Function() loader) async {
+      try {
+        await loader();
+      } catch (e) {
+        print('Error loading $name data: $e');
+      }
     }
-  }
 
-  Future<void> _loadJobsData() async {
-    try {
-      final jobsProvider = Provider.of<JobsProvider>(context, listen: false);
-      await jobsProvider.loadJobs();
-    } catch (e) {
-      print('Error loading jobs data: $e');
-    }
-  }
+    // Load initial data sequentially.
+    await _safeLoad('user profile', () => context.read<UserProvider>().loadProfile());
+    await _safeLoad('wallet balance', () => context.read<WalletProvider>().loadBalance());
+    await _safeLoad('wallet transactions', () => context.read<WalletProvider>().loadTransactions());
 
-  Future<void> _loadSavingsData() async {
-    try {
-      final savingsProvider = Provider.of<SavingsProvider>(context, listen: false);
-      await savingsProvider.loadSavingsGoals();
-      await savingsProvider.loadLoanRequests();
-    } catch (e) {
-      print('Error loading savings data: $e');
-    }
-  }
-
-  Future<void> _loadGamificationData() async {
-    try {
-      final gamificationProvider = Provider.of<GamificationProvider>(context, listen: false);
-      await gamificationProvider.loadProfile();
-    } catch (e) {
-      print('Error loading gamification data: $e');
-    }
-  }
-
-  Future<void> _loadAiData() async {
-    try {
-      final aiProvider = Provider.of<AiProvider>(context, listen: false);
-      await aiProvider.loadSuggestions();
-    } catch (e) {
-      print('Error loading AI data: $e');
-    }
+    // Load remaining data in parallel for better performance.
+    await Future.wait([
+      _safeLoad('jobs', () => context.read<JobsProvider>().loadJobs()),
+      _safeLoad('savings goals', () => context.read<SavingsProvider>().loadSavingsGoals()),
+      _safeLoad('loan requests', () => context.read<SavingsProvider>().loadLoanRequests()),
+      _safeLoad('gamification', () => context.read<GamificationProvider>().loadProfile()),
+      _safeLoad('AI suggestions', () => context.read<AiProvider>().loadSuggestions()),
+    ]);
   }
 
   @override
@@ -180,7 +149,7 @@ class _AppInitializerState extends State<AppInitializer> {
         if (authProvider.isLoggedIn) {
           return MainAppScreen();
         } else {
-          return LoginScreen();
+          return LoginScreen(onLoginSuccess: _loadUserData);
         }
       },
     );
@@ -188,6 +157,8 @@ class _AppInitializerState extends State<AppInitializer> {
 }
 
 class MainAppScreen extends StatelessWidget {
+  const MainAppScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -267,7 +238,7 @@ class MainAppScreen extends StatelessWidget {
               children: [
                 Text(
                   'Welcome, ${profile.fullName}!',
-                  style: Theme.of(context).textTheme.headline6,
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
                 SizedBox(height: 8),
                 Text('Email: ${profile.email ?? 'N/A'}'),
@@ -326,7 +297,7 @@ class MainAppScreen extends StatelessWidget {
                   children: [
                     Text(
                       'Wallet Balance',
-                      style: Theme.of(context).textTheme.headline6,
+                      style: Theme.of(context).textTheme.titleLarge,
                     ),
                     ElevatedButton(
                       onPressed: () => walletProvider.toggleCurrency(),
@@ -337,7 +308,7 @@ class MainAppScreen extends StatelessWidget {
                 SizedBox(height: 8),
                 Text(
                   '${walletProvider.currentBalance.toStringAsFixed(2)} ${walletProvider.getCurrencySymbol()}',
-                  style: Theme.of(context).textTheme.headline4,
+                  style: Theme.of(context).textTheme.headlineMedium,
                 ),
                 SizedBox(height: 8),
                 Text('KES: ${balance.kesBalance.toStringAsFixed(2)}'),
@@ -362,7 +333,7 @@ class MainAppScreen extends StatelessWidget {
           children: [
             Text(
               'Quick Actions',
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme.of(context).textTheme.titleLarge,
             ),
             SizedBox(height: 16),
             Row(
@@ -401,7 +372,7 @@ class MainAppScreen extends StatelessWidget {
               children: [
                 Text(
                   'Recent Transactions',
-                  style: Theme.of(context).textTheme.headline6,
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
                 SizedBox(height: 16),
                 if (transactions.isEmpty)
@@ -547,6 +518,9 @@ class MainAppScreen extends StatelessWidget {
 }
 
 class LoginScreen extends StatefulWidget {
+  final Future<void> Function()? onLoginSuccess;
+  const LoginScreen({super.key, this.onLoginSuccess});
+
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
@@ -554,6 +528,9 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _fullNameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _locationController = TextEditingController(text: 'Nairobi, Kenya');
   bool _isLogin = true;
 
   @override
@@ -569,7 +546,7 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             Text(
               _isLogin ? 'Login to Jashoo' : 'Register for Jashoo',
-              style: Theme.of(context).textTheme.headline4,
+              style: Theme.of(context).textTheme.headlineMedium,
             ),
             SizedBox(height: 32),
             TextField(
@@ -580,6 +557,34 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               keyboardType: TextInputType.emailAddress,
             ),
+            if (!_isLogin) ...[
+              SizedBox(height: 16),
+              TextField(
+                controller: _fullNameController,
+                decoration: InputDecoration(
+                  labelText: 'Full Name',
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.name,
+              ),
+              SizedBox(height: 16),
+              TextField(
+                controller: _phoneController,
+                decoration: InputDecoration(
+                  labelText: 'Phone Number (e.g., +254...)' ,
+                  border: OutlineInputBorder(),
+                ),
+                keyboardType: TextInputType.phone,
+              ),
+              SizedBox(height: 16),
+              TextField(
+                controller: _locationController,
+                decoration: InputDecoration(
+                  labelText: 'Location',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
             SizedBox(height: 16),
             TextField(
               controller: _passwordController,
@@ -618,6 +623,9 @@ class _LoginScreenState extends State<LoginScreen> {
               onPressed: () {
                 setState(() {
                   _isLogin = !_isLogin;
+                  // Clear registration fields if switching back to login
+                  _fullNameController.clear();
+                  _phoneController.clear();
                 });
               },
               child: Text(_isLogin ? 'Need an account? Register' : 'Have an account? Login'),
@@ -637,7 +645,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (success) {
       // Reload user data
-      await _loadUserData();
+      await widget.onLoginSuccess?.call();
     }
   }
 
@@ -646,29 +654,14 @@ class _LoginScreenState extends State<LoginScreen> {
     final success = await authProvider.register(
       email: _emailController.text,
       password: _passwordController.text,
-      fullName: 'New User', // You might want to add more fields
-      phoneNumber: '+254700000000',
-      location: 'Nairobi, Kenya',
+      fullName: _fullNameController.text,
+      phoneNumber: _phoneController.text,
+      location: _locationController.text,
     );
 
     if (success) {
       // Reload user data
-      await _loadUserData();
-    }
-  }
-
-  Future<void> _loadUserData() async {
-    try {
-      // Load user profile
-      final userProvider = Provider.of<UserProvider>(context, listen: false);
-      await userProvider.loadProfile();
-
-      // Load wallet data
-      final walletProvider = Provider.of<WalletProvider>(context, listen: false);
-      await walletProvider.loadBalance();
-      await walletProvider.loadTransactions();
-    } catch (e) {
-      print('Error loading user data: $e');
+      await widget.onLoginSuccess?.call();
     }
   }
 }
