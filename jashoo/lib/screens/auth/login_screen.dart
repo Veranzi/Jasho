@@ -3,6 +3,8 @@ import 'signup_screen.dart'; // This navigates to your signup screen
 import 'package:intl_phone_field/intl_phone_field.dart';
 import '../../services/api_service.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:provider/provider.dart';
+import '../../providers/user_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -204,6 +206,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             );
                       if (resp['success'] == true) {
                         if (!mounted) return;
+                        // Load user profile after login
+                        try { await context.read<UserProvider>().loadProfile(); } catch (_) {}
                         Navigator.pushReplacementNamed(context, '/dashboard');
                       } else {
                         if (!mounted) return;

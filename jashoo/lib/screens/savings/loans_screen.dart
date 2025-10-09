@@ -33,6 +33,15 @@ class _LoansScreenState extends State<LoansScreen> {
             const SizedBox(height: 16),
             _AbsaHighlightCard(),
             const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () => Navigator.pushNamed(context, '/loanEligibility'),
+                icon: const Icon(Icons.upload_file),
+                label: const Text('Increase eligibility via SACCO/Chama documents'),
+              ),
+            ),
+            const SizedBox(height: 16),
             _LoanApplicationCard(
               controller: _amountController,
               onSubmit: (amt) {

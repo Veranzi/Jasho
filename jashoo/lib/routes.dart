@@ -21,6 +21,7 @@ import 'screens/wallet/convert_screen.dart';
 import 'screens/wallet/set_pin_screen.dart';
 import 'screens/savings/savings_screen.dart';
 import 'screens/savings/loans_screen.dart';
+import 'screens/loans/loan_eligibility_screen.dart';
 import 'screens/support/support_chat_screen.dart';
 import 'screens/gamification/gamification_screen.dart';
 import 'screens/gamification/leaderboard_screen.dart';
@@ -59,6 +60,7 @@ final Map<String, WidgetBuilder> appRoutes = {
   '/setPin': (_) => const SetPinScreen(),
   '/savings': (_) => const SavingsScreen(),
   '/loans': (_) => const LoansScreen(),
+  '/loanEligibility': (_) => const LoanEligibilityScreen(),
   '/supportChat': (_) => const SupportChatScreen(),
   '/gamification': (_) => const GamificationScreen(),
   '/leaderboard': (_) => const LeaderboardScreen(),
