@@ -17,6 +17,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _isPasswordVisible = false;
   bool _rememberMe = false;
+  String? _fullPhoneE164;
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +68,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   initialCountryCode: 'KE',
                   onChanged: (phone) {
-                    // store full E.164
+                    _fullPhoneE164 = phone.completeNumber;
                   },
                 ),
                 const SizedBox(height: 15),
@@ -144,9 +145,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     final phone = mobileController.text.trim();
                     final password = passwordController.text;
                     try {
-                      final resp = phone.contains('@')
-                          ? await ApiService().login(email: phone, password: password) // This is correct for email
-                          : await ApiService().loginWithPhone(phoneNumber: phone, password: password, rememberMe: _rememberMe);
+                      final bool isEmail = phone.contains('@');
+                      final String phoneForApi = _fullPhoneE164 ?? phone;
+                      final resp = isEmail
+                          ? await ApiService().login(email: phone, password: password)
+                          : await ApiService().loginWithPhone(
+                              phoneNumber: phoneForApi,
+                              password: password,
+                              rememberMe: _rememberMe,
+                            );
                       if (resp['success'] == true) {
                         if (!mounted) return;
                         Navigator.pushReplacementNamed(context, '/dashboard');
