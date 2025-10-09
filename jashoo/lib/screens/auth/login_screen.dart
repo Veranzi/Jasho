@@ -14,9 +14,12 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final mobileController = TextEditingController();
   final passwordController = TextEditingController();
+  final emailController = TextEditingController();
 
   bool _isPasswordVisible = false;
   bool _rememberMe = false;
+  String? _fullPhoneE164;
+  bool _useEmailLogin = false;
 
   @override
   Widget build(BuildContext context) {
@@ -53,23 +56,38 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 25),
 
-                // 3. Mobile Number with country code
-                IntlPhoneField(
-                  controller: mobileController,
-                  decoration: InputDecoration(
-                    labelText: 'Phone Number',
-                    filled: true,
-                    fillColor: Colors.grey.shade100,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
+                // 3. Identifier (email or phone)
+                if (_useEmailLogin)
+                  TextFormField(
+                    controller: emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    decoration: InputDecoration(
+                      labelText: 'Email',
+                      filled: true,
+                      fillColor: Colors.grey.shade100,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
+                  )
+                else
+                  IntlPhoneField(
+                    controller: mobileController,
+                    decoration: InputDecoration(
+                      labelText: 'Phone Number',
+                      filled: true,
+                      fillColor: Colors.grey.shade100,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    initialCountryCode: 'KE',
+                    onChanged: (phone) {
+                      _fullPhoneE164 = phone.completeNumber;
+                    },
                   ),
-                  initialCountryCode: 'KE',
-                  onChanged: (phone) {
-                    // store full E.164
-                  },
-                ),
                 const SizedBox(height: 15),
 
                 // 4. Password
@@ -122,18 +140,34 @@ class _LoginScreenState extends State<LoginScreen> {
                         const Text("Remember me"),
                       ],
                     ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/forgotPassword');
-                      },
-                      child: const Text(
-                        "Forgot password?",
-                        style: TextStyle(
-                          color: Color(0xFF10B981),
-                          fontWeight: FontWeight.w600,
+                    Row(children: [
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            _useEmailLogin = !_useEmailLogin;
+                          });
+                        },
+                        child: Text(
+                          _useEmailLogin ? 'Use phone instead' : 'Use email instead',
+                          style: const TextStyle(
+                            color: Color(0xFF10B981),
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
-                    ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/forgotPassword');
+                        },
+                        child: const Text(
+                          "Forgot password?",
+                          style: TextStyle(
+                            color: Color(0xFF10B981),
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ]),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -141,12 +175,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 // 6. Login button
                 ElevatedButton(
                   onPressed: () async {
-                    final phone = mobileController.text.trim();
                     final password = passwordController.text;
                     try {
-                      final resp = phone.contains('@')
-                          ? await ApiService().login(email: phone, password: password) // This is correct for email
-                          : await ApiService().loginWithPhone(phoneNumber: phone, password: password, rememberMe: _rememberMe);
+                      final resp = _useEmailLogin
+                          ? await ApiService().login(
+                              email: emailController.text.trim(),
+                              password: password,
+                            )
+                          : await ApiService().loginWithPhone(
+                              phoneNumber: (_fullPhoneE164 ?? mobileController.text.trim()),
+                              password: password,
+                              rememberMe: _rememberMe,
+                            );
                       if (resp['success'] == true) {
                         if (!mounted) return;
                         Navigator.pushReplacementNamed(context, '/dashboard');
