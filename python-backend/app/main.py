@@ -21,6 +21,7 @@ def create_app() -> FastAPI:
 
     # Routers will be included below to match Flutter ApiService endpoints
     from .routers import auth, user, wallet, ai, heatmap, chatbot, credit_score, gamification, savings, profile_image, cybersecurity
+    from .routers import jobs
 
     app.include_router(auth.router, prefix=settings.api_prefix + "/auth", tags=["auth"])
     app.include_router(user.router, prefix=settings.api_prefix + "/user", tags=["user"])
@@ -33,6 +34,7 @@ def create_app() -> FastAPI:
     app.include_router(savings.router, prefix=settings.api_prefix + "/savings", tags=["savings"])
     app.include_router(profile_image.router, prefix=settings.api_prefix + "/profile-image", tags=["profile-image"])
     app.include_router(cybersecurity.router, prefix=settings.api_prefix + "/cybersecurity", tags=["cybersecurity"])
+    app.include_router(jobs.router, prefix=settings.api_prefix + "/jobs", tags=["jobs"])
 
     # Static files for uploaded profile images
     app.mount(
