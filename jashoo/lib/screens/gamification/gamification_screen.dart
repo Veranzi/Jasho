@@ -17,7 +17,7 @@ class GamificationScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Jasho Points'),
-        backgroundColor: const Color(0xFF0D47A1),
+        backgroundColor: const Color(0xFF10B981),
         actions: [
           IconButton(
             icon: const Icon(Icons.leaderboard),
@@ -97,7 +97,7 @@ class _HeaderCard extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF0D47A1), Color(0xFF1976D2)],
+          colors: [Color(0xFF10B981), Color(0xFF059669)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

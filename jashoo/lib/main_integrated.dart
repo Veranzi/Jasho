@@ -46,8 +46,19 @@ class IntegratedJashooApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Jashoo - Integrated',
         theme: ThemeData(
-          primarySwatch: Colors.blue,
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF10B981)),
+          useMaterial3: true,
           visualDensity: VisualDensity.adaptivePlatformDensity,
+          appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF10B981), foregroundColor: Colors.white),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF10B981), foregroundColor: Colors.white),
+          ),
+          outlinedButtonTheme: OutlinedButtonThemeData(
+            style: OutlinedButton.styleFrom(foregroundColor: const Color(0xFF10B981), side: const BorderSide(color: Color(0xFF10B981))),
+          ),
+          textButtonTheme: TextButtonThemeData(
+            style: TextButton.styleFrom(foregroundColor: const Color(0xFF10B981)),
+          ),
         ),
         home: AppInitializer(),
         debugShowCheckedModeBanner: false,
