@@ -60,26 +60,26 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
                         runSpacing: 6,
                         children: [
                           for (final skill in (user!.skills)
-                              .take(_showAllSkills ? user.skills.length : 2))
+                              .take(_showAllSkills ? user.skills.length : 1))
                             Chip(
                               label: Text(skill, style: const TextStyle(fontSize: 12)),
                               backgroundColor: const Color(0xFFE8F5E9),
                               side: const BorderSide(color: Color(0xFF10B981)),
                               visualDensity: VisualDensity.compact,
                             ),
-                          if (!_showAllSkills && user.skills.length > 2)
+                          if (!_showAllSkills && user.skills.length > 1)
                             TextButton(
                               onPressed: () => setState(() => _showAllSkills = true),
                               child: const Text('Show all'),
                             ),
-                          if (_showAllSkills && user.skills.length > 2)
+                          if (_showAllSkills && user.skills.length > 1)
                             TextButton(
                               onPressed: () => setState(() => _showAllSkills = false),
                               child: const Text('Show fewer'),
                             ),
                         ],
                       ),
-                    ]
+                    ],
                     const SizedBox(height: 16),
                     const Divider(),
                   ],
