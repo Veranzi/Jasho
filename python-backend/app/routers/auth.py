@@ -88,12 +88,18 @@ def login(req: LoginRequest):
         raise HTTPException(status_code=401, detail={"success": False, "message": "Invalid credentials", "code": "INVALID_CREDENTIALS"})
 
     user_doc = None
-    if req.email:
-        user_doc = UsersRepo.find_by_email(req.email)
-    elif req.phoneNumber:
-        user_doc = UsersRepo.find_by_phone(req.phoneNumber)
+    # Normalize identifiers
+    email_norm = str(req.email).strip().lower() if req.email else None
+    phone_norm = str(req.phoneNumber).strip() if req.phoneNumber else None
 
-    if not user_doc or not UsersRepo.verify_password(req.password, user_doc.get("passwordHash", "")):
+    if email_norm:
+        user_doc = UsersRepo.find_by_email(email_norm)
+    elif phone_norm:
+        user_doc = UsersRepo.find_by_phone(phone_norm)
+
+    # Support both Python ('passwordHash') and legacy Node ('password') hashed fields
+    password_hash = (user_doc or {}).get("passwordHash") or (user_doc or {}).get("password") or ""
+    if not user_doc or not UsersRepo.verify_password(req.password, password_hash):
         raise HTTPException(status_code=401, detail={"success": False, "message": "Invalid credentials", "code": "INVALID_CREDENTIALS"})
 
     # Update last login

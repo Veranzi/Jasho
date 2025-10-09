@@ -174,16 +174,27 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 // 6. Login button
                 ElevatedButton(
-                  onPressed: () async {
+                onPressed: () async {
                     final password = passwordController.text;
                     try {
-                      final resp = _useEmailLogin
+                      if (!_useEmailLogin && (_fullPhoneE164 == null || _fullPhoneE164!.isEmpty)) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Please enter a valid phone number')),
+                        );
+                        return;
+                      }
+                      // Auto-detect email vs phone regardless of toggle
+                      final String identifier = _useEmailLogin
+                          ? emailController.text.trim()
+                          : (_fullPhoneE164 ?? mobileController.text.trim());
+                      final bool isEmail = identifier.contains('@');
+                      final resp = isEmail
                           ? await ApiService().login(
-                              email: emailController.text.trim(),
+                              email: identifier,
                               password: password,
                             )
                           : await ApiService().loginWithPhone(
-                              phoneNumber: (_fullPhoneE164 ?? mobileController.text.trim()),
+                              phoneNumber: identifier,
                               password: password,
                               rememberMe: _rememberMe,
                             );
