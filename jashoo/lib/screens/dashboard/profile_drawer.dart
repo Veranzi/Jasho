@@ -5,8 +5,15 @@ import '../../providers/gamification_provider.dart';
 import '../../providers/user_provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class ProfileDrawer extends StatelessWidget {
+class ProfileDrawer extends StatefulWidget {
   const ProfileDrawer({super.key});
+
+  @override
+  State<ProfileDrawer> createState() => _ProfileDrawerState();
+}
+
+class _ProfileDrawerState extends State<ProfileDrawer> {
+  bool _showAllSkills = false;
 
   @override
   Widget build(BuildContext context) {
@@ -46,16 +53,33 @@ class ProfileDrawer extends StatelessWidget {
                       ),
                       maxLines: 1,
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      "Gig Worker",
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 14.sp,
-                        overflow: TextOverflow.ellipsis,
+                    const SizedBox(height: 8),
+                    if ((user?.skills ?? []).isNotEmpty) ...[
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        children: [
+                          for (final skill in (user!.skills)
+                              .take(_showAllSkills ? user.skills.length : 2))
+                            Chip(
+                              label: Text(skill, style: const TextStyle(fontSize: 12)),
+                              backgroundColor: const Color(0xFFE8F5E9),
+                              side: const BorderSide(color: Color(0xFF10B981)),
+                              visualDensity: VisualDensity.compact,
+                            ),
+                          if (!_showAllSkills && user.skills.length > 2)
+                            TextButton(
+                              onPressed: () => setState(() => _showAllSkills = true),
+                              child: const Text('Show all'),
+                            ),
+                          if (_showAllSkills && user.skills.length > 2)
+                            TextButton(
+                              onPressed: () => setState(() => _showAllSkills = false),
+                              child: const Text('Show fewer'),
+                            ),
+                        ],
                       ),
-                      maxLines: 1,
-                    ),
+                    ]
                     const SizedBox(height: 16),
                     const Divider(),
                   ],
