@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/locale_provider.dart';
 import '../../providers/gamification_provider.dart';
+import '../../providers/user_provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ProfileDrawer extends StatelessWidget {
@@ -11,6 +12,7 @@ class ProfileDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final localeProvider = context.watch<LocaleProvider>();
     final gamificationProvider = context.watch<GamificationProvider>();
+    final user = context.watch<UserProvider>().profile;
     final isEnglish = localeProvider.languageCode == 'en';
 
     return Drawer(
@@ -36,7 +38,7 @@ class ProfileDrawer extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "John Doe",
+                      user?.fullName ?? 'User',
                       style: TextStyle(
                         fontSize: 18.sp,
                         fontWeight: FontWeight.bold,
