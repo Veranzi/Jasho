@@ -236,7 +236,7 @@ class ApiService {
     String? fullName,
     String? location,
   }) async {
-    return await _makeRequest('POST', '/auth/firebase-phone-auth', body: {
+    return await _makeRequest('POST', '/auth/firebase-phone', body: {
       'idToken': idToken,
       if (fullName != null) 'fullName': fullName,
       if (location != null) 'location': location,
