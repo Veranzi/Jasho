@@ -95,7 +95,37 @@ def login(req: LoginRequest):
     if email_norm:
         user_doc = UsersRepo.find_by_email(email_norm)
     elif phone_norm:
-        user_doc = UsersRepo.find_by_phone(phone_norm)
+        # Try multiple reasonable variants to tolerate past formatting
+        variants: list[str] = []
+        raw = phone_norm.replace(" ", "").replace("-", "")
+        variants.append(raw)
+        # Ensure leading '+' for common country codes if missing
+        if raw.startswith("254") and not raw.startswith("+254"):
+            variants.append("+" + raw)
+        if raw.startswith("27") and not raw.startswith("+27"):
+            variants.append("+" + raw)
+        # Kenya: remove trunk '0' after country code (e.g., +2540xxxx -> +254xxxx)
+        if raw.startswith("+2540"):
+            variants.append("+254" + raw[len("+2540"):])
+        # South Africa: remove trunk '0' after country code (e.g., +270xxx -> +27xxx)
+        if raw.startswith("+270"):
+            variants.append("+27" + raw[len("+270"):])
+        # Local numbers to E.164 (Kenya common prefixes 07x/01x)
+        if raw.startswith("07"):
+            variants.append("+254" + raw[1:])
+        if raw.startswith("01"):
+            variants.append("+254" + raw[1:])
+        # Also try collapsing any duplicate variants while preserving order
+        seen: set[str] = set()
+        ordered_variants: list[str] = []
+        for v in variants:
+            if v not in seen:
+                seen.add(v)
+                ordered_variants.append(v)
+        for candidate in ordered_variants:
+            user_doc = UsersRepo.find_by_phone(candidate)
+            if user_doc:
+                break
 
     # Support both Python ('passwordHash') and legacy Node ('password') hashed fields
     password_hash = (user_doc or {}).get("passwordHash") or (user_doc or {}).get("password") or ""
