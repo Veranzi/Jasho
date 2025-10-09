@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'login_screen.dart'; // Make sure this path is correct
+import 'package:provider/provider.dart';
+import '../../providers/auth_provider.dart' as app_auth;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -14,15 +15,25 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Wait for 3 seconds and then navigate to the LoginScreen
-    Timer(
-      const Duration(seconds: 3),
-      () => Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (BuildContext context) => const LoginScreen(),
-        ),
-      ),
-    );
+    _bootstrap();
+  }
+
+  Future<void> _bootstrap() async {
+    // brief splash delay
+    await Future<void>.delayed(const Duration(milliseconds: 800));
+    try {
+      final auth = Provider.of<app_auth.AuthProvider>(context, listen: false);
+      await auth.initialize();
+      if (!mounted) return;
+      if (auth.isLoggedIn) {
+        Navigator.of(context).pushReplacementNamed('/dashboard');
+      } else {
+        Navigator.of(context).pushReplacementNamed('/login');
+      }
+    } catch (_) {
+      if (!mounted) return;
+      Navigator.of(context).pushReplacementNamed('/login');
+    }
   }
 
   @override
