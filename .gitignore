@@ -1,0 +1,15 @@
+node_modules/
+.dart_tool/
+build/
+.idea/
+.vscode/
+
+# iOS/macOS
+**/Pods/
+**/.symlinks/
+**/DerivedData/
+
+# Secrets
+secrets/*.json
+
+

@@ -1,0 +1,126 @@
+﻿name: jashoo
+description: "Jasho - AI-powered financial platform for gig workers in Kenya"
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Core Flutter
+  cupertino_icons: ^1.0.2
+  
+  # Firebase & Backend
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.15.3
+  cloud_firestore: ^4.13.6
+  firebase_storage: ^11.5.6
+  firebase_messaging: ^14.7.10
+  firebase_analytics: ^10.7.4
+  
+  # State Management
+  provider: ^6.1.1
+  riverpod: ^2.4.9
+  flutter_riverpod: ^2.4.9
+  
+  # HTTP & API
+  http: ^1.1.0
+  dio: ^5.4.0
+  retrofit: ^4.0.3
+  
+  # Local Storage
+  shared_preferences: ^2.2.2
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  
+  # Security & Authentication
+  local_auth: ^2.1.6
+  crypto: ^3.0.3
+  encrypt: ^5.0.1
+  pin_code_fields: ^8.0.1
+  
+  # AI & Machine Learning
+  tflite_flutter: ^0.10.4
+  google_mlkit_text_recognition: ^0.9.0
+  google_mlkit_face_detection: ^0.8.0
+  google_mlkit_barcode_scanning: ^0.9.0
+  
+  # Voice & Speech
+  speech_to_text: ^6.6.0
+  flutter_tts: ^3.8.5
+  record: ^5.0.4
+  
+  # Maps & Location
+  google_maps_flutter: ^2.5.0
+  geolocator: ^10.1.0
+  geocoding: ^2.1.1
+  
+  # Camera & Image Processing
+  image_picker: ^1.0.4
+  mobile_scanner: ^3.5.6
+  image: ^4.1.3
+  cached_network_image: ^3.3.0
+  
+  # Blockchain & Cryptocurrency
+  web3dart: ^2.7.3
+  bip39: ^1.0.4
+  
+  # UI Components
+  flutter_svg: ^2.0.9
+  lottie: ^2.7.0
+  shimmer: ^3.0.0
+  flutter_staggered_animations: ^1.1.1
+  flutter_screenutil: ^5.9.0
+  
+  # Charts & Data Visualization
+  fl_chart: ^0.66.0
+  syncfusion_flutter_charts: ^23.2.7
+  
+  # File Handling
+  printing: ^5.11.1
+  file_selector: ^1.0.4
+  path_provider: ^2.1.1
+  permission_handler: ^11.1.0
+  
+  # QR Code & Barcode
+  qr_flutter: ^4.1.0
+  qr_code_scanner: ^1.0.1
+  
+  # Notifications
+  flutter_local_notifications: ^16.3.0
+  
+  # Date & Time
+  intl: ^0.18.0
+  
+  # Utilities
+  uuid: ^4.2.1
+  url_launcher: ^6.2.2
+  package_info_plus: ^4.2.0
+  device_info_plus: ^9.1.1
+  
+  # SMS & Communication
+  sms_advanced: ^1.0.0
+  
+  # Biometric Authentication
+  local_auth_android: ^1.0.20
+  local_auth_ios: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  build_runner: ^2.4.7
+  retrofit_generator: ^8.0.6
+  hive_generator: ^2.0.1
+  json_annotation: ^4.8.1
+  json_serializable: ^6.7.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+    - assets/images/
+    - assets/icons/
+    - assets/animations/
