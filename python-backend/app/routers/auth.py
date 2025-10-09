@@ -88,12 +88,48 @@ def login(req: LoginRequest):
         raise HTTPException(status_code=401, detail={"success": False, "message": "Invalid credentials", "code": "INVALID_CREDENTIALS"})
 
     user_doc = None
-    if req.email:
-        user_doc = UsersRepo.find_by_email(req.email)
-    elif req.phoneNumber:
-        user_doc = UsersRepo.find_by_phone(req.phoneNumber)
+    # Normalize identifiers
+    email_norm = str(req.email).strip().lower() if req.email else None
+    phone_norm = str(req.phoneNumber).strip() if req.phoneNumber else None
 
-    if not user_doc or not UsersRepo.verify_password(req.password, user_doc.get("passwordHash", "")):
+    if email_norm:
+        user_doc = UsersRepo.find_by_email(email_norm)
+    elif phone_norm:
+        # Try multiple reasonable variants to tolerate past formatting
+        variants: list[str] = []
+        raw = phone_norm.replace(" ", "").replace("-", "")
+        variants.append(raw)
+        # Ensure leading '+' for common country codes if missing
+        if raw.startswith("254") and not raw.startswith("+254"):
+            variants.append("+" + raw)
+        if raw.startswith("27") and not raw.startswith("+27"):
+            variants.append("+" + raw)
+        # Kenya: remove trunk '0' after country code (e.g., +2540xxxx -> +254xxxx)
+        if raw.startswith("+2540"):
+            variants.append("+254" + raw[len("+2540"):])
+        # South Africa: remove trunk '0' after country code (e.g., +270xxx -> +27xxx)
+        if raw.startswith("+270"):
+            variants.append("+27" + raw[len("+270"):])
+        # Local numbers to E.164 (Kenya common prefixes 07x/01x)
+        if raw.startswith("07"):
+            variants.append("+254" + raw[1:])
+        if raw.startswith("01"):
+            variants.append("+254" + raw[1:])
+        # Also try collapsing any duplicate variants while preserving order
+        seen: set[str] = set()
+        ordered_variants: list[str] = []
+        for v in variants:
+            if v not in seen:
+                seen.add(v)
+                ordered_variants.append(v)
+        for candidate in ordered_variants:
+            user_doc = UsersRepo.find_by_phone(candidate)
+            if user_doc:
+                break
+
+    # Support both Python ('passwordHash') and legacy Node ('password') hashed fields
+    password_hash = (user_doc or {}).get("passwordHash") or (user_doc or {}).get("password") or ""
+    if not user_doc or not UsersRepo.verify_password(req.password, password_hash):
         raise HTTPException(status_code=401, detail={"success": False, "message": "Invalid credentials", "code": "INVALID_CREDENTIALS"})
 
     # Update last login
