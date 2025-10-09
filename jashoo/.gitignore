@@ -43,3 +43,13 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.env
+env/
