@@ -112,7 +112,12 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                       initialCountryCode: selectedCountry == 'South Africa' ? 'ZA' : 'KE',
                       onChanged: (phone) {
-                        _fullPhoneE164 = phone.completeNumber;
+                        // Normalize to E.164 without trunk '0' after country code
+                        final rawDigits = phone.number.replaceAll(RegExp(r'[^0-9]'), '');
+                        final withoutTrunkZero = rawDigits.startsWith('0')
+                            ? rawDigits.substring(1)
+                            : rawDigits;
+                        _fullPhoneE164 = '${phone.countryCode}$withoutTrunkZero';
                       },
                       validator: (val) {
                         if (val == null || val.number.isEmpty) {

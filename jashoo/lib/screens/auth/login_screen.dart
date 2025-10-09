@@ -85,7 +85,11 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     initialCountryCode: 'KE',
                     onChanged: (phone) {
-                      _fullPhoneE164 = phone.completeNumber;
+                      final rawDigits = phone.number.replaceAll(RegExp(r'[^0-9]'), '');
+                      final withoutTrunkZero = rawDigits.startsWith('0')
+                          ? rawDigits.substring(1)
+                          : rawDigits;
+                      _fullPhoneE164 = '${phone.countryCode}$withoutTrunkZero';
                     },
                   ),
                 const SizedBox(height: 15),
