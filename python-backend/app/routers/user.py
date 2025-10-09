@@ -2,6 +2,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 from ..middleware.auth import get_current_user
+from ..services.repos import UsersRepo
 
 router = APIRouter()
 
@@ -31,12 +32,13 @@ class UserProfile(BaseModel):
 
 @router.get('/profile')
 async def get_profile(user=Depends(get_current_user)):
+    u = UsersRepo.find_by_id(user['userId']) or {}
     profile = UserProfile(
         userId=user['userId'],
-        fullName='Demo User',
-        skills=['Boda Rider', 'Mama Fua'],
-        location='Nairobi, Westlands',
-        email='demo@example.com',
+        fullName=str(u.get('fullName', '')) or 'User',
+        skills=list(u.get('skills', [])),
+        location=str(u.get('location', 'Unknown')),
+        email=u.get('email'),
     )
     return {'success': True, 'data': {'profile': profile.model_dump()}}
 
@@ -49,8 +51,18 @@ class UpdateProfileRequest(BaseModel):
 
 
 @router.put('/profile')
-async def update_profile(_: UpdateProfileRequest, user=Depends(get_current_user)):
-    # Echo back a demo profile
+async def update_profile(req: UpdateProfileRequest, user=Depends(get_current_user)):
+    updates = {}
+    if req.fullName is not None:
+        updates['fullName'] = req.fullName
+    if req.skills is not None:
+        updates['skills'] = req.skills
+    if req.location is not None:
+        updates['location'] = req.location
+    if req.coordinates is not None:
+        updates['coordinates'] = req.coordinates
+    if updates:
+        UsersRepo.update_profile(user['userId'], updates)
     return await get_profile(user)
 
 

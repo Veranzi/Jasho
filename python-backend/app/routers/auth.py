@@ -3,6 +3,8 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, EmailStr
 from jose import jwt
 from ..config import settings
+from ..services.firebase import get_db
+from ..services.repos import UsersRepo, WalletsRepo, CreditRepo
 
 
 router = APIRouter()
@@ -38,26 +40,68 @@ def issue_token(user_id: str, days: int | None = None) -> str:
 
 @router.post("/register")
 def register(req: RegisterRequest):
-    user = {
-        "userId": f"user_{int(datetime.utcnow().timestamp())}",
-        "email": req.email,
+    if get_db() is None:
+        raise HTTPException(status_code=503, detail={"success": False, "message": "Firebase unavailable", "code": "FIREBASE_UNAVAILABLE"})
+
+    # Check existing
+    if UsersRepo.find_by_email(req.email) or UsersRepo.find_by_phone(req.phoneNumber):
+        raise HTTPException(status_code=400, detail={"success": False, "message": "Email or phone already registered", "code": "USER_EXISTS"})
+
+    user_id = f"user_{int(datetime.utcnow().timestamp())}"
+    user_doc = {
+        "email": req.email.lower(),
+        "phoneNumber": req.phoneNumber,
+        "passwordHash": UsersRepo.hash_password(req.password),
         "fullName": req.fullName,
+        "location": req.location,
+        "skills": req.skills or [],
+        "dateOfBirth": req.dateOfBirth,
+        "gender": req.gender,
+        "verificationLevel": "unverified",
+        "isActive": True,
+        "isBlocked": False,
+        "isLocked": False,
+        "lastLogin": None,
+        "lastActive": None,
+        "isVerified": False,
     }
-    token = issue_token(user["userId"]) 
+    UsersRepo.create_user(user_id, user_doc)
+
+    # Initialize wallet and credit score
+    WalletsRepo.get_or_create(user_id)
+    CreditRepo.get_or_create(user_id)
+
+    token = issue_token(user_id)
+    user_public = {"userId": user_id, "email": req.email.lower(), "fullName": req.fullName}
     return {
         "success": True,
         "message": "User registered successfully. Please verify your email and phone number.",
-        "data": {"token": token, "user": user, "verificationRequired": {"email": True, "phone": True}},
+        "data": {"token": token, "user": user_public, "verificationRequired": {"email": True, "phone": True}},
     }
 
 
 @router.post("/login")
 def login(req: LoginRequest):
+    if get_db() is None:
+        raise HTTPException(status_code=503, detail={"success": False, "message": "Firebase unavailable", "code": "FIREBASE_UNAVAILABLE"})
     if not req.password:
         raise HTTPException(status_code=401, detail={"success": False, "message": "Invalid credentials", "code": "INVALID_CREDENTIALS"})
-    user = {"userId": "user_demo", "email": req.email or "", "fullName": "Demo User"}
-    token = issue_token(user["userId"], 30 if req.rememberMe else settings.jwt_exp_days)
-    return {"success": True, "message": "Login successful", "data": {"token": token, "user": user, "expiresIn": f"{30 if req.rememberMe else settings.jwt_exp_days}d"}}
+
+    user_doc = None
+    if req.email:
+        user_doc = UsersRepo.find_by_email(req.email)
+    elif req.phoneNumber:
+        user_doc = UsersRepo.find_by_phone(req.phoneNumber)
+
+    if not user_doc or not UsersRepo.verify_password(req.password, user_doc.get("passwordHash", "")):
+        raise HTTPException(status_code=401, detail={"success": False, "message": "Invalid credentials", "code": "INVALID_CREDENTIALS"})
+
+    # Update last login
+    UsersRepo.update_profile(user_doc["userId"], {"lastLogin": datetime.utcnow()})
+
+    token = issue_token(user_doc["userId"], 30 if req.rememberMe else settings.jwt_exp_days)
+    user_public = {"userId": user_doc["userId"], "email": user_doc.get("email"), "fullName": user_doc.get("fullName")}
+    return {"success": True, "message": "Login successful", "data": {"token": token, "user": user_public, "expiresIn": f"{30 if req.rememberMe else settings.jwt_exp_days}d"}}
 
 
 @router.post("/logout")
