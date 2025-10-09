@@ -15,7 +15,7 @@ class TransactionHistoryScreen extends StatefulWidget {
 class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
   // Define colors and styles for consistency
   static const Color primaryColor = Color(0xFF10B981);
-  static const Color pendingColor = Colors.blueAccent;
+  static const Color pendingColor = Color(0xFF10B981);
 
   // Dummy data for the transaction list
   final List<Map<String, dynamic>> _transactions = [
@@ -431,7 +431,7 @@ class _TransactionHistoryScreenState extends State<TransactionHistoryScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFE3F2FD) : Colors.transparent,
+          color: isSelected ? const Color(0xFFE8F5E9) : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Column(

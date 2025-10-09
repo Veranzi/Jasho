@@ -30,7 +30,7 @@ class _SavingsScreenState extends State<SavingsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Savings'),
-        backgroundColor: const Color(0xFF0D47A1),
+        backgroundColor: const Color(0xFF10B981),
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _openCreateGoalSheet(context, savings),
@@ -180,14 +180,14 @@ class _PointsFromSavings extends StatelessWidget {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.blue.shade50,
+        color: Colors.green.shade50,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.blue.shade100),
+        border: Border.all(color: Colors.green.shade100),
       ),
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          const Icon(Icons.workspace_premium, color: Color(0xFF0D47A1)),
+          const Icon(Icons.workspace_premium, color: Color(0xFF10B981)),
           const SizedBox(width: 12),
           Expanded(
             child: Column(

@@ -22,7 +22,7 @@ class LogoutScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Logout"),
-        backgroundColor: Colors.blue,
+        backgroundColor: const Color(0xFF10B981),
       ),
       body: Center(
         child: Card(
