@@ -167,7 +167,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       SizedBox(height: 8.h),
                       // Subtitle
                       Text(
-                        'Sign in to continue where you left off.',
+                        'Easier Income Tracking',
                         style: TextStyle(
                           color: Colors.black.withOpacity(0.65),
                           fontSize: 14.sp,
