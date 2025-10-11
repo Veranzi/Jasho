@@ -19,24 +19,28 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     _WorkerShowcase(
       icon: Icons.delivery_dining,
       label: 'Rider',
+      headline: 'power your hustle with smart financial tools',
       backgroundColor: Color(0xFF10B981),
       accentColor: Color(0xFF064E3B),
     ),
     _WorkerShowcase(
       icon: Icons.handyman,
       label: 'Handyman',
+      headline: 'fraud functionality',
       backgroundColor: Color(0xFF0EA5E9),
       accentColor: Color(0xFF075985),
     ),
     _WorkerShowcase(
       icon: Icons.cleaning_services,
       label: 'Cleaner',
+      headline: 'ai forecasting, smart saving',
       backgroundColor: Color(0xFFF59E0B),
       accentColor: Color(0xFF92400E),
     ),
     _WorkerShowcase(
       icon: Icons.local_taxi,
       label: 'Driver',
+      headline: 'Fast, secure payouts when you need them',
       backgroundColor: Color(0xFF8B5CF6),
       accentColor: Color(0xFF4C1D95),
     ),
@@ -142,11 +146,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 }),
               ),
               SizedBox(height: 10.h),
-              Center(
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 6.w),
                 child: Text(
-                  _workers[_currentPage].label,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
+                  _workers[_currentPage].headline,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
                     color: Colors.black87,
                   ),
                 ),
@@ -154,34 +160,49 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               const Spacer(),
 
               // CTA buttons
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFF10B981),
-                        side: const BorderSide(color: Color(0xFF10B981), width: 1.5),
-                        padding: EdgeInsets.symmetric(vertical: 14.h),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
-                      ),
-                      onPressed: () => Navigator.of(context).pushReplacementNamed('/login'),
-                      child: const Text('Login'),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16.r),
+                  border: Border.all(color: Colors.black12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.03),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
                     ),
-                  ),
-                  SizedBox(width: 12.w),
-                  Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF10B981),
-                        foregroundColor: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: 14.h),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+                  ],
+                ),
+                padding: EdgeInsets.all(12.w),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF10B981),
+                          side: const BorderSide(color: Color(0xFF10B981), width: 1.5),
+                          padding: EdgeInsets.symmetric(vertical: 14.h),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+                        ),
+                        onPressed: () => Navigator.of(context).pushReplacementNamed('/login'),
+                        child: const Text('Login'),
                       ),
-                      onPressed: () => Navigator.of(context).pushReplacementNamed('/signup'),
-                      child: const Text('Sign Up'),
                     ),
-                  ),
-                ],
+                    SizedBox(width: 12.w),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF10B981),
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(vertical: 14.h),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
+                        ),
+                        onPressed: () => Navigator.of(context).pushReplacementNamed('/signup'),
+                        child: const Text('Sign Up'),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -280,11 +301,13 @@ class _WorkerCardState extends State<_WorkerCard> with SingleTickerProviderState
 class _WorkerShowcase {
   final IconData icon;
   final String label;
+  final String headline;
   final Color backgroundColor;
   final Color accentColor;
   const _WorkerShowcase({
     required this.icon,
     required this.label,
+    required this.headline,
     required this.backgroundColor,
     required this.accentColor,
   });
