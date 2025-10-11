@@ -28,11 +28,11 @@ class _SplashScreenState extends State<SplashScreen> {
       if (auth.isLoggedIn) {
         Navigator.of(context).pushReplacementNamed('/dashboard');
       } else {
-        Navigator.of(context).pushReplacementNamed('/login');
+        Navigator.of(context).pushReplacementNamed('/welcome');
       }
     } catch (_) {
       if (!mounted) return;
-      Navigator.of(context).pushReplacementNamed('/login');
+      Navigator.of(context).pushReplacementNamed('/welcome');
     }
   }
 
