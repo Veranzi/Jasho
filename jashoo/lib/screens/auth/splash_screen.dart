@@ -20,7 +20,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _bootstrap() async {
     // brief splash delay
-    await Future<void>.delayed(const Duration(milliseconds: 800));
+    await Future<void>.delayed(const Duration(seconds: 2));
     try {
       final auth = Provider.of<app_auth.AuthProvider>(context, listen: false);
       await auth.initialize();
