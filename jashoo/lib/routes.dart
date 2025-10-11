@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:jashoo/screens/auth/splash_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/signup_screen.dart';
+import 'screens/auth/welcome_screen.dart';
 import 'screens/auth/forgot_password_screen.dart';
 import 'screens/auth/change_password_screen.dart';
 import 'screens/dashboard/dashboard_screen.dart';
@@ -37,6 +38,7 @@ import 'screens/dashboard/transactions.dart';
 
 final Map<String, WidgetBuilder> appRoutes = {
   '/splash': (_) => const SplashScreen(), // 👈 new route
+  '/welcome': (_) => const WelcomeScreen(),
   '/login': (_) => const LoginScreen(),
   '/signup': (_) => const SignupScreen(),
   '/forgotPassword': (_) => const ForgotPass(),
