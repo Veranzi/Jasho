@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -11,21 +13,32 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-  final List<String> _backgroundImages = const <String>[
+  static const List<String> _fallbackImages = <String>[
     'assets/login.png',
     'assets/signup.png',
     'assets/sign_illustration.jpg',
     'assets/login_illustration.png',
   ];
 
+  late List<String> _backgroundImages = List<String>.from(_fallbackImages);
+
+  // Captions corresponding to each background image
+  final List<String> _captions = const <String>[
+    'Powering your hustle',
+    'Savings better',
+    'Get Gig',
+    'Smart tool',
+  ];
+
   late final Timer _backgroundTimer;
   int _currentBackgroundIndex = 0;
 
-  static const Color _primaryGreen = Color(0xFF0B9E6D);
+  static const Color _primaryGreen = Color(0xFF10B981);
 
   @override
   void initState() {
     super.initState();
+    _tryLoadBrandImages();
     _backgroundTimer = Timer.periodic(const Duration(seconds: 4), (_) {
       if (!mounted) return;
       setState(() {
@@ -33,6 +46,28 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             (_currentBackgroundIndex + 1) % _backgroundImages.length;
       });
     });
+  }
+
+  Future<void> _tryLoadBrandImages() async {
+    try {
+      final String manifestJson = await rootBundle.loadString('AssetManifest.json');
+      final Map<String, dynamic> manifestMap = json.decode(manifestJson) as Map<String, dynamic>;
+      final List<String> candidates = manifestMap.keys
+          .where((String path) => path.startsWith('assets/') &&
+              (path.toLowerCase().contains('mama') ||
+               path.toLowerCase().contains('baba') ||
+               path.toLowerCase().contains('fua')))
+          .toList()
+        ..sort();
+      if (candidates.isNotEmpty && mounted) {
+        setState(() {
+          _backgroundImages = candidates;
+          _currentBackgroundIndex = 0;
+        });
+      }
+    } catch (_) {
+      // Ignore and keep fallbacks
+    }
   }
 
   @override
@@ -91,7 +126,32 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             ),
           ),
 
-          // 2) Progress dots centered near bottom of background section
+          // 2) Caption text centered near bottom of background section
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: sheetHeight + 52,
+            child: Center(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+                decoration: BoxDecoration(
+                  color: Colors.black.withOpacity(0.35),
+                  borderRadius: BorderRadius.circular(16.r),
+                ),
+                child: Text(
+                  _captions[_currentBackgroundIndex % _captions.length],
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14.sp,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // 3) Progress dots centered near bottom of background section
           Positioned(
             left: 0,
             right: 0,
@@ -116,7 +176,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             ),
           ),
 
-          // 3) Bottom white sheet with content
+          // 4) Bottom white sheet with content
           Positioned(
             left: 0,
             right: 0,
@@ -141,37 +201,48 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 24.h),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       // Back arrow
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back),
-                        color: Colors.black,
-                        splashRadius: 24.r,
-                        onPressed: () {
-                          if (Navigator.of(context).canPop()) {
-                            Navigator.of(context).pop();
-                          }
-                        },
-                      ),
-                      SizedBox(height: 6.h),
-                      // Title
-                      Text(
-                        'Welcome Back',
-                        style: TextStyle(
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: IconButton(
+                          icon: const Icon(Icons.arrow_back),
                           color: Colors.black,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 26.sp,
+                          splashRadius: 24.r,
+                          onPressed: () {
+                            if (Navigator.of(context).canPop()) {
+                              Navigator.of(context).pop();
+                            }
+                          },
                         ),
                       ),
-                      SizedBox(height: 8.h),
-                      // Subtitle
-                      Text(
-                        'Empower your hustle with smart financial tool',
-                        style: TextStyle(
-                          color: Colors.black.withOpacity(0.65),
-                          fontSize: 14.sp,
-                          height: 1.4,
+                      SizedBox(height: 6.h),
+                      // Title + Subtitle centered
+                      Center(
+                        child: Column(
+                          children: [
+                            Text(
+                              'Welcome Back',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 22.sp,
+                              ),
+                            ),
+                            SizedBox(height: 8.h),
+                            Text(
+                              'Empower your hustle with smart financial tool',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black.withOpacity(0.65),
+                                fontSize: 14.sp,
+                                height: 1.4,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       const Spacer(),
@@ -190,13 +261,11 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                           onPressed: () {
                             Navigator.of(context).pushReplacementNamed('/login');
                           },
-                          child: Text(
-                            'Login',
-                            style: TextStyle(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
+                          child: Text('Login',
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.w600,
+                              )),
                         ),
                       ),
                       SizedBox(height: 12.h),
@@ -206,9 +275,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         child: OutlinedButton(
                           style: OutlinedButton.styleFrom(
                             backgroundColor: Colors.white,
-                            foregroundColor: Colors.black,
+                            foregroundColor: _primaryGreen,
                             side: const BorderSide(
-                              color: Color(0x26000000), // #00000026
+                              color: _primaryGreen,
                               width: 1.0,
                             ),
                             padding: EdgeInsets.symmetric(vertical: 14.h),
@@ -217,13 +286,13 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             ),
                           ),
                           onPressed: () {
-                            Navigator.of(context).pushReplacementNamed('/login');
+                            Navigator.of(context).pushReplacementNamed('/signup');
                           },
                           child: Text(
                             'Sign Up',
                             style: TextStyle(
                               fontSize: 16.sp,
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),

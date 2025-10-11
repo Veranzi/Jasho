@@ -41,7 +41,11 @@ class _SignupScreenState extends State<SignupScreen> {
     "Mechanic",
     "Tailor",
     "Hairdresser",
+    "Other",
   ];
+
+  // Custom hustle input when "Other" is selected
+  final TextEditingController otherHustleController = TextEditingController();
 
   // Country -> Counties/Provinces
   final Map<String, List<String>> countryRegions = {
@@ -137,6 +141,24 @@ class _SignupScreenState extends State<SignupScreen> {
 
                   // Hustles
                   _buildMultiSelectField("Your Hustles", hustles),
+                  if (selectedHustles.contains('Other'))
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: TextFormField(
+                        controller: otherHustleController,
+                        decoration: const InputDecoration(
+                          labelText: 'Specify your hustle',
+                          prefixIcon: Icon(Icons.edit_outlined),
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (val) {
+                          if (selectedHustles.contains('Other') && (val == null || val.trim().isEmpty)) {
+                            return 'Please specify your hustle';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
 
                   // Country
                   _buildDropdownField(
@@ -258,6 +280,16 @@ class _SignupScreenState extends State<SignupScreen> {
       return;
     }
 
+    // Build skills list with custom hustle if "Other" provided
+    final List<String> finalSkills = List<String>.from(selectedHustles);
+    if (finalSkills.contains('Other')) {
+      final String custom = otherHustleController.text.trim();
+      if (custom.isNotEmpty) {
+        finalSkills.remove('Other');
+        finalSkills.add(custom);
+      }
+    }
+
     final fullLocation = '${selectedCountry!}, ${selectedCounty!}, ${selectedWard!}';
     try {
       final resp = await ApiService().register(
@@ -266,7 +298,7 @@ class _SignupScreenState extends State<SignupScreen> {
         fullName: usernameController.text.trim(),
         phoneNumber: _fullPhoneE164!,
         location: fullLocation,
-        skills: selectedHustles,
+        skills: finalSkills,
       );
 
       if (!mounted) return;

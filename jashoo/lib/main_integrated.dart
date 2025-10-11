@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'providers/auth_provider.dart';
 import 'providers/user_provider.dart';
 import 'providers/wallet_provider.dart';
@@ -59,6 +60,7 @@ class IntegratedJashooApp extends StatelessWidget {
           textButtonTheme: TextButtonThemeData(
             style: TextButton.styleFrom(foregroundColor: const Color(0xFF10B981)),
           ),
+          textTheme: GoogleFonts.poppinsTextTheme(),
         ),
         home: AppInitializer(),
         debugShowCheckedModeBanner: false,
