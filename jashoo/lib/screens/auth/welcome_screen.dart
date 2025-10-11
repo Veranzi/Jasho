@@ -167,7 +167,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       SizedBox(height: 8.h),
                       // Subtitle
                       Text(
-                        'Easier Income Tracking',
+                        'Empower your hustle with smart financial tool',
                         style: TextStyle(
                           color: Colors.black.withOpacity(0.65),
                           fontSize: 14.sp,
@@ -191,7 +191,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             Navigator.of(context).pushReplacementNamed('/login');
                           },
                           child: Text(
-                            'Log in as 254745***00',
+                            'Login',
                             style: TextStyle(
                               fontSize: 16.sp,
                               fontWeight: FontWeight.w700,
@@ -220,7 +220,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                             Navigator.of(context).pushReplacementNamed('/login');
                           },
                           child: Text(
-                            'Switch Account',
+                            'Sign Up',
                             style: TextStyle(
                               fontSize: 16.sp,
                               fontWeight: FontWeight.w700,
