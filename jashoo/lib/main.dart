@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'l10n/app_localizations.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -62,6 +63,7 @@ class JashoApp extends StatelessWidget {
               colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF10B981)),
               useMaterial3: true,
               visualDensity: VisualDensity.adaptivePlatformDensity,
+              textTheme: GoogleFonts.poppinsTextTheme(),
             ),
             locale: Locale(localeProvider.languageCode),
             supportedLocales: const [
