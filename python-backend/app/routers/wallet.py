@@ -1,5 +1,6 @@
 from __future__ import annotations
 from datetime import datetime
+from idlelib.query import Query
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
@@ -8,346 +9,267 @@ from ..utils.security import mask_balance
 from ..services.repos import WalletsRepo, TransactionsRepo
 from passlib.context import CryptContext
 
-router = APIRouter()
+from typing import Any, Dict, List
+from datetime import timedelta
 
+from auth import get_current_user
 
-class BalanceResponse(BaseModel):
-    kesBalance: float
-    usdtBalance: float
-    usdBalance: float
-    maskedKesBalance: Optional[str] = None
-    maskedUsdtBalance: Optional[str] = None
-    maskedUsdBalance: Optional[str] = None
-    hasPin: bool = False
-    isPinLocked: bool = False
-    isFrozen: bool = False
-    status: str = "active"
-    dailyLimits: dict | None = None
-    dailyUsage: dict | None = None
-    statistics: dict | None = None
+# ---------- Pydantic models for analytics ----------
 
+class CategoryCount(BaseModel):
+    category: str
+    count: int
 
-class Transaction(BaseModel):
-    id: str
-    type: str
+class CurrencyAverage(BaseModel):
+    currencyCode: str
+    averageAmount: float
+
+class SimpleTransaction(BaseModel):
+    id: Optional[str] = None
+    type: Optional[str] = None
     amount: float
     currencyCode: str
-    date: datetime
-    status: str
-    description: str
+    date: str
+    status: Optional[str] = None
+    description: Optional[str] = None
     category: Optional[str] = None
     method: Optional[str] = None
     hustle: Optional[str] = None
-    netAmount: Optional[float] = None
-    fees: Optional[dict] = None
-    exchangeRate: Optional[dict] = None
-    transferInfo: Optional[dict] = None
-    blockchain: Optional[dict] = None
-    security: Optional[dict] = None
 
+class AnalyticsResponse(BaseModel):
+    success: bool
+    balances: Dict[str, float]
+    totalsByCurrency: Dict[str, Dict[str, float]]  # { "KES": { "inflow": 0, "outflow": 0, "net": 0 }, ... }
+    averagesByCurrency: List[CurrencyAverage]
+    categoryCounts: List[CategoryCount]
+    successRate: float
+    totalTransactions: int
+    lastActivity: Optional[str]
+    recent: List[SimpleTransaction]
 
-# In-memory demo store (replace with Firestore)
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# ---------- Helpers ----------
 
+IN_TYPES = {"deposit", "transfer_in", "convert_in", "airtime_cashback", "refund"}
+OUT_TYPES = {"withdraw", "transfer_out", "convert_out", "payment", "bill"}
 
-def _get_wallet(user_id: str) -> dict:
-    data = WalletsRepo.get_or_create(user_id)
-    return data
+def _parse_date(dt: Any) -> Optional[datetime]:
+    if not dt:
+        return None
+    if isinstance(dt, datetime):
+        return dt
+    if isinstance(dt, str):
+        # Try common ISO formats
+        try:
+            return datetime.fromisoformat(dt.replace("Z", "+00:00"))
+        except Exception:
+            pass
+    # Firestore-like timestamp dict support
+    if isinstance(dt, dict):
+        # Try { "_seconds": 123, "_nanoseconds": 0 } or { "seconds": 123 }
+        seconds = dt.get("_seconds") or dt.get("seconds")
+        if seconds is not None:
+            try:
+                return datetime.utcfromtimestamp(int(seconds))
+            except Exception:
+                return None
+    return None
 
+def _tx_direction(tx_type: Optional[str]) -> Optional[str]:
+    if not tx_type:
+        return None
+    t = str(tx_type).lower()
+    if t in IN_TYPES:
+        return "in"
+    if t in OUT_TYPES:
+        return "out"
+    # Heuristic fallback
+    if "deposit" in t or "in" in t:
+        return "in"
+    if "withdraw" in t or "out" in t or "payment" in t:
+        return "out"
+    return None
 
-@router.get("/balance")
-async def get_balance(user=Depends(get_current_user)):
-    wdoc = _get_wallet(user["userId"]) or {}
-    balances = wdoc.get("balances", {"KES": 0.0, "USDT": 0.0, "USD": 0.0})
-    resp = BalanceResponse(
-        kesBalance=float(balances.get("KES", 0.0)),
-        usdtBalance=float(balances.get("USDT", 0.0)),
-        usdBalance=float(balances.get("USD", 0.0)),
-        maskedKesBalance=mask_balance(float(balances.get("KES", 0.0)), user["userId"]),
-        maskedUsdtBalance=mask_balance(float(balances.get("USDT", 0.0)), user["userId"]),
-        maskedUsdBalance=mask_balance(float(balances.get("USD", 0.0)), user["userId"]),
-        hasPin=bool(wdoc.get("hasPin", False)),
-        isPinLocked=bool(wdoc.get("isPinLocked", False)),
-        isFrozen=bool(wdoc.get("isFrozen", False)),
-        status=str(wdoc.get("status", "active")),
-        dailyLimits=wdoc.get("dailyLimits"),
-        dailyUsage=wdoc.get("dailyUsage"),
-        statistics=wdoc.get("statistics"),
+def _coerce_float(val: Any, default: float = 0.0) -> float:
+    try:
+        return float(val)
+    except Exception:
+        return default
+
+def _build_simple_tx(raw: Dict[str, Any]) -> SimpleTransaction:
+    date = _parse_date(raw.get("date"))
+    return SimpleTransaction(
+        id=raw.get("id"),
+        type=raw.get("type"),
+        amount=_coerce_float(raw.get("amount", 0)),
+        currencyCode=str(raw.get("currencyCode") or "KES"),
+        date=(date or datetime.utcnow()).isoformat(),
+        status=raw.get("status"),
+        description=raw.get("description"),
+        category=raw.get("category"),
+        method=raw.get("method"),
+        hustle=raw.get("hustle"),
     )
-    return {"success": True, "data": {"balance": resp.model_dump()}}
 
+async def _maybe_await(val):
+    # Utility to support either sync or async helpers
+    if hasattr(val, "__await__"):
+        return await val
+    return val
 
-class PinRequest(BaseModel):
-    pin: str
+async def _get_user_wallet(user_id: str) -> Dict[str, Any]:
+    # Reuse existing internal wallet fetcher if available
+    wallet = await _maybe_await(_get_wallet(user_id))  # type: ignore[name-defined]
+    if not wallet:
+        raise HTTPException(status_code=404, detail={"success": False, "message": "Wallet not found"})
+    return wallet
 
+def _extract_balances(wallet: Dict[str, Any]) -> Dict[str, float]:
+    # Try multiple shapes safely
+    balances = {}
+    candidates = [
+        wallet.get("balances"),
+        wallet.get("balance"),
+        wallet.get("accounts"),
+    ]
+    for c in candidates:
+        if isinstance(c, dict):
+            for k, v in c.items():
+                try:
+                    balances[str(k).upper()] = float(v if not isinstance(v, dict) else v.get("available", 0))
+                except Exception:
+                    continue
+    # If none discovered, fallback to known keys if present
+    for k in ("KES", "USD", "USDT"):
+        if k not in balances and k in wallet:
+            try:
+                balances[k] = float(wallet[k])
+            except Exception:
+                pass
+    return balances
 
-@router.post("/pin")
-async def set_pin(req: PinRequest, user=Depends(get_current_user)):
-    # Store hashed PIN in Firestore
-    pin_hash = pwd_context.hash(req.pin)
-    WalletsRepo.set_pin(user["userId"], pin_hash)
-    return {"success": True, "message": "Transaction PIN set successfully", "data": {"hasPin": True}}
+def _filter_and_normalize_transactions(
+    transactions: List[Dict[str, Any]],
+    start_at: Optional[datetime],
+    end_at: Optional[datetime],
+    limit: int,
+) -> List[SimpleTransaction]:
+    # Normalize, sort desc by date, filter by date window, apply limit
+    normalized: List[SimpleTransaction] = []
+    for raw in transactions:
+        stx = _build_simple_tx(raw)
+        dt = _parse_date(stx.date)
+        if start_at and dt and dt < start_at:
+            continue
+        if end_at and dt and dt > end_at:
+            continue
+        normalized.append(stx)
 
+    normalized.sort(key=lambda t: t.date, reverse=True)
+    return normalized[:limit]
 
-@router.post("/verify-pin")
-async def verify_pin(req: PinRequest, user=Depends(get_current_user)):
-    stored = WalletsRepo.get_pin_hash(user["userId"]) or ""
-    if not stored or not pwd_context.verify(req.pin, stored):
-        raise HTTPException(status_code=400, detail={"success": False, "message": "Invalid PIN", "code": "INVALID_PIN"})
-    return {"success": True, "message": "PIN verified successfully", "data": {"verified": True}}
+def _analyze_transactions(txs: List[SimpleTransaction]) -> Dict[str, Any]:
+    totals_by_currency: Dict[str, Dict[str, float]] = {}
+    sums_for_avg: Dict[str, List[float]] = {}
+    category_counts: Dict[str, int] = {}
+    success_count = 0
+    total_count = len(txs)
+    last_activity: Optional[str] = None
 
+    for tx in txs:
+        cur = tx.currencyCode or "KES"
+        dirn = _tx_direction(tx.type)
+        amt = _coerce_float(tx.amount, 0.0)
 
-class DepositRequest(BaseModel):
-    amount: float
-    currencyCode: str = Field(default="KES")
-    description: str = Field(default="Deposit")
-    method: Optional[str] = None
-    hustle: Optional[str] = None
-    category: str = Field(default="Deposit")
-    network: Optional[str] = None
+        # Initialize currency bucket
+        bucket = totals_by_currency.setdefault(cur, {"inflow": 0.0, "outflow": 0.0, "net": 0.0})
 
+        if dirn == "in":
+            bucket["inflow"] += amt
+            bucket["net"] += amt
+        elif dirn == "out":
+            bucket["outflow"] += amt
+            bucket["net"] -= amt
 
-@router.post("/deposit")
-async def deposit(req: DepositRequest, user=Depends(get_current_user)):
-    # Update Firestore balance
-    wdoc = WalletsRepo.update_balance(user["userId"], req.currencyCode, req.amount)
-    txn = Transaction(
-        id=f"TXN_{int(datetime.utcnow().timestamp())}",
-        type="deposit",
-        amount=req.amount,
-        currencyCode=req.currencyCode,
-        date=datetime.utcnow(),
-        status="completed",
-        description=req.description,
-        category=req.category,
-        method=req.method,
-        hustle=req.hustle,
-        blockchain=None,
-    )
-    TransactionsRepo.create({
-        "transactionId": txn.id,
-        "userId": user["userId"],
-        "type": txn.type,
-        "amount": txn.amount,
-        "currencyCode": txn.currencyCode,
-        "description": txn.description,
-        "category": txn.category,
-        "method": txn.method,
-        "status": txn.status,
-        "initiatedAt": txn.date,
-        "completedAt": txn.date,
-    })
+        # For averages, include absolute amounts to avoid sign issues
+        sums_for_avg.setdefault(cur, []).append(abs(amt))
+
+        # Category counts
+        cat = (tx.category or "uncategorized").lower()
+        category_counts[cat] = category_counts.get(cat, 0) + 1
+
+        # Success rate
+        st = (tx.status or "").lower()
+        if st in ("success", "completed", "complete", "ok"):
+            success_count += 1
+
+        # Last activity
+        if not last_activity or tx.date > last_activity:
+            last_activity = tx.date
+
+    averages = [
+        CurrencyAverage(currencyCode=cur, averageAmount=(sum(vals) / max(len(vals), 1)))
+        for cur, vals in sums_for_avg.items()
+    ]
+    categories = [CategoryCount(category=k, count=v) for k, v in sorted(category_counts.items(), key=lambda x: (-x[1], x[0]))]
+
+    success_rate = (success_count / total_count) if total_count > 0 else 0.0
+
     return {
-        "success": True,
-        "message": "Deposit successful",
-        "data": {
-            "transaction": txn.model_dump(),
-            "newBalance": {
-                "kesBalance": float(wdoc.get("balances", {}).get("KES", 0.0)),
-                "usdtBalance": float(wdoc.get("balances", {}).get("USDT", 0.0)),
-                "usdBalance": float(wdoc.get("balances", {}).get("USD", 0.0)),
-            },
-        },
+        "totalsByCurrency": totals_by_currency,
+        "averagesByCurrency": averages,
+        "categoryCounts": categories,
+        "successRate": success_rate,
+        "totalTransactions": total_count,
+        "lastActivity": last_activity,
     }
 
+# ---------- Route: GET /analytics ----------
 
-class WithdrawRequest(BaseModel):
-    amount: float
-    pin: str
-    currencyCode: str = Field(default="KES")
-    category: str = Field(default="Expense")
-    method: Optional[str] = None
-    hustle: Optional[str] = None
-    network: Optional[str] = None
+@router.get("/analytics", response_model=AnalyticsResponse, summary="Get analytics for the current user's wallet")  # type: ignore[name-defined]
+async def get_user_analytics(
+    days: int = Query(30),
+    limit: int = Query(50),
+    current_user: Dict[str, str] = Depends(get_current_user),
+):
+    user_id = current_user.get("userId")
+    if not user_id:
+        raise HTTPException(status_code=401, detail={"success": False, "message": "Unauthorized"})
 
+    # Time window
+    end_at = datetime.utcnow()
+    start_at = end_at - timedelta(days=days)
 
-@router.post("/withdraw")
-async def withdraw(req: WithdrawRequest, user=Depends(get_current_user)):
-    wdoc = _get_wallet(user["userId"])
-    if float(wdoc.get("balances", {}).get(req.currencyCode, 0.0)) < req.amount:
-        raise HTTPException(status_code=400, detail={"success": False, "message": "Insufficient balance", "code": "INSUFFICIENT_BALANCE"})
-    wdoc = WalletsRepo.update_balance(user["userId"], req.currencyCode, -req.amount)
-    txn = Transaction(
-        id=f"TXN_{int(datetime.utcnow().timestamp())}",
-        type="withdrawal",
-        amount=req.amount,
-        currencyCode=req.currencyCode,
-        date=datetime.utcnow(),
-        status="completed",
-        description="Withdraw",
-        category=req.category,
-        method=req.method,
-        hustle=req.hustle,
-        security={"pinVerified": True},
+    # Fetch wallet
+    wallet = await _get_user_wallet(user_id)
+    balances = _extract_balances(wallet)
+
+    # Collect transactions
+    raw_transactions: List[Dict[str, Any]] = []
+
+    # Preferred: read from wallet object if available
+    wallet_txs = wallet.get("transactions")
+    if isinstance(wallet_txs, list):
+        raw_transactions = wallet_txs
+
+    # If none were found, you can plug in your datastore read here
+    # Example (pseudo):
+    # raw_transactions = await transactions_repo.list_for_user(user_id, start_at, end_at, limit)
+    # Make sure each item has fields: amount, currencyCode, type, date, status, description, category
+
+    # Normalize, filter, and limit
+    recent = _filter_and_normalize_transactions(raw_transactions, start_at, end_at, limit)
+
+    # Analyze
+    analysis = _analyze_transactions(recent)
+
+    return AnalyticsResponse(
+        success=True,
+        balances=balances,
+        totalsByCurrency=analysis["totalsByCurrency"],
+        averagesByCurrency=analysis["averagesByCurrency"],
+        categoryCounts=analysis["categoryCounts"],
+        successRate=analysis["successRate"],
+        totalTransactions=analysis["totalTransactions"],
+        lastActivity=analysis["lastActivity"],
+        recent=recent,
     )
-    TransactionsRepo.create({
-        "transactionId": txn.id,
-        "userId": user["userId"],
-        "type": txn.type,
-        "amount": txn.amount,
-        "currencyCode": txn.currencyCode,
-        "description": txn.description,
-        "category": txn.category,
-        "method": txn.method,
-        "status": txn.status,
-        "initiatedAt": txn.date,
-        "completedAt": txn.date,
-    })
-    return {
-        "success": True,
-        "message": "Withdrawal successful",
-        "data": {
-            "transaction": txn.model_dump(),
-            "newBalance": {
-                "kesBalance": float(wdoc.get("balances", {}).get("KES", 0.0)),
-                "usdtBalance": float(wdoc.get("balances", {}).get("USDT", 0.0)),
-                "usdBalance": float(wdoc.get("balances", {}).get("USD", 0.0)),
-            },
-        },
-    }
-
-
-class ConvertRequest(BaseModel):
-    amount: float
-    pin: str
-    rate: float
-    fromCurrency: str = Field(default="KES")
-    toCurrency: str = Field(default="USDT")
-    network: Optional[str] = None
-
-
-@router.post("/convert")
-async def convert(req: ConvertRequest, user=Depends(get_current_user)):
-    wdoc = _get_wallet(user["userId"])
-    if float(wdoc.get("balances", {}).get(req.fromCurrency, 0.0)) < req.amount:
-        raise HTTPException(status_code=400, detail={"success": False, "message": "Insufficient balance", "code": "INSUFFICIENT_BALANCE"})
-    converted_amount = req.amount / req.rate
-    WalletsRepo.update_balance(user["userId"], req.fromCurrency, -req.amount)
-    wdoc = WalletsRepo.update_balance(user["userId"], req.toCurrency, converted_amount)
-    txn = Transaction(
-        id=f"TXN_{int(datetime.utcnow().timestamp())}",
-        type="convert",
-        amount=req.amount,
-        currencyCode=req.fromCurrency,
-        date=datetime.utcnow(),
-        status="completed",
-        description=f"Convert {req.fromCurrency} to {req.toCurrency}",
-        category="Convert",
-        exchangeRate={
-            "fromCurrency": req.fromCurrency,
-            "toCurrency": req.toCurrency,
-            "rate": req.rate,
-            "convertedAmount": converted_amount,
-        },
-        security={"pinVerified": True},
-    )
-    TransactionsRepo.create({
-        "transactionId": txn.id,
-        "userId": user["userId"],
-        "type": txn.type,
-        "amount": txn.amount,
-        "currencyCode": txn.currencyCode,
-        "description": txn.description,
-        "category": txn.category,
-        "status": txn.status,
-        "initiatedAt": txn.date,
-        "completedAt": txn.date,
-        "exchangeRate": txn.exchangeRate,
-    })
-    return {
-        "success": True,
-        "message": "Currency conversion successful",
-        "data": {
-            "transaction": txn.model_dump(),
-            "convertedAmount": converted_amount,
-            "newBalance": {
-                "kesBalance": float(wdoc.get("balances", {}).get("KES", 0.0)),
-                "usdtBalance": float(wdoc.get("balances", {}).get("USDT", 0.0)),
-                "usdBalance": float(wdoc.get("balances", {}).get("USD", 0.0)),
-            },
-        },
-    }
-
-
-class TransferRequest(BaseModel):
-    recipientUserId: str
-    amount: float
-    pin: str
-    currencyCode: str = Field(default="KES")
-    description: Optional[str] = None
-    network: Optional[str] = None
-
-
-@router.post("/transfer")
-async def transfer(req: TransferRequest, user=Depends(get_current_user)):
-    sender_doc = _get_wallet(user["userId"])
-    if float(sender_doc.get("balances", {}).get(req.currencyCode, 0.0)) < req.amount:
-        raise HTTPException(status_code=400, detail={"success": False, "message": "Insufficient balance", "code": "INSUFFICIENT_BALANCE"})
-    WalletsRepo.update_balance(user["userId"], req.currencyCode, -req.amount)
-    recipient_doc = WalletsRepo.update_balance(req.recipientUserId, req.currencyCode, req.amount)
-    txn = Transaction(
-        id=f"TXN_{int(datetime.utcnow().timestamp())}",
-        type="transfer",
-        amount=req.amount,
-        currencyCode=req.currencyCode,
-        date=datetime.utcnow(),
-        status="completed",
-        description=req.description or f"Transfer to {req.recipientUserId}",
-        category="Transfer",
-        method="wallet",
-        transferInfo={"recipientUserId": req.recipientUserId},
-        security={"pinVerified": True},
-    )
-    TransactionsRepo.create({
-        "transactionId": txn.id,
-        "userId": user["userId"],
-        "type": txn.type,
-        "amount": txn.amount,
-        "currencyCode": txn.currencyCode,
-        "description": txn.description,
-        "category": txn.category,
-        "status": txn.status,
-        "initiatedAt": txn.date,
-        "completedAt": txn.date,
-        "transferInfo": txn.transferInfo,
-    })
-    return {
-        "success": True,
-        "message": "Transfer successful",
-        "data": {
-            "transaction": txn.model_dump(),
-            "recipient": {"userId": req.recipientUserId, "fullName": req.recipientUserId},
-            "newBalance": {
-                "kesBalance": float(WalletsRepo.get_or_create(user["userId"]).get("balances", {}).get("KES", 0.0)),
-                "usdtBalance": float(WalletsRepo.get_or_create(user["userId"]).get("balances", {}).get("USDT", 0.0)),
-                "usdBalance": float(WalletsRepo.get_or_create(user["userId"]).get("balances", {}).get("USD", 0.0)),
-            },
-        },
-    }
-
-
-@router.get("/transactions")
-async def list_transactions(page: int = 1, limit: int = 20, user=Depends(get_current_user)):
-    items, total = TransactionsRepo.list_by_user(user["userId"], page, limit, {})
-    # map to WalletTransaction
-    mapped = []
-    for t in items:
-        mapped.append({
-            "id": t.get("transactionId"),
-            "type": t.get("type"),
-            "amount": t.get("amount"),
-            "currencyCode": t.get("currencyCode"),
-            "date": (t.get("initiatedAt") or datetime.utcnow()).isoformat(),
-            "status": t.get("status", "completed"),
-            "description": t.get("description", ""),
-            "category": t.get("category"),
-            "method": t.get("method"),
-            "hustle": t.get("metadata", {}).get("hustle") if t.get("metadata") else None,
-            "netAmount": t.get("netAmount"),
-            "fees": t.get("fees"),
-            "exchangeRate": t.get("exchangeRate"),
-            "transferInfo": t.get("transferInfo"),
-            "blockchain": t.get("blockchain"),
-            "security": t.get("security"),
-        })
-    return {"success": True, "data": {"transactions": mapped, "pagination": {"page": page, "limit": limit, "total": total}}}

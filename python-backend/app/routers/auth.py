@@ -214,3 +214,7 @@ def firebase_phone(_: FirebasePhoneRequest):
     user = {"userId": "user_phone", "email": None, "fullName": _.fullName or "New User"}
     token = issue_token(user["userId"]) 
     return {"success": True, "message": "Authenticated via Firebase phone", "data": {"token": token, "user": user}}
+
+
+def get_current_user():
+    return None
