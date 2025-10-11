@@ -11,304 +11,231 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-  late final PageController _pageController;
-  late final Timer _autoScrollTimer;
-  int _currentPage = 0;
-
-  final List<_WorkerShowcase> _workers = const <_WorkerShowcase>[
-    _WorkerShowcase(
-      icon: Icons.delivery_dining,
-      label: 'Rider',
-      headline: 'power your hustle with smart financial tools',
-      backgroundColor: Color(0xFF10B981),
-      accentColor: Color(0xFF064E3B),
-    ),
-    _WorkerShowcase(
-      icon: Icons.handyman,
-      label: 'Handyman',
-      headline: 'fraud functionality',
-      backgroundColor: Color(0xFF0EA5E9),
-      accentColor: Color(0xFF075985),
-    ),
-    _WorkerShowcase(
-      icon: Icons.cleaning_services,
-      label: 'Cleaner',
-      headline: 'ai forecasting, smart saving',
-      backgroundColor: Color(0xFFF59E0B),
-      accentColor: Color(0xFF92400E),
-    ),
-    _WorkerShowcase(
-      icon: Icons.local_taxi,
-      label: 'Driver',
-      headline: 'Fast, secure payouts when you need them',
-      backgroundColor: Color(0xFF8B5CF6),
-      accentColor: Color(0xFF4C1D95),
-    ),
+  final List<String> _backgroundImages = const <String>[
+    'assets/login.png',
+    'assets/signup.png',
+    'assets/sign_illustration.jpg',
+    'assets/login_illustration.png',
   ];
 
+  late final Timer _backgroundTimer;
+  int _currentBackgroundIndex = 0;
+
+  static const Color _primaryGreen = Color(0xFF0B9E6D);
+
   @override
   void initState() {
     super.initState();
-    _pageController = PageController(viewportFraction: 0.82, initialPage: 0);
-    _autoScrollTimer = Timer.periodic(const Duration(seconds: 3), (Timer timer) {
+    _backgroundTimer = Timer.periodic(const Duration(seconds: 4), (_) {
       if (!mounted) return;
-      final int next = (_currentPage + 1) % _workers.length;
-      _pageController.animateToPage(
-        next,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeInOut,
-      );
+      setState(() {
+        _currentBackgroundIndex =
+            (_currentBackgroundIndex + 1) % _backgroundImages.length;
+      });
     });
   }
 
   @override
   void dispose() {
-    _autoScrollTimer.cancel();
-    _pageController.dispose();
+    _backgroundTimer.cancel();
     super.dispose();
-  }
-
-  void _onPageChanged(int index) {
-    setState(() {
-      _currentPage = index;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final Size screenSize = MediaQuery.of(context).size;
+    final double sheetHeight = screenSize.height * 0.38;
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Welcome to Jasho',
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF10B981),
-                  ),
-                ),
-              ),
-              SizedBox(height: 8.h),
-              Text(
-                'Find opportunities, work smarter, and get paid.',
-                style: theme.textTheme.bodyMedium?.copyWith(color: Colors.black54),
-              ),
-              SizedBox(height: 28.h),
-
-              // Animated workers carousel
-              SizedBox(
-                height: 320.h,
-                child: PageView.builder(
-                  controller: _pageController,
-                  onPageChanged: _onPageChanged,
-                  itemCount: _workers.length,
-                  itemBuilder: (context, index) {
-                    final item = _workers[index];
-                    final bool isActive = index == _currentPage;
-                    return AnimatedContainer(
-                      duration: const Duration(milliseconds: 350),
-                      margin: EdgeInsets.symmetric(horizontal: isActive ? 8.w : 14.w, vertical: isActive ? 0 : 12.h),
-                      decoration: BoxDecoration(
-                        color: item.backgroundColor.withOpacity(0.08),
-                        borderRadius: BorderRadius.circular(24.r),
-                        border: Border.all(color: item.backgroundColor.withOpacity(0.35), width: 1.5),
-                      ),
-                      child: _WorkerCard(item: item, isActive: isActive),
-                    );
-                  },
-                ),
-              ),
-              SizedBox(height: 14.h),
-
-              // Dots indicator + label
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(_workers.length, (i) {
-                  final bool active = i == _currentPage;
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 250),
-                    width: active ? 22.w : 8.w,
-                    height: 8.h,
-                    margin: EdgeInsets.symmetric(horizontal: 4.w),
-                    decoration: BoxDecoration(
-                      color: active ? const Color(0xFF10B981) : Colors.black12,
-                      borderRadius: BorderRadius.circular(8.r),
-                    ),
-                  );
-                }),
-              ),
-              SizedBox(height: 10.h),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 6.w),
-                child: Text(
-                  _workers[_currentPage].headline,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: Colors.black87,
-                  ),
-                ),
-              ),
-              const Spacer(),
-
-              // CTA buttons
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16.r),
-                  border: Border.all(color: Colors.black12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.03),
-                      blurRadius: 12,
-                      offset: const Offset(0, 6),
-                    ),
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          // 1) Animated background with smooth fade
+          Positioned.fill(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 900),
+              switchInCurve: Curves.easeIn,
+              switchOutCurve: Curves.easeOut,
+              layoutBuilder: (currentChild, previousChildren) {
+                return Stack(
+                  fit: StackFit.expand,
+                  children: <Widget>[
+                    ...previousChildren,
+                    if (currentChild != null) currentChild,
                   ],
-                ),
-                padding: EdgeInsets.all(12.w),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF10B981),
-                          side: const BorderSide(color: Color(0xFF10B981), width: 1.5),
-                          padding: EdgeInsets.symmetric(vertical: 14.h),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
-                        ),
-                        onPressed: () => Navigator.of(context).pushReplacementNamed('/login'),
-                        child: const Text('Login'),
-                      ),
-                    ),
-                    SizedBox(width: 12.w),
-                    Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF10B981),
-                          foregroundColor: Colors.white,
-                          padding: EdgeInsets.symmetric(vertical: 14.h),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14.r)),
-                        ),
-                        onPressed: () => Navigator.of(context).pushReplacementNamed('/signup'),
-                        child: const Text('Sign Up'),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _WorkerCard extends StatefulWidget {
-  final _WorkerShowcase item;
-  final bool isActive;
-  const _WorkerCard({required this.item, required this.isActive});
-
-  @override
-  State<_WorkerCard> createState() => _WorkerCardState();
-}
-
-class _WorkerCardState extends State<_WorkerCard> with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
-  late final Animation<double> _floatAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1600),
-    )..repeat(reverse: true);
-    _floatAnimation = Tween<double>(begin: 0, end: 10.h).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final size = 180.w;
-    return Center(
-      child: AnimatedScale(
-        scale: widget.isActive ? 1.0 : 0.95,
-        duration: const Duration(milliseconds: 250),
-        curve: Curves.easeOut,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AnimatedBuilder(
-              animation: _floatAnimation,
-              builder: (context, child) {
-                return Transform.translate(
-                  offset: Offset(0, widget.isActive ? -_floatAnimation.value : 0),
-                  child: child,
                 );
               },
-              child: Container(
-                width: size,
-                height: size,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    colors: [
-                      widget.item.backgroundColor.withOpacity(0.85),
-                      widget.item.accentColor.withOpacity(0.85),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: widget.item.backgroundColor.withOpacity(0.28),
-                      blurRadius: 24,
-                      spreadRadius: 2,
-                      offset: const Offset(0, 10),
-                    )
+              child: Image.asset(
+                _backgroundImages[_currentBackgroundIndex],
+                key: ValueKey<int>(_currentBackgroundIndex),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+
+          // Top gradient overlay for readability
+          Positioned.fill(
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color.fromARGB(140, 0, 0, 0),
+                    Color.fromARGB(40, 0, 0, 0),
+                    Colors.transparent,
                   ],
-                ),
-                child: Icon(
-                  widget.item.icon,
-                  size: 98.sp,
-                  color: Colors.white,
+                  stops: [0.0, 0.2, 0.5],
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+
+          // 2) Progress dots centered near bottom of background section
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: sheetHeight + 18.h,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(_backgroundImages.length, (int index) {
+                final bool isActive = index == _currentBackgroundIndex;
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 250),
+                  margin: EdgeInsets.symmetric(horizontal: 4.w),
+                  width: isActive ? 12.w : 6.w,
+                  height: 6.w,
+                  decoration: BoxDecoration(
+                    color: isActive
+                        ? _primaryGreen
+                        : Colors.white.withOpacity(0.55),
+                    borderRadius: BorderRadius.circular(4.r),
+                  ),
+                );
+              }),
+            ),
+          ),
+
+          // 3) Bottom white sheet with content
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: SafeArea(
+              top: false,
+              child: Container(
+                height: sheetHeight,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(24.r),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 20,
+                      offset: const Offset(0, -6),
+                    )
+                  ],
+                ),
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(20.w, 12.h, 20.w, 24.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Back arrow
+                      IconButton(
+                        icon: const Icon(Icons.arrow_back),
+                        color: Colors.black,
+                        splashRadius: 24.r,
+                        onPressed: () {
+                          if (Navigator.of(context).canPop()) {
+                            Navigator.of(context).pop();
+                          }
+                        },
+                      ),
+                      SizedBox(height: 6.h),
+                      // Title
+                      Text(
+                        'Welcome Back',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 26.sp,
+                        ),
+                      ),
+                      SizedBox(height: 8.h),
+                      // Subtitle
+                      Text(
+                        'Easier Income Tracking',
+                        style: TextStyle(
+                          color: Colors.black.withOpacity(0.65),
+                          fontSize: 14.sp,
+                          height: 1.4,
+                        ),
+                      ),
+                      const Spacer(),
+                      // Primary button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: _primaryGreen,
+                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(vertical: 14.h),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pushReplacementNamed('/login');
+                          },
+                          child: Text(
+                            'Log in as 254745***00',
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 12.h),
+                      // Secondary button
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton(
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: Colors.black,
+                            side: const BorderSide(
+                              color: Color(0x26000000), // #00000026
+                              width: 1.0,
+                            ),
+                            padding: EdgeInsets.symmetric(vertical: 14.h),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.r),
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pushReplacementNamed('/login');
+                          },
+                          child: Text(
+                            'Switch Account',
+                            style: TextStyle(
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
-}
-
-class _WorkerShowcase {
-  final IconData icon;
-  final String label;
-  final String headline;
-  final Color backgroundColor;
-  final Color accentColor;
-  const _WorkerShowcase({
-    required this.icon,
-    required this.label,
-    required this.headline,
-    required this.backgroundColor,
-    required this.accentColor,
-  });
 }
