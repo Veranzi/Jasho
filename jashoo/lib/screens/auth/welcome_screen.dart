@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -11,12 +13,14 @@ class WelcomeScreen extends StatefulWidget {
 }
 
 class _WelcomeScreenState extends State<WelcomeScreen> {
-  final List<String> _backgroundImages = const <String>[
+  static const List<String> _fallbackImages = <String>[
     'assets/login.png',
     'assets/signup.png',
     'assets/sign_illustration.jpg',
     'assets/login_illustration.png',
   ];
+
+  late List<String> _backgroundImages = List<String>.from(_fallbackImages);
 
   // Captions corresponding to each background image
   final List<String> _captions = const <String>[
@@ -34,6 +38,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   void initState() {
     super.initState();
+    _tryLoadBrandImages();
     _backgroundTimer = Timer.periodic(const Duration(seconds: 4), (_) {
       if (!mounted) return;
       setState(() {
@@ -41,6 +46,28 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             (_currentBackgroundIndex + 1) % _backgroundImages.length;
       });
     });
+  }
+
+  Future<void> _tryLoadBrandImages() async {
+    try {
+      final String manifestJson = await rootBundle.loadString('AssetManifest.json');
+      final Map<String, dynamic> manifestMap = json.decode(manifestJson) as Map<String, dynamic>;
+      final List<String> candidates = manifestMap.keys
+          .where((String path) => path.startsWith('assets/') &&
+              (path.toLowerCase().contains('mama') ||
+               path.toLowerCase().contains('baba') ||
+               path.toLowerCase().contains('fua')))
+          .toList()
+        ..sort();
+      if (candidates.isNotEmpty && mounted) {
+        setState(() {
+          _backgroundImages = candidates;
+          _currentBackgroundIndex = 0;
+        });
+      }
+    } catch (_) {
+      // Ignore and keep fallbacks
+    }
   }
 
   @override
